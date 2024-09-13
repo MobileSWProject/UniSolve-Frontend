@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function Tab2() {
+export default function Question() {
   return (
     <View>
-      <Text>Tab2</Text>
+      <Text>Question</Text>
     </View>
   );
 }

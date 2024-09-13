@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
 
-export default function Tab1() {
+export default function History() {
   return (
     <View>
-      <Text>Tab1</Text>
+      <Text>History</Text>
     </View>
   );
 }

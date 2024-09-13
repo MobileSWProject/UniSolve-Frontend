@@ -5,16 +5,16 @@ import { mainColor } from "../../../constants/Colors";
 export default function TabsLayout() {
   return (
     <Tabs
-      initialRouteName="tab1"
+      initialRouteName="home/index"
       screenOptions={{
         tabBarActiveTintColor: mainColor,
         tabBarInactiveTintColor: "gray",
       }}
     >
       <Tabs.Screen
-        name="tab1"
+        name="home/index"
         options={{
-          title: "홈",
+          title: "Home",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "home-variant" : "home-variant-outline"}
@@ -24,9 +24,9 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="tab2"
+        name="question/index"
         options={{
-          title: "질문하기",
+          title: "Question",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "comment-question" : "comment-question-outline"}
@@ -36,9 +36,9 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="tab3"
+        name="community/index"
         options={{
-          title: "커뮤니티",
+          title: "Community",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "chat-processing" : "chat-processing-outline"}
@@ -48,9 +48,9 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="tab4"
+        name="history/index"
         options={{
-          title: "히스토리",
+          title: "History",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={"history"}

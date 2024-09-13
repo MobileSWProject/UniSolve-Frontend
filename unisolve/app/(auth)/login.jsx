@@ -37,7 +37,7 @@ export default function Login() {
       if (String(otp) === String(tempNumber)) {
         setTempNumberChecking("인증에 성공하였습니다!\n자동으로 이동합니다.");
         setTimeout(() => {
-          router.push("/(app)/(tabs)/tab1");
+          router.push("/(app)/(tabs)/home");
         }, 3000);
       } else {
         setTempNumberChecking("인증에 실패하였습니다.");
@@ -65,7 +65,7 @@ export default function Login() {
             </TouchableOpacity>
             <TouchableOpacity
               style={{ ...styles.button, backgroundColor: "#e60054" }}
-              onPress={() => router.replace("/(app)/(tabs)/tab1")}
+              onPress={() => router.replace("/(app)/(tabs)/home")}
             >
               <Text style={styles.buttonText}>개발용 fake 로그인</Text>
             </TouchableOpacity>
