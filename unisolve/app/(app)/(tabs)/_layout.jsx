@@ -9,10 +9,11 @@ export default function TabsLayout() {
       screenOptions={{
         tabBarActiveTintColor: mainColor,
         tabBarInactiveTintColor: "gray",
+        headerShown: false,
       }}
     >
       <Tabs.Screen
-        name="home/index"
+        name="home"
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
@@ -24,7 +25,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="question/index"
+        name="question"
         options={{
           title: "Question",
           tabBarIcon: ({ color, focused }) => (
@@ -36,7 +37,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="community/index"
+        name="community"
         options={{
           title: "Community",
           tabBarIcon: ({ color, focused }) => (
@@ -48,7 +49,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="history/index"
+        name="history"
         options={{
           title: "History",
           tabBarIcon: ({ color, focused }) => (
