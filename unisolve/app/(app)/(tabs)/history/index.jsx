@@ -7,7 +7,7 @@ export default function History() {
   return (
     <View>
       <Text>History</Text>
-      <Link href={`${pathname}/subPage`}>test</Link>
+      <Link href={`${pathname}/subPage`}>Go To SubPage</Link>
     </View>
   );
 }

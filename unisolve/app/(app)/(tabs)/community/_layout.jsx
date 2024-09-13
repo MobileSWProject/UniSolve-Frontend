@@ -9,7 +9,7 @@ export default function CommunityLayout() {
       />
       <Stack.Screen
         name="subPage"
-        options={{ title: "서브 페이지" }}
+        options={{ title: "Community 서브 페이지" }}
       />
     </Stack>
   );

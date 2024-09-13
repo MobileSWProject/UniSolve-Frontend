@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <View>
       <Text>Home</Text>
-      <Link href={`${pathname}/subPage`}>test</Link>
+      <Link href={`${pathname}/subPage`}>Go To SubPage</Link>
     </View>
   );
 }

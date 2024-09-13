@@ -7,7 +7,7 @@ export default function Question() {
   return (
     <View>
       <Text>Question</Text>
-      <Link href={`${pathname}/subPage`}>test</Link>
+      <Link href={`${pathname}/subPage`}>Go To SubPage</Link>
     </View>
   );
 }
