@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/login');
-    }, 3000);
+      router.replace("/(auth)");
+    }, 1000);
     return () => clearTimeout(timer);
   }, [router]);
 
@@ -23,8 +23,8 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   text: {
     fontSize: 20,
