@@ -7,10 +7,6 @@ export default function HistoryLayout() {
         name="index"
         options={{ title: "History" }}
       />
-      <Stack.Screen
-        name="subPage"
-        options={{ title: "History 서브 페이지" }}
-      />
     </Stack>
   );
 }
