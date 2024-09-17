@@ -20,21 +20,40 @@ export default function Home() {
       <Text style={styles.welcomeText}>환영합니다</Text>
       <Text style={styles.timeText}>현재 시간: {currentTime}</Text>
       
-      {/* 로고 이미지 추가 */}
-      <Image
-        source={require('../../../../assets/logo.jpg')} // 이미지 경로 수정
-        style={styles.logo}
-      />
-      
-    
+
+      {/* 로고 페이지 */}
       <Link
-        href={`${pathname}/alarmpage`}
-        style={styles.link}
+        href={`${pathname}/logopage`}
+        style={styles.logopage}
       >
         <Image
-        source={require('../../../../assets/alarm.png')} // 이미지 경로 수정
-        style={styles.logo}
-      />
+          source={require('../../../../assets/logo.jpg')} 
+          style={styles.logo}
+        />
+      </Link>
+      
+      <Text >로고를 클릭하여 문제를 해결하세요!</Text>
+
+      {/* 프로필 페이지 */}
+      <Link
+        href={`${pathname}/profilepage`}
+        style={styles.profileLink}
+      >
+        <Image
+          source={require('../../../../assets/profile.png')} 
+          style={styles.extralogo}
+        />
+      </Link>
+
+      {/* 알림 페이지 */}
+      <Link
+        href={`${pathname}/notificationpage`}
+        style={styles.notificationLink}
+      >
+        <Image
+          source={require('../../../../assets/notification.png')} 
+          style={styles.extralogo}
+        />
       </Link>
     </View>
   );
@@ -47,29 +66,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
   },
-  welcomeText: {
+  welcomeText: { //환영합니다
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  timeText: {
+  timeText: { //실시간
     fontSize: 18,
     marginBottom: 20,
   },
-  logo: {
-    width: 100, // 원하는 너비로 수정
-    height: 100, // 원하는 높이로 수정
+  logo: { //로고 이미지
+    width: 250, 
+    height: 250,
     marginBottom: 20,
   },
-  homeText: {
-    fontSize: 18,
+  extralogo: { //프로필, 알림 이미지
+    width: 50, 
+    height: 50,
     marginBottom: 20,
   },
-  link: {
+  profileLink: { //프로필 링크 사진
+    position: 'absolute',
+    top: 10,
+    left: 10,
+  },
+  notificationLink: { // 알림 링크 사진
     position: 'absolute',
     top: 10,
     right: 10,
-    fontSize: 16,
-    color: 'blue',
   },
 });
