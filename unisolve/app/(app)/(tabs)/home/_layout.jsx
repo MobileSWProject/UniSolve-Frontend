@@ -18,7 +18,7 @@ export default function HomeLayout() {
       />
       <Stack.Screen
         name="notificationpage"
-        options={{ title: "알림 페이지" }}
+        options={{ title: "알림 페이지(알림 페이지 구현)" }}
       />
       <Stack.Screen
         name="subPage"
