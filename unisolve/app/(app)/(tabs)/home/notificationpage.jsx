@@ -6,7 +6,7 @@ export default function HomeSubPage() {
 
   return (
     <View>
-      <Text>notification Page</Text>
+      <Text>notification Pageddd</Text>
       <TouchableOpacity onPress={() => router.back()}>
         <Text>Back</Text>
       </TouchableOpacity>
