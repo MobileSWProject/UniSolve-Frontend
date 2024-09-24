@@ -37,7 +37,7 @@ export default function Question() {
       // 카메라 취소되지 않았을 때, 이미지를 setImage로 설정하고 다음 페이지로 이동시킵니다.
       if (!result.canceled) {
         setImage(result.assets[0].uri);
-        router.push(`${pathname}/subPage`);
+        router.push(`${pathname}/upload`);
       }
     },
     // 사진 첨부하기
@@ -61,13 +61,13 @@ export default function Question() {
       // 사진 선택 취소되지 않았을 때, 이미지를 setImage로 설정하고 다음 페이지로 이동시킵니다.
       if (!result.canceled) {
         setImage(result.assets[0].uri);
-        router.push(`${pathname}/subPage`);
+        router.push(`${pathname}/upload`);
       }
     },
     // 바로 질문하기
     askQuestionImmediately: () => {
       setImage(null);
-      router.push(`${pathname}/subPage`);
+      router.push(`${pathname}/upload`);
     },
   };
 

@@ -15,11 +15,11 @@ export default function QuestionLayout() {
       <Stack initialRouteName="index">
         <Stack.Screen
           name="index"
-          options={{ title: "Question" }}
+          options={{ title: "질문하기" }}
         />
         <Stack.Screen
-          name="subPage"
-          options={{ title: "Question 서브 페이지" }}
+          name="upload"
+          options={{ title: "질문하기", headerBackTitle: "뒤로가기" }}
         />
       </Stack>
     </ImageContext.Provider>
