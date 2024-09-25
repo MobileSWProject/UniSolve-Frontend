@@ -47,6 +47,8 @@ export default function QuestionSubPage() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log("제출완료");
     setSubmitLoading(false);
+    router.back();
+    router.push("/community/123");
     // 등록된 게시글로 router replace
   };
 

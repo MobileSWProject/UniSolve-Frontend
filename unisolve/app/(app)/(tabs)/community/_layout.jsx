@@ -7,6 +7,12 @@ export default function CommunityLayout() {
         name="index"
         options={{ title: "Community" }}
       />
+      <Stack.Screen
+        name="[id]"
+        options={({ route }) => ({
+          title: `질문 #${route.params.id}`,
+        })}
+      />
     </Stack>
   );
 }
