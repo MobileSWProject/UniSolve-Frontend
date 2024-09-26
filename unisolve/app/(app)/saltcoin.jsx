@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   meText: {
-    fontSize: '3em',
+    fontSize: 72, // fontSize: 'em은 부모 요소의 값, 24이므로 3em인 72가 됨',
     fontWeight: 'bold',
     marginLeft: 10,
   },
