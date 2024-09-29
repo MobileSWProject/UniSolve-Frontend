@@ -47,9 +47,11 @@ export default function QuestionSubPage() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log("제출완료");
     setSubmitLoading(false);
-    router.back();
+
+    // router.replace 사용하여 question으로 먼저 이동
+    router.replace("/question");
+    // 그 후 생성된 게시글로 이동
     router.push("/community/123");
-    // 등록된 게시글로 router replace
   };
 
   return (
