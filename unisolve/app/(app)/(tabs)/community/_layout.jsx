@@ -17,6 +17,7 @@ export default function CommunityLayout() {
         name="chat/[id]"
         options={({ route }) => ({
           title: `채팅 (질문 #${route.params.id})`,
+          animation: "slide_from_bottom",
         })}
       />
     </Stack>
