@@ -13,6 +13,7 @@ from mysql.connector import Error
 
 # Flask 애플리케이션 초기화
 app = Flask(__name__)
+CORS(app)
 
 # MySQL 데이터베이스 설정
 db_config = {
@@ -22,15 +23,22 @@ db_config = {
     'database': 'unisolve'
 }
 
-# 데이터베이스 연결 함수
-def get_db_connection():
+try:
+    # 데이터베이스 연결
     connection = mysql.connector.connect(
-        host=db_config['host'],
-        user=db_config['user'],
-        password=db_config['password'],
-        database=db_config['database']
+        host='localhost',
+        user='root',
+        password='1234',
+        database='unisolve'
     )
-    return connection
+
+    if connection.is_connected():
+        print("Successfully connected to the database")
+
+except mysql.connector.Error as err:
+    print(f"Error: {err}")
+
+mysql = MySQL(app)
 
 # 기본 라우트 (테스트 용도)
 @app.route('/')
@@ -40,19 +48,18 @@ def home():
 # 데이터 조회 (SELECT)
 @app.route('/users', methods=['GET'])
 def get_users():
-    conn = get_db_connection()
+    conn = connection
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM users")  # `users` 테이블을 조회
     result = cursor.fetchall()
     cursor.close()
-    conn.close()
     return jsonify(result)
 
 # 질문 데이터 조회 (전체 또는 특정 사용자)
 @app.route('/questions', methods=['GET'])
 def get_questions():
     user = request.args.get('user')
-    conn = get_db_connection()
+    conn = connection
     cursor = conn.cursor(dictionary=True)
 
     # 특정 사용자의 질문 조회 (쿼리 파라미터로 전달된 경우)
@@ -63,7 +70,6 @@ def get_questions():
 
     result = cursor.fetchall()
     cursor.close()
-    conn.close()
     return jsonify(result)
 
 # 질문 데이터 삽입
@@ -77,7 +83,7 @@ def add_question():
     created_time = datetime.now()
     answer_count = 0
 
-    conn = get_db_connection()
+    conn = connection
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO problem (is_public, created_by, title, description, created_at, answer_count) "
@@ -86,7 +92,6 @@ def add_question():
     )
     conn.commit()
     cursor.close()
-    conn.close()
 
     return jsonify({'message': 'Question added successfully!'}), 201
 
@@ -98,7 +103,7 @@ def update_question(id):
     title = update_data.get('title')
     content = update_data.get('content')
 
-    conn = get_db_connection()
+    conn = connection
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE questions SET is_public = %s, title = %s, description = %s WHERE problem_id = %s",
@@ -106,19 +111,17 @@ def update_question(id):
     )
     conn.commit()
     cursor.close()
-    conn.close()
 
     return jsonify({'message': 'Question updated successfully!'})
 
 # 특정 질문 삭제
 @app.route('/questions/<int:id>', methods=['DELETE'])
 def delete_question(id):
-    conn = get_db_connection()
+    conn = connection
     cursor = conn.cursor()
     cursor.execute("DELETE FROM problem WHERE problem_id = %s", (id,))
     conn.commit()
     cursor.close()
-    conn.close()
 
     return jsonify({'message': 'Question deleted successfully!'})
 
@@ -128,7 +131,7 @@ def add_history():
     # 요청으로부터 데이터 수신
     histories = request.json  # `histories`는 배열 형태의 데이터가 들어온다고 가정
 
-    conn = get_db_connection()
+    conn = connection
     cursor = conn.cursor()
     
     # 각 데이터를 `problem_history` 테이블에 삽입
@@ -150,7 +153,6 @@ def add_history():
 
     conn.commit()
     cursor.close()
-    conn.close()
 
     return jsonify({'message': 'Histories added successfully!'}), 201
 
