@@ -1,6 +1,8 @@
 import { FlatList } from "react-native";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import List from "../../../../components/tabs/List/List"
+import _axios from '../../../../api';
 
 export default function History() {
   // 백엔드에서 Array[Object] 형태로 response(Value에서 Type은 상관 없음)
@@ -10,6 +12,16 @@ export default function History() {
     { id: 1325, private: true, user:'홍길동', title: '곡선의 기울기 관련', description: '곡선의 기울기란', timestamp: '22시간 전', reply: 2 }, //1:1 and 지정됨
     { id: 1324, private: false, user:'', title: 'React Native 질문', description: 'React Native에서', timestamp: '2024.8.31 20:18', reply: 0 }, //공개(커뮤니티에 보임)
   ]);
+  useFocusEffect(
+    useCallback(() => {
+      _axios.get('/history').then(response => {
+        setHistorys(response.data || []);
+      })
+      .catch(error => {
+        setHistorys([]);
+      })
+    }, [])
+  );
   return (
     <FlatList
       data={historys}
