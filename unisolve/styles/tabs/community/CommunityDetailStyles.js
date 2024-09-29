@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import { mainColor } from "../../../constants/Colors";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -41,6 +42,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
   },
+  chatButtonContainer: {
+    height: 50,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+  },
+  chatButtonTouchArea: {
+    backgroundColor: mainColor,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
+  },
+  chatButtonText: { color: "white", fontWeight: "900", fontSize: 22 },
   replyContainer: {
     padding: 15,
     backgroundColor: "#f8f8f8",

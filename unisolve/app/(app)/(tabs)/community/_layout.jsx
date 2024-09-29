@@ -13,6 +13,12 @@ export default function CommunityLayout() {
           title: `질문 #${route.params.id}`,
         })}
       />
+      <Stack.Screen
+        name="chat/[id]"
+        options={({ route }) => ({
+          title: `채팅 (질문 #${route.params.id})`,
+        })}
+      />
     </Stack>
   );
 }
