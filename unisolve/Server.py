@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect
 from flask_mysqldb import MySQL
 from flask_cors import CORS
 import bcrypt
@@ -9,6 +9,7 @@ import datetime
 import pytz
 import requests
 import mysql.connector
+import pymysql
 from mysql.connector import Error
 
 # Flask 애플리케이션 초기화
@@ -40,10 +41,69 @@ except mysql.connector.Error as err:
 
 mysql = MySQL(app)
 
-# 기본 라우트 (테스트 용도)
-@app.route('/')
-def home():
-    return "Welcome to the Flask MySQL server!"
+# 로그인 처리 엔드포인트
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        # 클라이언트에서 전달받은 JSON 데이터
+        data = request.json
+        user_id = data.get('user_id')          # 사용자 ID
+        password = data.get('password')        # 비밀번호
+
+        # 입력값 유효성 검사
+        if not user_id or not password:
+            return jsonify({"status": "error", "message": "User ID and password are required!"})
+
+        # 데이터베이스 커서 생성
+        cursor = db_config.cursor(pymysql.cursors.DictCursor)
+
+        # 사용자가 입력한 ID로 DB에서 비밀번호 조회
+        sql = "SELECT user_pw FROM users WHERE user_id = %s"
+        cursor.execute(sql, (user_id,))
+        result = cursor.fetchone()
+
+        # 해당 ID가 존재하지 않는 경우
+        if not result:
+            return jsonify({"status": "error", "message": "User ID not found!"})
+
+        # 데이터베이스에서 가져온 해시된 비밀번호와 입력된 비밀번호 비교
+        hashed_pw = result['user_pw']
+        if bcrypt.checkpw(password.encode('utf-8'), hashed_pw.encode('utf-8')):
+            return jsonify({"status": "success", "message": "Login successful!"})
+        else:
+            return jsonify({"status": "error", "message": "Incorrect password!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+# 회원가입 처리 엔드포인트 (선택 사항)
+@app.route('/register', methods=['POST'])
+def register():
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        user_nickname = data.get('user_nickname', None)
+
+        if not user_id or not username or not email or not password:
+            return jsonify({"status": "error", "message": "All fields are required!"})
+
+        # 비밀번호 해싱
+        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        # 데이터베이스 커서 생성
+        cursor = db_config.cursor()
+        sql = """
+        INSERT INTO users (user_id, username, email, user_pw, user_nickname, role)
+        VALUES (%s, %s, %s, %s, %s, 'student')
+        """
+        cursor.execute(sql, (user_id, username, email, hashed_pw.decode('utf-8'), user_nickname))
+        db_config.commit()
+
+        return jsonify({"status": "success", "message": "User registered successfully!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 # 데이터 조회 (SELECT)
 @app.route('/users', methods=['GET'])
@@ -155,6 +215,136 @@ def add_history():
     cursor.close()
 
     return jsonify({'message': 'Histories added successfully!'}), 201
+
+# 게시글 목록을 가져오는 API 엔드포인트
+@app.route('/community', methods=['GET'])
+def get_community():
+    try:
+        cursor = db_config.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT * FROM post")
+        rows = cursor.fetchall()
+
+        # 데이터 형식 맞추기
+        response = []
+        for row in rows:
+            response.append({
+                "id": row["post_id"],
+                "questioner": row["author_id"],
+                "title": row["title"],
+                "description": row["content"],
+                "timestamp": row["created_at"].strftime('%Y.%m.%d %H:%M'),
+                "reply": 0  # 현재 답글은 기본값 0으로 설정
+            })
+
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+    
+# 게시글 작성 API 엔드포인트
+@app.route('/add_post', methods=['POST'])
+def add_post():
+    try:
+        data = request.json
+        title = data.get('title')
+        content = data.get('content')
+        is_private = data.get('isPrivate')
+        image = data.get('image')
+        author_id = "닉네임"  # 예시로 작성자를 고정값으로 설정. 실제 작성자 ID를 받아올 수 있도록 수정 가능
+
+        # 데이터베이스 커서 생성
+        cursor = db_config.cursor()
+
+        # 게시글 삽입 쿼리
+        sql = """
+        INSERT INTO post (title, content, is_private, image, author_id)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (title, content, is_private, image, author_id))
+        db_config.commit()
+
+        return jsonify({"status": "success", "message": "Post added successfully!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+# 알림 추가 API 엔드포인트
+@app.route('/add_notification', methods=['POST'])
+def add_notification():
+    try:
+        # 클라이언트에서 전달받은 JSON 데이터
+        data = request.json
+        user_id = data.get('user_id')  # 사용자 ID
+        title = data.get('title')      # 알림 제목
+        is_private = data.get('isPrivate', False)  # 공개 여부 (기본값: False)
+        description = data.get('description')      # 알림 설명
+        is_read = data.get('isRead', False)        # 읽음 여부 (기본값: False)
+
+        # 데이터베이스 커서 생성
+        cursor = db_config.cursor()
+
+        # 알림 삽입 쿼리
+        sql = """
+        INSERT INTO notification (user_id, title, is_private, description, is_read)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (user_id, title, is_private, description, is_read))
+        db_config.commit()
+
+        return jsonify({"status": "success", "message": "Notification added successfully!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+# 게시글 리스트 가져오기 엔드포인트 (type='community')
+@app.route('/community', methods=['GET'])
+def get_community():
+    try:
+        cursor = db_config.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT post_id AS id, title, content AS description, author_id AS questioner, created_at AS timestamp, reply_count AS reply FROM post")
+        rows = cursor.fetchall()
+        for row in rows:
+            row['timestamp'] = row['timestamp'].strftime('%Y.%m.%d %H:%M')  # 날짜 형식 변환
+        return jsonify(rows)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+# 알림 리스트 가져오기 엔드포인트 (type='notification')
+@app.route('/notification', methods=['GET'])
+def get_notifications():
+    try:
+        cursor = db_config.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT notification_id AS id, user_id, title, description, created_at AS timestamp, is_read AS check, is_private, TIMESTAMPDIFF(MINUTE, created_at, NOW()) AS timebefore FROM notification")
+        rows = cursor.fetchall()
+        for row in rows:
+            row['timebefore'] = f"{row['timebefore']}분 전"  # 시간차이를 표시
+            row['timestamp'] = row['timestamp'].strftime('%Y.%m.%d %H:%M')
+            row['type'] = 1 if row['is_private'] else 0  # type 변환
+        return jsonify(rows)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+# 특정 게시글 보기 엔드포인트
+@app.route('/post/<int:post_id>', methods=['GET'])
+def get_post(post_id):
+    try:
+        cursor = db_config.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("SELECT post_id AS id, title, content AS description, author_id, created_at AS timestamp, reply_count FROM post WHERE post_id = %s", (post_id,))
+        row = cursor.fetchone()
+        if row:
+            row['timestamp'] = row['timestamp'].strftime('%Y.%m.%d %H:%M')
+            return jsonify(row)
+        else:
+            return jsonify({"status": "error", "message": "Post not found"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+# 인증 및 리다이렉트 처리
+@app.route('/auth/<path:url>', methods=['GET'])
+def auth_redirect(url):
+    # 로그인 여부를 체크하는 로직 (예시로 고정값 사용)
+    is_authenticated = False  # 실제로는 세션, JWT 등을 이용하여 인증 체크
+    if is_authenticated:
+        return redirect(f"/{url}")
+    else:
+        return redirect("/login")  # 인증되지 않은 경우 로그인 페이지로 리다이렉트
 
 mysql = MySQL(app)
 
