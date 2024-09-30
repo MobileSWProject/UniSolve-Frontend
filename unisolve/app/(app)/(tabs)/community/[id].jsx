@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, Image, ScrollView } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../../../../styles/tabs/community/CommunityDetailStyles";
 
@@ -26,6 +26,10 @@ export default function CommunityDetail() {
   const { id } = useLocalSearchParams();
   const data = getData();
 
+  const pathname = usePathname();
+  const communityPath = pathname.replace(new RegExp(`/${id}.*`), "");
+  const router = useRouter();
+
   return (
     <ScrollView style={styles.container}>
       <Image
@@ -49,6 +53,15 @@ export default function CommunityDetail() {
           {data.user} • {data.timestamp}
         </Text>
         <Text style={styles.content}>{data.content}</Text>
+      </View>
+      <View style={styles.chatButtonContainer}>
+        <TouchableOpacity
+          onPress={() => router.push(`${communityPath}/chat/${id}`)}
+          style={styles.chatButtonTouchArea}
+          hitSlop={4}
+        >
+          <Text style={styles.chatButtonText}>비공개 채팅</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.replyContainer}>
         <Text style={styles.replyTitle}>댓글 {data.reply.length}개</Text>

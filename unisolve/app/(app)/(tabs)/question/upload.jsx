@@ -47,9 +47,14 @@ export default function QuestionSubPage() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log("제출완료");
     setSubmitLoading(false);
-    router.back();
-    router.push("/community/123");
-    // 등록된 게시글로 router replace
+
+    // question으로 먼저 이동 후
+    router.navigate("/question");
+    // community 메인으로 이동
+    router.push("/community");
+    // 바로 생성된 게시글로 이동
+    // 게시글로 이동 후 뒤로가기 버튼 없이 화면이 나타나는 환경이 있어서 setTimeout으로 임시 해결하였습니다.
+    setTimeout(() => router.push("/community/123"));
   };
 
   return (
