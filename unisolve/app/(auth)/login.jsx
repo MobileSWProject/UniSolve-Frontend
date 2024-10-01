@@ -5,6 +5,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import PhoneInput from "../../components/auth/PhoneInput";
 import OTPInput from "../../components/auth/OTPInput";
 import styles from "../../styles/auth/LoginStyles";
+import _axios from '../../api';
 
 export default function Login() {
   const [go, setGo] = useState(false);
@@ -30,20 +31,31 @@ export default function Login() {
     }, 3000);
   };
 
-  const checking = () => {
+  const checking = async () => {
+    try {
+      let data = JSON.stringify({
+        "user_id": "", // 비밀번호 입력
+        "password": "", // 비밀번호 입력
+      });
+      const response = await _axios.post('/login', data);
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+    } catch (error) {
+      throw error;
+    }
     if (process) return;
-    setProcess(true);
-    setTimeout(() => {
-      if (String(otp) === String(tempNumber)) {
-        setTempNumberChecking("인증에 성공하였습니다!\n자동으로 이동합니다.");
-        setTimeout(() => {
-          router.push("/(app)/(tabs)/home");
-        }, 3000);
-      } else {
-        setTempNumberChecking("인증에 실패하였습니다.");
-      }
-      setProcess(false);
-    }, 3000);
+    // setProcess(true);
+    // setTimeout(() => {
+    //   if (String(otp) === String(tempNumber)) {
+    //     setTempNumberChecking("인증에 성공하였습니다!\n자동으로 이동합니다.");
+    //     setTimeout(() => {
+    //       router.push("/(app)/(tabs)/home");
+    //     }, 3000);
+    //   } else {
+    //     setTempNumberChecking("인증에 실패하였습니다.");
+    //   }
+    //   setProcess(false);
+    // }, 3000);
   };
 
   return (
