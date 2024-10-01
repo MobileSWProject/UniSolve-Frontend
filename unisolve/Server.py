@@ -3,7 +3,6 @@ from flask_mysqldb import MySQL
 from flask_cors import CORS
 import bcrypt
 import random
-import smtplib
 import jwt
 import datetime
 import pytz
@@ -15,6 +14,10 @@ from mysql.connector import Error
 # Flask 애플리케이션 초기화
 app = Flask(__name__)
 CORS(app)
+
+# 비밀 키 설정 (토큰을 발급할 때 사용했던 시크릿 키와 동일해야 함)
+SECRET_KEY = '2d12125031c6e17f8d630776d2177e14759f02b6c5d8e14ad703c489608d3996'
+
 
 # MySQL 데이터베이스 설정
 db_config = {
@@ -47,15 +50,18 @@ def login():
     try:
         # 클라이언트에서 전달받은 JSON 데이터
         data = request.json
+        print(data)
         user_id = data.get('user_id')          # 사용자 ID
         password = data.get('password')        # 비밀번호
+        
+        print(user_id, password)
 
         # 입력값 유효성 검사
         if not user_id or not password:
             return jsonify({"status": "error", "message": "User ID and password are required!"})
 
         # 데이터베이스 커서 생성
-        cursor = db_config.cursor(pymysql.cursors.DictCursor)
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
 
         # 사용자가 입력한 ID로 DB에서 비밀번호 조회
         sql = "SELECT user_pw FROM users WHERE user_id = %s"
@@ -66,10 +72,15 @@ def login():
         if not result:
             return jsonify({"status": "error", "message": "User ID not found!"})
 
+        print(result)
         # 데이터베이스에서 가져온 해시된 비밀번호와 입력된 비밀번호 비교
-        hashed_pw = result['user_pw']
+        hashed_pw = result[0]
         if bcrypt.checkpw(password.encode('utf-8'), hashed_pw.encode('utf-8')):
-            return jsonify({"status": "success", "message": "Login successful!"})
+            token = jwt.encode({
+                'user_id': user_id,
+                'exp': datetime.datetime.now(pytz.UTC) + datetime.timedelta(hours=24)
+            }, '2d12125031c6e17f8d630776d2177e14759f02b6c5d8e14ad703c489608d3996', algorithm='HS256')
+            return jsonify({"message": "Login successful", "token": token}), 200
         else:
             return jsonify({"status": "error", "message": "Incorrect password!"})
     except Exception as e:
@@ -190,7 +201,6 @@ def delete_question(id):
 def add_history():
     # 요청으로부터 데이터 수신
     histories = request.json  # `histories`는 배열 형태의 데이터가 들어온다고 가정
-
     conn = connection
     cursor = connection.cursor()
     
@@ -218,48 +228,71 @@ def add_history():
 
 # /history 경로에 GET 요청을 처리하여 데이터 저장
 @app.route('/history', methods=['GET'])
-def save_history():
+def get_history():
     conn = None
     cursor = None
-    print(request)
     try:
-        # 클라이언트로부터 데이터 받기 (JSON 형식)
-        histories = request.args
+        # Authorization 헤더에서 JWT 토큰 추출
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'error': 'Authorization token is missing!'}), 401
 
-        # 배열 형식이 아닌 경우 에러 반환
-        if not isinstance(histories, list):
-            return jsonify({'error': '데이터가 배열 형식이어야 합니다.'}), 400
+        # Bearer 토큰의 형식일 경우 "Bearer "를 제거
+        if token.startswith("Bearer "):
+            token = token.split(" ")[1]
+
+        # JWT 토큰 디코딩 (PyJWT 라이브러리 사용)
+        try:
+            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            user_id = decoded_token.get('user_id')  # 디코딩된 토큰에서 사용자 ID 추출
+            if not user_id:
+                return jsonify({'error': 'User ID not found in the token!'}), 400
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token has expired!'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token!'}), 401
+
+        print(f"Decoded user ID from token: {user_id}")  # 추출한 user_id 출력
 
         # 데이터베이스 연결 생성
         conn = connection
         if not conn:
             return jsonify({'error': '데이터베이스 연결에 실패했습니다.'}), 500
 
-        # 데이터베이스에 데이터 삽입을 위한 커서 생성
-        cursor = connection.cursor()
+        # 데이터베이스에 데이터 조회를 위한 커서 생성
+        cursor = conn.cursor()
 
-        # 각 항목을 순회하며 데이터베이스에 삽입
-        for history in histories:
-            query = """
-                INSERT INTO problem_history (history_id, problem_id, user_id, title, is_private, reply_count, description, solved_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """
-            values = (
-                history['id'],                # history_id
-                None,                         # problem_id (필요 시 수정)
-                history['user'],              # user_id
-                history['title'],             # title
-                history['private'],           # is_private
-                history['reply'],             # reply_count
-                history['description'],       # description
-                history['timestamp']          # solved_at
-            )
-            cursor.execute(query, values)
+        # SELECT 쿼리: 특정 사용자의 `problem_history` 조회
+        query = """
+            SELECT *
+            FROM problem_history
+            WHERE user_id = %s
+        """
+        cursor.execute(query, (user_id,))
+        result = cursor.fetchall()
+        
+        if not result:
+            return jsonify([])  # 빈 리스트 반환
+        
+        # 데이터 형식 맞추기
+        response = []
+        for row in result:
+            print(row[4])
+            response.append({
+                "id": row[1],
+                "user": row[2],
+                "timestamp": row[3],
+                "private": True if row[4] != 'null' and row[4] == 0 else False,
+                "reply": row[5],
+                "description": row[6],
+                "title" : row[7]
+            })
+            
+            
+        if not result:
+            return jsonify({"message": "No history found for the given user."}), 404
 
-        # 변경 사항 커밋
-        conn.commit()
-
-        return jsonify({'message': '데이터가 성공적으로 저장되었습니다.'}), 200
+        return jsonify({'message': 'Data retrieved successfully', 'data': response}), 200
 
     except Error as e:
         return jsonify({'error': str(e)}), 500
