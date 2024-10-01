@@ -15,7 +15,7 @@ export default function History() {
   useFocusEffect(
     useCallback(() => {
       _axios.get('/history').then(response => {
-        setHistorys(response.data || []);
+        setHistorys(response.data.data || []);
       })
       .catch(error => {
         setHistorys([]);

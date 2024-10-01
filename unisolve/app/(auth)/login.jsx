@@ -39,6 +39,7 @@ export default function Login() {
       });
       const response = await _axios.post('/login', data);
       const token = response.data.token;
+      console.log(token)
       localStorage.setItem('token', token);
     } catch (error) {
       throw error;
