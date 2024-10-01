@@ -6,6 +6,7 @@ import PhoneInput from "../../components/auth/PhoneInput";
 import OTPInput from "../../components/auth/OTPInput";
 import styles from "../../styles/auth/LoginStyles";
 import _axios from '../../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login() {
   const [go, setGo] = useState(false);
@@ -47,7 +48,7 @@ export default function Login() {
           setProcess(false);
           return;
         }
-        localStorage.setItem('token', token);
+        AsyncStorage.setItem('token', token);
         setTempNumberChecking("인증에 성공하였습니다!\n자동으로 이동합니다.");
         setTimeout(() => {
           setProcess(false);
