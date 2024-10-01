@@ -144,7 +144,7 @@ def add_question():
     answer_count = 0
 
     conn = connection
-    cursor = conn.cursor()
+    cursor = connection.cursor()
     cursor.execute(
         "INSERT INTO problem (is_public, created_by, title, description, created_at, answer_count) "
         "VALUES (%s, %s, %s, %s, %s, %s)",
@@ -164,7 +164,7 @@ def update_question(id):
     content = update_data.get('content')
 
     conn = connection
-    cursor = conn.cursor()
+    cursor = connection.cursor()
     cursor.execute(
         "UPDATE questions SET is_public = %s, title = %s, description = %s WHERE problem_id = %s",
         (is_public, title, content, id)
@@ -178,7 +178,7 @@ def update_question(id):
 @app.route('/questions/<int:id>', methods=['DELETE'])
 def delete_question(id):
     conn = connection
-    cursor = conn.cursor()
+    cursor = connection.cursor()
     cursor.execute("DELETE FROM problem WHERE problem_id = %s", (id,))
     conn.commit()
     cursor.close()
@@ -192,7 +192,7 @@ def add_history():
     histories = request.json  # `histories`는 배열 형태의 데이터가 들어온다고 가정
 
     conn = connection
-    cursor = conn.cursor()
+    cursor = connection.cursor()
     
     # 각 데이터를 `problem_history` 테이블에 삽입
     for history in histories:
@@ -216,23 +216,81 @@ def add_history():
 
     return jsonify({'message': 'Histories added successfully!'}), 201
 
+# /history 경로에 GET 요청을 처리하여 데이터 저장
+@app.route('/history', methods=['GET'])
+def save_history():
+    conn = None
+    cursor = None
+    print(request)
+    try:
+        # 클라이언트로부터 데이터 받기 (JSON 형식)
+        histories = request.args
+
+        # 배열 형식이 아닌 경우 에러 반환
+        if not isinstance(histories, list):
+            return jsonify({'error': '데이터가 배열 형식이어야 합니다.'}), 400
+
+        # 데이터베이스 연결 생성
+        conn = connection
+        if not conn:
+            return jsonify({'error': '데이터베이스 연결에 실패했습니다.'}), 500
+
+        # 데이터베이스에 데이터 삽입을 위한 커서 생성
+        cursor = connection.cursor()
+
+        # 각 항목을 순회하며 데이터베이스에 삽입
+        for history in histories:
+            query = """
+                INSERT INTO problem_history (history_id, problem_id, user_id, title, is_private, reply_count, description, solved_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            values = (
+                history['id'],                # history_id
+                None,                         # problem_id (필요 시 수정)
+                history['user'],              # user_id
+                history['title'],             # title
+                history['private'],           # is_private
+                history['reply'],             # reply_count
+                history['description'],       # description
+                history['timestamp']          # solved_at
+            )
+            cursor.execute(query, values)
+
+        # 변경 사항 커밋
+        conn.commit()
+
+        return jsonify({'message': '데이터가 성공적으로 저장되었습니다.'}), 200
+
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        # 커서와 연결이 있는지 확인 후 안전하게 닫기
+        if cursor is not None:
+            cursor.close()
+
 # 게시글 목록을 가져오는 API 엔드포인트
 @app.route('/community', methods=['GET'])
 def get_community():
     try:
-        cursor = db_config.cursor(pymysql.cursors.DictCursor)
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM post")
         rows = cursor.fetchall()
-
+        # print(rows)
+        # [(2, 'React Native 질문', 'React Native에서', 'admin', datetime.datetime(2024, 8, 31, 20, 18), datetime.datetime(2024, 10, 1, 19, 59, 22), None, 0, 0)]
+        # 데이터가 없는 경우 빈 리스트 반환
+        if not rows:
+            return jsonify([])  # 빈 리스트 반환
+        
         # 데이터 형식 맞추기
         response = []
         for row in rows:
             response.append({
-                "id": row["post_id"],
-                "questioner": row["author_id"],
-                "title": row["title"],
-                "description": row["content"],
-                "timestamp": row["created_at"].strftime('%Y.%m.%d %H:%M'),
+                "id": row[0],
+                "questioner": row[3],
+                "title": row[1],
+                "description": row[2],
+                "timestamp": row[4].strftime('%Y.%m.%d %H:%M'),
                 "reply": 0  # 현재 답글은 기본값 0으로 설정
             })
 
@@ -252,7 +310,7 @@ def add_post():
         author_id = "닉네임"  # 예시로 작성자를 고정값으로 설정. 실제 작성자 ID를 받아올 수 있도록 수정 가능
 
         # 데이터베이스 커서 생성
-        cursor = db_config.cursor()
+        cursor = connection.cursor()
 
         # 게시글 삽입 쿼리
         sql = """
@@ -293,18 +351,6 @@ def add_notification():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-# 게시글 리스트 가져오기 엔드포인트 (type='community')
-@app.route('/community', methods=['GET'])
-def get_community():
-    try:
-        cursor = db_config.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT post_id AS id, title, content AS description, author_id AS questioner, created_at AS timestamp, reply_count AS reply FROM post")
-        rows = cursor.fetchall()
-        for row in rows:
-            row['timestamp'] = row['timestamp'].strftime('%Y.%m.%d %H:%M')  # 날짜 형식 변환
-        return jsonify(rows)
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
 
 # 알림 리스트 가져오기 엔드포인트 (type='notification')
 @app.route('/notification', methods=['GET'])
