@@ -48,7 +48,7 @@ export default function Login() {
           setProcess(false);
           return;
         }
-        AsyncStorage.setItem('token', token);
+        await AsyncStorage.setItem('token', token);
         setTempNumberChecking("인증에 성공하였습니다!\n자동으로 이동합니다.");
         setTimeout(() => {
           setProcess(false);
