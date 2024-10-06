@@ -4,12 +4,12 @@ import { mainColor } from '../../constants/Colors';
 
 export default function Register() {
 
+  const router = useRouter();
 
-  const router = useRouter()
   return (
-  <View style={styles.container}>
-    {/* 회원가입 제목 */}
-    <Text style={styles.title}>회원가입</Text>
+    <View style={styles.container}>
+      {/* 회원가입 제목 */}
+      <Text style={styles.title}>회원가입</Text>
 
       {/* 아이디 입력 필드 */}
       <Text style={styles.label}>아이디</Text>
@@ -25,12 +25,26 @@ export default function Register() {
         placeholder="한글, 본명을 입력하세요"
       />
 
+      {/* 이메일 입력 필드 */}
+      <Text style={styles.label}>이메일</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="이메일 @형식으로 입력하세요"
+      />
+
       {/* 비밀번호 입력 필드 */}
       <Text style={styles.label}>비밀번호</Text>
       <TextInput
         style={styles.input}
         placeholder="사용할 비밀번호를 입력하세요."
         secureTextEntry={true}
+      />
+
+      {/* 닉네임 입력 필드 */}
+      <Text style={styles.label}>닉네임</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="앱 사용시 사용할 닉네임을 입력하세요"
       />
 
       {/* 하단 로그인 링크 */}
@@ -42,8 +56,11 @@ export default function Register() {
       </View>
 
       {/* 회원가입 버튼 */}
-      <TouchableOpacity style={[styles.button, { backgroundColor: mainColor }]} >
-        <Text style={styles.buttonText}>다음</Text>
+      <TouchableOpacity 
+        style={[styles.button, { backgroundColor: mainColor }]} 
+        onPress={() => router.push('/registerOk')}
+      >
+        <Text style={styles.buttonText}>회원가입</Text>
       </TouchableOpacity>
     </View>
   );

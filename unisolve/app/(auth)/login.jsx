@@ -82,7 +82,7 @@ export default function Login() {
             </TouchableOpacity>
             <TouchableOpacity
               style={{ ...styles.button, backgroundColor: "#e60054" }}
-              onPress={() => router.replace("/(app)/(tabs)/home")}
+              onPress={() => router.replace("/loginOk")}
             >
               <Text style={styles.buttonText}>개발용 fake 로그인</Text>
             </TouchableOpacity>

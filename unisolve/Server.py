@@ -418,12 +418,23 @@ def get_post(post_id):
 # 인증 및 리다이렉트 처리
 @app.route('/auth/<path:url>', methods=['GET'])
 def auth_redirect(url):
-    # 로그인 여부를 체크하는 로직 (예시로 고정값 사용)
-    is_authenticated = False  # 실제로는 세션, JWT 등을 이용하여 인증 체크
-    if is_authenticated:
-        return redirect(f"/{url}")
+    token = request.headers.get('Authorization')  # 헤더에서 Authorization 토큰 가져오기
+
+    if token:
+        try:
+            # Bearer token 형식이므로 "Bearer "를 제거한 후 디코딩
+            token = token.replace("Bearer ", "")
+            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+
+            # 토큰 검증이 성공하면 요청된 URL로 리다이렉트
+            return redirect(f"/{url}")
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token'}), 401
     else:
-        return redirect("/login")  # 인증되지 않은 경우 로그인 페이지로 리다이렉트
+        # 토큰이 없으면 로그인 페이지로 리다이렉트
+        return redirect("/login")
 
 mysql = MySQL(app)
 
