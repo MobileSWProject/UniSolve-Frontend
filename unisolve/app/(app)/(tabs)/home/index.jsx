@@ -23,7 +23,7 @@ export default function Home() {
 
       {/* 로고 페이지 */}
       <Link
-        href={`${pathname}/logopage`}
+        href={`${pathname}/../question`}
         style={styles.logopage}
       >
         <Image

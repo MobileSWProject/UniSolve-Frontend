@@ -11,11 +11,11 @@ export default function AuthLayout() {
         name="login"
         options={{ title: "Login" }}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="register"
         options={{ title: "Register" }}
       />
-        */}
+        
     </Stack>
   );
 }
