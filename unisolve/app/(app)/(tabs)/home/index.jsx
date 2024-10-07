@@ -47,11 +47,11 @@ export default function Home() {
 
       {/* 알림 페이지 */}
       <Link
-        href={`${pathname}/notificationpage`}
-        style={styles.notificationLink}
+        href={`${pathname}/alarmpage`}
+        style={styles.alarmLink}
       >
         <Image
-          source={require('../../../../assets/notification.png')} 
+          source={require('../../../../assets/alarm.png')} 
           style={styles.extralogo}
         />
       </Link>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     top: 10,
     left: 10,
   },
-  notificationLink: { // 알림 링크 사진
+  alarmLink: { // 알림 링크 사진
     position: 'absolute',
     top: 10,
     right: 10,

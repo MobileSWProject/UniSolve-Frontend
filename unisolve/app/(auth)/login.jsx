@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, TextInput, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Link, useRouter } from "expo-router";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import PhoneInput from "../../components/auth/PhoneInput";
@@ -17,6 +17,10 @@ export default function Login() {
   const [otp, setOtp] = useState("");
   const [tempNumber, setTempNumber] = useState("0");
   const [tempNumberChecking, setTempNumberChecking] = useState("");
+  
+  // 아이디와 비밀번호 상태
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
 
   const router = useRouter();
 
@@ -38,8 +42,8 @@ export default function Login() {
     setTimeout(async () => {
       try {
         let data = JSON.stringify({
-          "user_id": "", // 비밀번호 입력
-          "password": "", // 비밀번호 입력
+          "user_id": userId, // 아이디를 JSON에 추가
+          "password": password, // 비밀번호를 JSON에 추가
         });
         const response = await _axios.post('/login', data);
         const token = response.data.token;
@@ -55,7 +59,7 @@ export default function Login() {
           router.push("/(app)/(tabs)/home");
         }, 3000);
       } catch (error) {
-        console.log(error)
+        console.log(error);
         setTempNumberChecking("인증에 실패하였습니다.");
         setProcess(false);
         return;
@@ -67,11 +71,30 @@ export default function Login() {
     <View style={styles.container}>
       <View style={styles.main}>
         <Text style={styles.title}>Login</Text>
+        {/* 아이디 입력 필드 */}
+        <Text style={styles.label}>아이디</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="아이디를 입력하세요."
+          value={userId}
+          onChangeText={setUserId} // 상태 업데이트
+        />
+
+        <Text style={styles.label}>비밀번호</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="비밀번호를 입력하세요."
+          secureTextEntry={true} // 비밀번호 보호
+          value={password}
+          onChangeText={setPassword} // 상태 업데이트
+        />
+
         <FontAwesome5
           name="key"
           size={24}
           color="black"
         />
+
         {!go && (
           <>
             <TouchableOpacity
@@ -88,6 +111,7 @@ export default function Login() {
             </TouchableOpacity>
           </>
         )}
+
         {go && !goo && (
           <PhoneInput
             phone2={phone2}
@@ -96,6 +120,7 @@ export default function Login() {
             setPhone3={setPhone3}
           />
         )}
+
         {phone2.length + phone3.length >= 8 && !goo && (
           <TouchableOpacity
             style={styles.button}
@@ -110,6 +135,7 @@ export default function Login() {
             )}
           </TouchableOpacity>
         )}
+
         {goo && (
           <OTPInput
             otp={otp}
