@@ -17,7 +17,7 @@ export default function HomeLayout() {
         options={{ title: "개인정보 페이지" }}
       />
       <Stack.Screen
-        name="alarmpage"
+        name="notificationpage"
         options={{ title: "알림 페이지(알림 페이지 구현)" }}
       />
       <Stack.Screen
