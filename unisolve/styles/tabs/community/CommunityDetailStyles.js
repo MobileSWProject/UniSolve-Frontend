@@ -12,6 +12,9 @@ const styles = StyleSheet.create({
     width: windowWidth,
     height: windowWidth,
     resizeMode: "cover",
+    maxWidth: 400,
+    maxHeight: 400,
+    alignSelf: "center",
   },
   contentContainer: {
     padding: 15,
