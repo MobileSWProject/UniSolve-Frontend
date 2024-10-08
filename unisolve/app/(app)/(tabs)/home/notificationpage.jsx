@@ -1,8 +1,8 @@
 import { FlatList } from "react-native";
 import { useState, useCallback } from "react";
 import { useFocusEffect } from '@react-navigation/native';
-import List from "../../components/tabs/List/List"
-import _axios from '../../api';
+import List from "../../../../components/tabs/List/List"
+import _axios from '../../../../api';
 
 export default function Notification() {
   // 백엔드에서 Array[Object] 형태로 response(Value에서 Type은 상관 없음)

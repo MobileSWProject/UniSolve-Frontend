@@ -47,7 +47,7 @@ export default function Home() {
 
       {/* 알림 페이지 */}
       <Link
-        href={`${pathname}/alarmpage`}
+        href={`${pathname}/notificationmpage`}
         style={styles.alarmLink}
       >
         <Image
