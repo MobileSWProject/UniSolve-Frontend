@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { View, TextInput, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  TextInput,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import PhoneInput from "../../components/auth/PhoneInput";
 import OTPInput from "../../components/auth/OTPInput";
 import styles from "../../styles/auth/LoginStyles";
-import _axios from '../../api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import _axios from "../../api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const [go, setGo] = useState(false);
@@ -17,7 +23,7 @@ export default function Login() {
   const [otp, setOtp] = useState("");
   const [tempNumber, setTempNumber] = useState("0");
   const [tempNumberChecking, setTempNumberChecking] = useState("");
-  
+
   // 아이디와 비밀번호 상태
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -42,21 +48,21 @@ export default function Login() {
     setTimeout(async () => {
       try {
         let data = JSON.stringify({
-          "user_id": userId, // 아이디를 JSON에 추가
-          "password": password, // 비밀번호를 JSON에 추가
+          user_id: userId, // 아이디를 JSON에 추가
+          password: password, // 비밀번호를 JSON에 추가
         });
-        const response = await _axios.post('/login', data);
+        const response = await _axios.post("/login", data);
         const token = response.data.token;
         if (!token) {
           setTempNumberChecking("인증에 실패하였습니다.");
           setProcess(false);
           return;
         }
-        await AsyncStorage.setItem('token', token);
+        await AsyncStorage.setItem("token", token);
         setTempNumberChecking("인증에 성공하였습니다!\n자동으로 이동합니다.");
         setTimeout(() => {
           setProcess(false);
-          router.push("/(app)/(tabs)/home");
+          router.replace("/(app)/(tabs)/home");
         }, 3000);
       } catch (error) {
         console.log(error);
@@ -105,7 +111,7 @@ export default function Login() {
             </TouchableOpacity>
             <TouchableOpacity
               style={{ ...styles.button, backgroundColor: "#e60054" }}
-              onPress={() => router.replace("/loginOk")}
+              onPress={checking}
             >
               <Text style={styles.buttonText}>개발용 fake 로그인</Text>
             </TouchableOpacity>
