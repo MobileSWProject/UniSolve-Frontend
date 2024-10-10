@@ -8,12 +8,6 @@ export default function CommunityLayout() {
         options={{ title: "Community" }}
       />
       <Stack.Screen
-        name="[id]"
-        options={({ route }) => ({
-          title: `질문 #${route.params.id}`,
-        })}
-      />
-      <Stack.Screen
         name="chat/[id]"
         options={({ route }) => ({
           title: `채팅 (질문 #${route.params.id})`,
