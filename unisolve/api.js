@@ -22,4 +22,19 @@ _axios.interceptors.request.use(
   }
 );
 
+export const formFetch = async (url, data) => {
+  const token = await AsyncStorage.getItem("token");
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_SERVER_BASE_URL}${url}`,
+    {
+      method: "POST",
+      body: data,
+      headers: {
+        Authorization: token,
+      },
+    }
+  );
+  return await response.json();
+};
+
 export default _axios;
