@@ -9,15 +9,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   image: {
-    width: windowWidth,
-    height: windowWidth,
+    width: "100%",
+    aspectRatio: 1,
     resizeMode: "cover",
     maxWidth: 400,
     maxHeight: 400,
     alignSelf: "center",
+    borderRadius: 20,
+    marginBottom: 20,
   },
   contentContainer: {
-    padding: 15,
+    paddingHorizontal: 30,
+    paddingVertical: 20,
   },
   title: {
     fontSize: 20,

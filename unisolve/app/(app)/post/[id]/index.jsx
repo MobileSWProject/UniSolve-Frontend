@@ -30,7 +30,7 @@ const Post = () => {
               title: response.data.title,
               content: response.data.description,
               timestamp: response.data.timestamp,
-              image: null,
+              image: response.data.image,
               reply: [],
             });
           })
@@ -48,15 +48,13 @@ const Post = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {data.image ? (
-        <Image
-          source={{ uri: data.image }}
-          style={styles.image}
-        />
-      ) : (
-        <View style={{ height: 20 }} />
-      )}
       <View style={styles.contentContainer}>
+        {data.image && (
+          <Image
+            source={{ uri: data.image }}
+            style={styles.image}
+          />
+        )}
         <Text style={styles.title}>{data.title}</Text>
         <View style={styles.privateStatusContainer}>
           <Ionicons
