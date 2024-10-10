@@ -36,11 +36,13 @@ export default function QuestionSubPage() {
       isPrivate,
       image,
     };
+
     // 폼이 다 채워지지 않았을 때 처리
     if (data.title.trim() === "" || data.content.trim() === "") {
       console.log("폼이 다 채워지지 않음");
       return;
     }
+
     // 서버로 데이터 전송
     console.log("제출중...");
     setSubmitLoading(true);
@@ -52,19 +54,35 @@ export default function QuestionSubPage() {
       content,
       // image <-- 이미지는 임시 보류
     });
-    const response = await _axios.post("/questions", dataForServer);
-    console.log(response);
 
-    console.log("제출완료");
-    setSubmitLoading(false);
+    try {
+      const response = await _axios.post("/questions", dataForServer);
+      console.log(response);
 
-    // question으로 먼저 이동 후
-    router.navigate("/question");
-    // community 메인으로 이동
-    router.push("/community");
-    // 바로 생성된 게시글로 이동
-    // 게시글로 이동 후 뒤로가기 버튼 없이 화면이 나타나는 환경이 있어서 setTimeout으로 임시 해결하였습니다.
-    setTimeout(() => router.push("/community/123"));
+      console.log("제출완료");
+      setSubmitLoading(false);
+
+      // question으로 먼저 이동 후
+      router.navigate("/question");
+      // community 메인으로 이동
+      router.push("/community");
+      // 바로 생성된 게시글로 이동
+      setTimeout(() => router.push("/community/123"));
+    } catch (error) {
+      console.log("Error during submission:", error);
+
+      // 400 또는 401 상태 코드를 받을 때 홈 화면으로 리다이렉트
+      if (
+        error.response &&
+        (error.response.status === 400 || error.response.status === 401)
+      ) {
+        console.log("권한이 없거나 요청이 잘못됨, 홈으로 리다이렉트 중...");
+        router.replace("/"); // 홈 라우터로 이동 (로그인 페이지 등으로 리다이렉트)
+      }
+
+      // 기타 다른 에러 처리 로직
+      setSubmitLoading(false);
+    }
   };
 
   return (
