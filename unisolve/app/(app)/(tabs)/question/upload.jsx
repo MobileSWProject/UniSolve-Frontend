@@ -69,7 +69,7 @@ export default function QuestionSubPage() {
       // community 메인으로 이동
       router.push("/community");
       // 등록된 포스트로 이동
-      setTimeout(() => router.push(`/community/${postId}`));
+      setTimeout(() => router.push(`/post/${postId}`));
     } catch (error) {
       console.log("Error during submission:", error);
 
