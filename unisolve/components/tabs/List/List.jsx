@@ -37,11 +37,9 @@ export default function PostListItem({ item, index, count, type }) {
             />
           ) : null}
           {type === "community"
-            ? item.questioner
+            ? `#${item.id} | by ${item.questioner}`
             : type === "history"
-            ? `#${count - index} | ${item.private ? "비공개" : "공개"}${
-                item.user ? `(→${item.user})` : ""
-              }`
+            ? `#${item.id} | ${item.private ? "비공개" : "공개"}`
             : type === "notification"
             ? typeConvert[item.type]
             : null}
