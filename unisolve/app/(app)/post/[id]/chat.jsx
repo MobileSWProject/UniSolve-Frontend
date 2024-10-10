@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet } from "react-native";
-import ChatMessage from "../../../../../components/tabs/community/ChatMessage";
+import ChatMessage from "../../../../components/post/ChatMessage";
 
 // 임시 데이터
 // /send_message post 방식으로 라우팅 필요합니다.

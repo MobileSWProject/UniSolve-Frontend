@@ -1,41 +1,61 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
+import {
+  useFocusEffect,
+  useLocalSearchParams,
+  usePathname,
+  useRouter,
+} from "expo-router";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import styles from "../../../styles/post/PostStyles";
-
-// 게시글 불러오는 기능 라우팅 필요합니다.
-const getData = () => ({
-  id: 123,
-  private: true,
-  user: "천사1004",
-  title: "리액트 네이티브 오류 VirtualizedLists should never be nested...",
-  content: "외 않 되",
-  timestamp: "14분 전",
-  image: "https://i.ibb.co/WgmTx24/2024-09-25-2-02-47.png",
-  reply: [
-    { user: "사자52", timestamp: "3분 전", content: "구글링을 해보십쇼" },
-    {
-      user: "악어99",
-      timestamp: "8분 전",
-      content: "오류나는 코드를 알려주세요.",
-    },
-  ],
-});
+import styles from "../../../../styles/post/PostStyles";
+import { useCallback, useState } from "react";
+import _axios from "../../../../api";
 
 const Post = () => {
   const { id } = useLocalSearchParams();
-  const data = getData();
+  const [data, setData] = useState(null);
 
   const pathname = usePathname();
-  const communityPath = pathname.replace(new RegExp(`/${id}.*`), "");
   const router = useRouter();
+
+  useFocusEffect(
+    useCallback(() => {
+      const getData = async () => {
+        _axios
+          .get(`/post/${id}`)
+          .then((response) => {
+            setData({
+              id: response.data.id,
+              private: Boolean(response.data.is_private),
+              user: response.data.author_id,
+              title: response.data.title,
+              content: response.data.description,
+              timestamp: response.data.timestamp,
+              image: null,
+              reply: [],
+            });
+          })
+          .catch((error) => {
+            router.replace("community");
+          });
+      };
+      getData();
+    }, [id]) // id가 변경될 때만 effect 실행
+  );
+
+  if (!data) {
+    return <></>;
+  }
 
   return (
     <ScrollView style={styles.container}>
-      <Image
-        source={{ uri: data.image }}
-        style={styles.image}
-      />
+      {data.image ? (
+        <Image
+          source={{ uri: data.image }}
+          style={styles.image}
+        />
+      ) : (
+        <View style={{ height: 20 }} />
+      )}
       <View style={styles.contentContainer}>
         <Text style={styles.title}>{data.title}</Text>
         <View style={styles.privateStatusContainer}>
@@ -56,7 +76,7 @@ const Post = () => {
       </View>
       <View style={styles.chatButtonContainer}>
         <TouchableOpacity
-          onPress={() => router.push(`${communityPath}/chat/${id}`)}
+          onPress={() => router.push(`${pathname}/chat`)}
           style={styles.chatButtonTouchArea}
           hitSlop={4}
         >
