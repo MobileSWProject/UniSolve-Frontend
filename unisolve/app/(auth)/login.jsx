@@ -42,35 +42,33 @@ export default function Login() {
     }, 3000);
   };
 
-  const checking = () => {
+  const checking = async () => {
     if (process) return;
     setProcess(true);
-    setTimeout(async () => {
-      try {
-        let data = JSON.stringify({
-          user_id: userId, // 아이디를 JSON에 추가
-          password: password, // 비밀번호를 JSON에 추가
-        });
-        const response = await _axios.post("/login", data);
-        const token = response.data.token;
-        if (!token) {
-          setTempNumberChecking("인증에 실패하였습니다.");
-          setProcess(false);
-          return;
-        }
-        await AsyncStorage.setItem("token", token);
-        setTempNumberChecking("인증에 성공하였습니다!\n자동으로 이동합니다.");
-        setTimeout(() => {
-          setProcess(false);
-          router.replace("/(app)/(tabs)/home");
-        }, 3000);
-      } catch (error) {
-        console.log(error);
+    try {
+      let data = JSON.stringify({
+        user_id: userId, // 아이디를 JSON에 추가
+        password: password, // 비밀번호를 JSON에 추가
+      });
+      const response = await _axios.post("/login", data);
+      const token = response.data.token;
+      if (!token) {
         setTempNumberChecking("인증에 실패하였습니다.");
         setProcess(false);
         return;
       }
-    }, 3000);
+      await AsyncStorage.setItem("token", token);
+      setTempNumberChecking("인증에 성공하였습니다!\n자동으로 이동합니다.");
+      setTimeout(() => {
+        setProcess(false);
+        router.replace("/(app)/(tabs)/home");
+      }, 1500);
+    } catch (error) {
+      console.log(error);
+      setTempNumberChecking("인증에 실패하였습니다.");
+      setProcess(false);
+      return;
+    }
   };
 
   return (
