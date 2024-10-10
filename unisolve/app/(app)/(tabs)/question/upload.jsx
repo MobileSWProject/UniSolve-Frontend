@@ -57,7 +57,9 @@ export default function QuestionSubPage() {
 
     try {
       const response = await _axios.post("/questions", dataForServer);
-      console.log(response);
+
+      // 등록된 포스트 아이디를 가져옴
+      const postId = response.data.postId;
 
       console.log("제출완료");
       setSubmitLoading(false);
@@ -66,8 +68,8 @@ export default function QuestionSubPage() {
       router.navigate("/question");
       // community 메인으로 이동
       router.push("/community");
-      // 바로 생성된 게시글로 이동
-      setTimeout(() => router.push("/community/123"));
+      // 등록된 포스트로 이동
+      setTimeout(() => router.push(`/community/${postId}`));
     } catch (error) {
       console.log("Error during submission:", error);
 
