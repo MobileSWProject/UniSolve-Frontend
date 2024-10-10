@@ -21,18 +21,18 @@ SECRET_KEY = '2d12125031c6e17f8d630776d2177e14759f02b6c5d8e14ad703c489608d3996'
 
 # MySQL 데이터베이스 설정
 db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '1234',
+    'host': '119.203.117.3',
+    'user': 'unisolve',
+    'password': '1234**',
     'database': 'unisolve'
 }
 
 try:
     # 데이터베이스 연결
     connection = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='1234',
+        host='119.203.117.3',
+        user='unisolve',
+        password='1234**',
         database='unisolve'
     )
 
@@ -115,16 +115,6 @@ def register():
         return jsonify({"status": "success", "message": "User registered successfully!"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
-
-# 데이터 조회 (SELECT)
-@app.route('/users', methods=['GET'])
-def get_users():
-    conn = connection
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM users")  # `users` 테이블을 조회
-    result = cursor.fetchall()
-    cursor.close()
-    return jsonify(result)
 
 # 질문 데이터 조회 (전체 또는 특정 사용자)
 @app.route('/questions', methods=['GET'])
@@ -265,9 +255,9 @@ def get_history():
         # SELECT 쿼리: 특정 사용자의 `problem_history` 조회
         query = """
             SELECT *
-            FROM problem_history
+            FROM post
             WHERE user_id = %s
-        """
+        """     # 테이블 통합으로 인한 참조 테이블 변경
         cursor.execute(query, (user_id,))
         result = cursor.fetchall()
         
@@ -435,6 +425,109 @@ def auth_redirect(url):
     else:
         # 토큰이 없으면 로그인 페이지로 리다이렉트
         return redirect("/login")
+
+# 댓글 및 답글을 조회하는 API 엔드포인트
+@app.route('/comments/<author_id>', methods=['GET'])
+def get_comments_by_author(author_id):
+    # MySQL 연결
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    # 댓글 및 답글 조회 쿼리 (author_id 기준)
+    query = """
+    SELECT 
+        c1.comment_id AS CommentID,
+        c1.content AS CommentContent,
+        c1.created_at AS CommentCreated,
+        c2.comment_id AS ReplyID,
+        c2.content AS ReplyContent,
+        c2.created_at AS ReplyCreated
+    FROM comments c1
+    LEFT JOIN comments c2 ON c1.comment_id = c2.parent_id
+    WHERE c1.author_id = %s
+    ORDER BY c1.created_at, c2.created_at;
+    """
+    
+    # 쿼리 실행
+    cursor.execute(query, (author_id,))
+    rows = cursor.fetchall()
+
+    # 결과를 계층 구조로 재구성
+    comments = []
+    comment_map = {}
+
+    # 최상위 댓글 및 답글을 계층형 구조로 변환
+    for row in rows:
+        comment_id = row['CommentID']
+        if comment_id not in comment_map:
+            # 새로운 댓글 추가
+            comment = {
+                'CommentID': row['CommentID'],
+                'Content': row['CommentContent'],
+                'CreatedAt': row['CommentCreated'],
+                'Replies': []
+            }
+            comment_map[comment_id] = comment
+            comments.append(comment)
+
+        # 답글이 있는 경우 추가
+        if row['ReplyID']:
+            reply = {
+                'CommentID': row['ReplyID'],
+                'Content': row['ReplyContent'],
+                'CreatedAt': row['ReplyCreated']
+            }
+            comment_map[comment_id]['Replies'].append(reply)
+
+    # MySQL 연결 종료
+    cursor.close()
+
+    # 결과 반환
+    return jsonify(comments), 200
+
+# 새로운 메시지를 저장하는 API
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    data = request.get_json()
+    room_id = data.get('room_id')
+    sender_id = data.get('sender_id')
+    receiver_id = data.get('receiver_id')
+    message_content = data.get('message_content')
+
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+
+    # 메시지 삽입 쿼리
+    insert_query = """
+    INSERT INTO messages (room_id, sender_id, receiver_id, message_content)
+    VALUES (%s, %s, %s, %s)
+    """
+    cursor.execute(insert_query, (room_id, sender_id, receiver_id, message_content))
+    conn.commit()
+
+    # 결과 반환
+    cursor.close()
+    return jsonify({"status": "Message Sent"}), 201
+
+# 특정 채팅방의 모든 메시지 조회
+@app.route('/get_messages/<room_id>', methods=['GET'])
+def get_messages(room_id):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    # 특정 채팅방의 메시지 조회 쿼리
+    query = """
+    SELECT message_id, sender_id, receiver_id, message_content, sent_at
+    FROM messages 
+    WHERE room_id = %s
+    ORDER BY sent_at ASC
+    """
+    cursor.execute(query, (room_id,))
+    messages = cursor.fetchall()
+
+    # 결과 반환
+    cursor.close()
+    return jsonify(messages), 200
 
 mysql = MySQL(app)
 

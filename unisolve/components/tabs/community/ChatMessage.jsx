@@ -1,6 +1,8 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 
+
+// 서버에서 만들어둔 send_message 라우터로 라우팅 필요합니다.
 const ChatMessage = ({ me, message, user }) => {
   return (
     <View

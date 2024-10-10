@@ -2,6 +2,8 @@ import { FlatList, StyleSheet } from "react-native";
 import ChatMessage from "../../../../../components/tabs/community/ChatMessage";
 
 // 임시 데이터
+// /send_message post 방식으로 라우팅 필요합니다.
+// 서버 코드 490번째 줄부터 참조하시면 됩니다
 const chatData = [
   {
     me: false,

@@ -1,9 +1,10 @@
-import React from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
-import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, usePathname, useRouter } from "expo-router";
+import React from "react";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import styles from "../../../../styles/tabs/community/CommunityDetailStyles";
 
+// 게시글 불러오는 기능 라우팅 필요합니다.
 const getData = () => ({
   id: 123,
   private: true,
