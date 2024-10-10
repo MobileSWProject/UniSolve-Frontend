@@ -14,6 +14,7 @@ import InputBox from "../../../../components/tabs/question/InputBox";
 import InputTitle from "../../../../components/tabs/question/InputTitle";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import _axios from "../../../../api";
 
 export default function QuestionSubPage() {
   // 폼 내용 상태 관리
@@ -42,9 +43,18 @@ export default function QuestionSubPage() {
     }
     // 서버로 데이터 전송
     console.log("제출중...");
-    console.log(`전송 데이터: ${JSON.stringify(data)}`);
     setSubmitLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // !! 서버 전송 로직 ===
+    const dataForServer = JSON.stringify({
+      is_private: Number(isPrivate),
+      title,
+      content,
+      // image <-- 이미지는 임시 보류
+    });
+    const response = await _axios.post("/questions", dataForServer);
+    console.log(response);
+
     console.log("제출완료");
     setSubmitLoading(false);
 
