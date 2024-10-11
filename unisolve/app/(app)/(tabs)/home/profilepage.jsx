@@ -1,9 +1,29 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
+import _axios from "../../../../api";
 
 export default function HomeSubPage() {
   const router = useRouter();
+
+  const [user, setUser] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      _axios
+        .get("/userinfo")
+        .then((response) => {
+          setUser(response.data.data);
+        })
+        .catch((error) => {
+          router.replace("/login");
+        });
+    }, [])
+  );
+
+  if (!user) {
+    return <></>;
+  }
 
   return (
     <View style={styles.container}>
@@ -14,13 +34,16 @@ export default function HomeSubPage() {
           style={styles.profileImage}
         />
         <View style={styles.profileTextContainer}>
-          <Text style={styles.nickname}>닉네임</Text>
+          <Text style={styles.nickname}>{user.username}</Text>
           <Text style={styles.phoneNumber}>010-1***-***9</Text>
         </View>
       </View>
 
       {/* 질문 게시판 버튼 */}
-      <TouchableOpacity style={styles.button} onPress={()=> {}}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {}}
+      >
         <Text style={styles.buttonText}>질문/답변 기록</Text>
       </TouchableOpacity>
 
@@ -30,12 +53,18 @@ export default function HomeSubPage() {
       </TouchableOpacity>
 
       {/* 뒤로 가기 버튼 */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.back()}
+      >
         <Text style={styles.backButtonText}>뒤로가기</Text>
       </TouchableOpacity>
 
       {/* 뒤로 가기 버튼 */}
-      <TouchableOpacity style={styles.Button} onPress={() => router.back()}>
+      <TouchableOpacity
+        style={styles.Button}
+        onPress={() => router.back()}
+      >
         <Text style={styles.exitButtonText}>탈퇴하시겠습니까?</Text>
       </TouchableOpacity>
     </View>
