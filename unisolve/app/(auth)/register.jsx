@@ -1,6 +1,6 @@
-import { useRouter } from "expo-router";
-import { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import { useFocusEffect, useRouter } from "expo-router";
+import { useState, useCallback } from 'react';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { mainColor } from '../../constants/Colors';
 import _axios from "../../api";
 
@@ -17,6 +17,8 @@ export default function Register() {
   const [subPassword, setSubPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [school, setSchool] = useState("");
+  const [schoolData, SetSchoolData] = useState([]);
+  const [search, setSearch] = useState("");
 
   const IDCheckProcess = async () => {
     await _axios.post('/existuser', {user_id: id}).then(response => {
@@ -46,12 +48,31 @@ export default function Register() {
   };
 
   const RegisterProcess = async () => {
-    if (id.length <= 0 || !idCheck || name.length <= 0 || email.length <= 0 || !emailCheck || !emailChecks || password !== subPassword || nickname.length <= 0 || school <= 0) return;
+    if (id.length <= 0 || !idCheck || name.length <= 0 ||  email.length <= 0 || !emailCheck || !emailChecks || password !== subPassword || nickname.length <= 0) return;
     await _axios.post('/register', {user_id: id, username: name, email: email, password: password, user_nickname: nickname, school: school }).then(response => {
       if (response.data.status === "success") {
         router.push('/registerOk');
       }
     })
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      _axios.get('/universities').then(response => {
+        SetSchoolData(response.data.universities);
+      })
+    }, [])
+  );
+
+  const searchSchool = () => {
+    return schoolData && search ? schoolData.filter(item =>
+      item.univ_name.includes(search)
+    ) : []
+  }
+
+  const handleSelect = (item) => {
+    setSearch(item.univ_name);
+    setSchool(item.univ_name);
   };
 
   return (
@@ -159,9 +180,22 @@ export default function Register() {
       <Text style={styles.label}>소속</Text>
       <TextInput
         style={styles.input}
-        placeholder="본인의 소속을 입력하세요. 이메일로 관련 내용이 발송됩니다."
-        value={school}
-        onChangeText={setSchool} 
+        placeholder="본인의 소속을 입력 후 선택하세요."
+        value={search}
+        onChangeText={(text) => setSearch(text)}
+      />
+      <FlatList
+        style={styles.list}
+        data={searchSchool()}
+        keyExtractor={item => item.univ_id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => handleSelect(item)}>
+            <Text style={styles.item}>
+              {item.univ_name}
+            </Text>
+          </TouchableOpacity>
+        )}
+        ListEmptyComponent={<Text style={styles.empty}></Text>}
       />
 
       {/* 하단 로그인 링크 */}
@@ -210,6 +244,9 @@ const styles = StyleSheet.create({
   flexItem: {
     flex: 1,
     marginRight: 8,
+  },
+  list: {
+    flex: 1,
   },
   input: {
     width: '100%',

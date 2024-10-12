@@ -3,6 +3,7 @@ import styles from "../../../styles/tabs/List/ListStyles";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
+import formatAuthor from "../../../utils/formatAuthor";
 
 export default function PostListItem({ item, index, count, type }) {
   const typeConvert = { 0: "시스템 알림", 1: "새로운 답변" };
@@ -37,7 +38,7 @@ export default function PostListItem({ item, index, count, type }) {
             />
           ) : null}
           {type === "community"
-            ? `#${item.id} | by ${item.questioner}`
+            ? `#${item.id} | by ${formatAuthor(item.questioner)}`
             : type === "history"
             ? `#${item.id} | ${item.private ? "비공개" : "공개"}`
             : type === "notification"
