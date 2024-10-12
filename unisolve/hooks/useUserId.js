@@ -9,7 +9,6 @@ const useUserId = () => {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      console.log("fetch");
       try {
         const token = await AsyncStorage.getItem("token");
         if (token) {

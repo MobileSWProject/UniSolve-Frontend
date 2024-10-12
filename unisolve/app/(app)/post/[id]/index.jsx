@@ -52,7 +52,7 @@ const Post = () => {
             setData({
               id: response.data.id,
               private: Boolean(response.data.is_private),
-              user: formatAuthor(response.data.author_id),
+              authorId: formatAuthor(response.data.author_id),
               title: response.data.title,
               content: response.data.description,
               timestamp: response.data.timestamp,
@@ -114,7 +114,8 @@ const Post = () => {
         commentsCount: updatedPost.data.comments_count,
       }));
     } catch (error) {
-      console.log(error);
+      // "something error 😭"
+      console.log("Something Error 😭");
     }
   };
 
@@ -159,6 +160,21 @@ const Post = () => {
     setSelectedComment(comment.comment_id);
   };
 
+  const handleRemovePost = async () => {
+    try {
+      const response = await _axios.delete(`/question/${id}`);
+
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/community");
+      }
+    } catch (error) {
+      // "something error 😭"
+      console.log("Something Error 😭");
+    }
+  };
+
   if (!data) {
     return <></>;
   }
@@ -172,7 +188,27 @@ const Post = () => {
             style={styles.image}
           />
         )}
-        <Text style={styles.title}>{data.title}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 10,
+            minHeight: 30,
+          }}
+        >
+          <Text style={styles.title}>{data.title}</Text>
+          {formatAuthor(data.authorId) === formatAuthor(userId) && (
+            <TouchableOpacity
+              hitSlop={8}
+              onPress={handleRemovePost}
+            >
+              <Text style={{ color: "red", fontSize: 24, fontWeight: 700 }}>
+                ×
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
         <View style={styles.privateStatusContainer}>
           <Ionicons
             name={data.private ? "lock-closed" : "earth-sharp"}
