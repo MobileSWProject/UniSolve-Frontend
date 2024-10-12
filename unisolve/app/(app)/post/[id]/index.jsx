@@ -14,16 +14,30 @@ import {
   TextInput,
 } from "react-native";
 import styles from "../../../../styles/post/PostStyles";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import _axios from "../../../../api";
+import {
+  ReplyCommentIdProvider,
+  useReplyCommentId,
+} from "../../../../components/post/ReplyCommentIdContext";
 
 const Post = () => {
   const { id } = useLocalSearchParams();
   const [data, setData] = useState(null);
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
+  const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
+
+  const { selectedComment, setSelectedComment } = useReplyCommentId();
 
   const pathname = usePathname();
   const router = useRouter();
+
+  // selectedComment가 변경될 때마다 replyComment 초기화
+  useEffect(() => {
+    if (selectedComment) {
+      setReplyComment(""); // selectedComment가 변경될 때만 실행
+    }
+  }, [selectedComment]);
 
   useFocusEffect(
     useCallback(() => {
@@ -51,17 +65,19 @@ const Post = () => {
     }, [id])
   );
 
-  if (!data) {
-    return <></>;
-  }
+  // 댓글 또는 대댓글 추가 로직
+  const handleAddComment = async (isReply) => {
+    const commentContent = isReply ? replyComment : newComment;
+    if (!commentContent) {
+      console.log("댓글 내용이 있어야합니다.");
+      return;
+    }
 
-  // 현재는 상위 댓글 추가만 구현
-  // ToDo 하위 댓글은 추후 구현 예정
-  const handleAddComment = async () => {
     try {
       let data = JSON.stringify({
         post_id: id,
-        content: newComment,
+        content: commentContent,
+        parent_id: isReply ? selectedComment : null,
       });
       const response = await _axios.post("/comment", data);
 
@@ -75,7 +91,9 @@ const Post = () => {
     } catch (error) {
       console.log(error);
     } finally {
-      setNewComment(""); // 제출 후 댓글창 초기화
+      setNewComment("");
+      setReplyComment("");
+      setSelectedComment(null);
     }
   };
 
@@ -93,6 +111,15 @@ const Post = () => {
       </View>
     ));
   };
+
+  // comment_id를 선택한 후 대댓글 초기화는 useEffect에서 처리
+  const handleReply = (comment) => {
+    setSelectedComment(comment.comment_id);
+  };
+
+  if (!data) {
+    return <></>;
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -142,7 +169,7 @@ const Post = () => {
         />
         <TouchableOpacity
           style={styles.commentButton}
-          onPress={handleAddComment}
+          onPress={() => handleAddComment(false)}
         >
           <Text style={styles.commentButtonText}>댓글 작성</Text>
         </TouchableOpacity>
@@ -159,6 +186,31 @@ const Post = () => {
             <Text style={styles.commentUser}>{comment.author_id}</Text>
             <Text style={styles.commentTimestamp}>{comment.created_at}</Text>
             <Text style={styles.commentContent}>{comment.content}</Text>
+            <TouchableOpacity
+              style={styles.replyButton} // 스타일 적용
+              onPress={() => handleReply(comment)} // 대댓글 작성 핸들러
+            >
+              <Text style={styles.replyButtonText}>답글 달기</Text>
+            </TouchableOpacity>
+            {selectedComment === comment.comment_id && (
+              <>
+                {/* 대댓글 입력 필드 */}
+                <View style={styles.commentInputContainer}>
+                  <TextInput
+                    style={styles.commentInput}
+                    placeholder="댓글을 입력하세요..."
+                    value={replyComment}
+                    onChangeText={(text) => setReplyComment(text)}
+                  />
+                  <TouchableOpacity
+                    style={styles.commentButton}
+                    onPress={() => handleAddComment(true)}
+                  >
+                    <Text style={styles.commentButtonText}>댓글 작성</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
 
             {/* 하위 댓글 렌더링 */}
             {comment.replies && comment.replies.length > 0 && (
@@ -173,4 +225,10 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default function PostWithReplyCommentIdProvider() {
+  return (
+    <ReplyCommentIdProvider>
+      <Post />
+    </ReplyCommentIdProvider>
+  );
+}

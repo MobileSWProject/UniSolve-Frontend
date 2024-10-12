@@ -150,6 +150,21 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+
+  // 대댓글 버튼
+  replyButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    backgroundColor: mainColor,
+    borderRadius: 5,
+    marginTop: 8,
+    alignSelf: "flex-start", // 버튼을 왼쪽에 배치
+  },
+  replyButtonText: {
+    color: "#FFFFFF", // 텍스트 색상: 흰색
+    fontSize: 12, // 텍스트 크기: 작게
+    fontWeight: "bold",
+  },
 });
 
 export default styles;
