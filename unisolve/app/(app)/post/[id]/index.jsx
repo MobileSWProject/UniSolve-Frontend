@@ -22,6 +22,7 @@ import {
 } from "../../../../components/post/ReplyCommentIdContext";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useUserId from "../../../../hooks/useUserId"; // 커스텀 훅 불러오기
+import formatAuthor from "../../../../utils/formatAuthor";
 
 const Post = () => {
   const { id } = useLocalSearchParams();
@@ -51,7 +52,7 @@ const Post = () => {
             setData({
               id: response.data.id,
               private: Boolean(response.data.is_private),
-              user: response.data.author_id,
+              user: formatAuthor(response.data.author_id),
               title: response.data.title,
               content: response.data.description,
               timestamp: response.data.timestamp,
@@ -132,8 +133,10 @@ const Post = () => {
               height: 28,
             }}
           >
-            <Text style={styles.commentUser}>{reply.author_id}</Text>
-            {reply.author_id === userId && (
+            <Text style={styles.commentUser}>
+              {formatAuthor(reply.author_id)}
+            </Text>
+            {formatAuthor(reply.author_id) === formatAuthor(userId) && (
               <TouchableOpacity
                 hitSlop={8}
                 onPress={() => handleRemoveComment(reply.comment_id)}
@@ -230,8 +233,10 @@ const Post = () => {
                 height: 28,
               }}
             >
-              <Text style={styles.commentUser}>{comment.author_id}</Text>
-              {comment.author_id === userId && (
+              <Text style={styles.commentUser}>
+                {formatAuthor(comment.author_id)}
+              </Text>
+              {formatAuthor(comment.author_id) === formatAuthor(userId) && (
                 <TouchableOpacity
                   hitSlop={8}
                   onPress={() => handleRemoveComment(comment.comment_id)}
