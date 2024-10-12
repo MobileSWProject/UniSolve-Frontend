@@ -20,6 +20,7 @@ import {
   ReplyCommentIdProvider,
   useReplyCommentId,
 } from "../../../../components/post/ReplyCommentIdContext";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const Post = () => {
   const { id } = useLocalSearchParams();
@@ -122,7 +123,7 @@ const Post = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <KeyboardAwareScrollView style={styles.container}>
       <View style={styles.contentContainer}>
         {data.image && (
           <Image
@@ -221,7 +222,7 @@ const Post = () => {
           </View>
         ))}
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 
