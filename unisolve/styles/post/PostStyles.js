@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#e0e0e0",
   },
   commentUser: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
   },
   commentTimestamp: {

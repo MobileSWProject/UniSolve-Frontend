@@ -21,12 +21,15 @@ import {
   useReplyCommentId,
 } from "../../../../components/post/ReplyCommentIdContext";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import decodeJWT from "../../../../utils/decodeJWT";
 
 const Post = () => {
   const { id } = useLocalSearchParams();
   const [data, setData] = useState(null);
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
   const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
+  const [curUserId, setUser] = useState(null);
 
   const { selectedComment, setSelectedComment } = useReplyCommentId();
 
@@ -62,10 +65,19 @@ const Post = () => {
             router.replace("community");
           });
       };
+      const getUser = async () => {
+        const token = await AsyncStorage.getItem("token");
+        const decodedToken = decodeJWT(token);
+        if (!decodedToken?.user_id) {
+          return router.replace("/login");
+        }
+
+        setUser(decodedToken.user_id);
+      };
       getData();
+      getUser();
     }, [id])
   );
-
   // 댓글 또는 대댓글 추가 로직
   const handleAddComment = async (isReply) => {
     const commentContent = isReply ? replyComment : newComment;
@@ -98,6 +110,22 @@ const Post = () => {
     }
   };
 
+  const handleRemoveComment = async (targetCommentId) => {
+    try {
+      const response = await _axios.delete(`/comment/${targetCommentId}`);
+
+      // 댓글 추가 후 댓글 목록만 다시 불러옴
+      const updatedPost = await _axios.get(`/post/${id}`);
+      setData((prev) => ({
+        ...prev,
+        comments: updatedPost.data.comments,
+        commentsCount: updatedPost.data.comments_count,
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const renderReplies = (replies) => {
     return replies.map((reply, index) => (
       <View
@@ -105,7 +133,26 @@ const Post = () => {
         style={styles.replyItem} // 대댓글 스타일 적용
       >
         <View style={styles.replyIndent}>
-          <Text style={styles.replyUser}>{reply.author_id}</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              height: 28,
+            }}
+          >
+            <Text style={styles.commentUser}>{reply.author_id}</Text>
+            {reply.author_id === curUserId && (
+              <TouchableOpacity
+                hitSlop={8}
+                onPress={() => handleRemoveComment(reply.comment_id)}
+              >
+                <Text style={{ color: "red", fontSize: 24, fontWeight: 700 }}>
+                  ×
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <Text style={styles.replyTimestamp}>{reply.created_at}</Text>
           <Text style={styles.replyContent}>{reply.content}</Text>
         </View>
@@ -184,7 +231,26 @@ const Post = () => {
             key={index}
             style={styles.commentItem} // 댓글 스타일 적용
           >
-            <Text style={styles.commentUser}>{comment.author_id}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                height: 28,
+              }}
+            >
+              <Text style={styles.commentUser}>{comment.author_id}</Text>
+              {comment.author_id === curUserId && (
+                <TouchableOpacity
+                  hitSlop={8}
+                  onPress={() => handleRemoveComment(comment.comment_id)}
+                >
+                  <Text style={{ color: "red", fontSize: 24, fontWeight: 700 }}>
+                    ×
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <Text style={styles.commentTimestamp}>{comment.created_at}</Text>
             <Text style={styles.commentContent}>{comment.content}</Text>
             <TouchableOpacity
