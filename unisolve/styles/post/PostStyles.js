@@ -120,6 +120,36 @@ const styles = StyleSheet.create({
   replyContent: {
     fontSize: 13,
   },
+
+  // 댓글 입력 칸
+  // 댓글 입력 필드 스타일
+  commentInputContainer: {
+    flexDirection: "row",
+    padding: 15,
+    backgroundColor: "#f8f8f8",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  commentInput: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    backgroundColor: "#fff",
+  },
+  commentButton: {
+    marginLeft: 10,
+    backgroundColor: mainColor,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  commentButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });
 
 export default styles;
