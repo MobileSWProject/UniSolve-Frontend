@@ -1,60 +1,88 @@
 import { useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
-import {
-  Button,
-  Image,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useContext, useState } from "react";
+import { Image, Platform, Text, TouchableOpacity, View } from "react-native";
 import { ImageContext } from "./_layout";
 import styles from "../../../../styles/tabs/question/UploadStyles";
 import InputBox from "../../../../components/tabs/question/InputBox";
 import InputTitle from "../../../../components/tabs/question/InputTitle";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { _fetchFormData, formFetch } from "../../../../api";
 
 export default function QuestionSubPage() {
-  // 폼 내용 상태 관리
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
-
-  // 질문 제출 로딩 상태 관리
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const router = useRouter();
-  const { image } = useContext(ImageContext);
+  const { image } = useContext(ImageContext); // 이미지 URI 가져오기
 
-  // 작성 완료 버튼을 눌렀을 때 동작하는 함수
+  // 이미지 및 폼 데이터 전송
   const handleSubmit = async () => {
-    const data = {
-      title,
-      content,
-      isPrivate,
-      image,
-    };
     // 폼이 다 채워지지 않았을 때 처리
-    if (data.title.trim() === "" || data.content.trim() === "") {
+    if (title.trim() === "" || content.trim() === "") {
       console.log("폼이 다 채워지지 않음");
       return;
     }
+    const data = new FormData();
+
+    // 기본 질문 데이터 추가
+    data.append("title", title);
+    data.append("content", content);
+    data.append("is_private", Number(isPrivate));
+
+    console.log("image" + image);
+
+    // 이미지가 있을 경우 FormData에 추가
+    if (image) {
+      if (Platform.OS === "web") {
+        // 웹 환경에서는 파일을 그대로 FormData에 추가
+        console.log("web");
+        data.append("image", image);
+      } else {
+        // 앱 환경에서는 uri 기반으로 처리
+        console.log("app");
+        data.append("image", {
+          uri: image, // 이미지 URI
+          name: "image.jpg", // 파일 이름 (없을 경우 기본 이름 설정)
+          type: "image/jpeg", // MIME 타입 (없을 경우 기본값 설정)
+        });
+      }
+    }
+
     // 서버로 데이터 전송
     console.log("제출중...");
-    console.log(`전송 데이터: ${JSON.stringify(data)}`);
     setSubmitLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("제출완료");
-    setSubmitLoading(false);
+    try {
+      const response = await formFetch("/questions", data);
+      // 등록된 포스트 아이디를 가져옴
+      const postId = response.postId;
 
-    // question으로 먼저 이동 후
-    router.navigate("/question");
-    // community 메인으로 이동
-    router.push("/community");
-    // 바로 생성된 게시글로 이동
-    // 게시글로 이동 후 뒤로가기 버튼 없이 화면이 나타나는 환경이 있어서 setTimeout으로 임시 해결하였습니다.
-    setTimeout(() => router.push("/community/123"));
+      console.log("제출완료");
+      setSubmitLoading(false);
+
+      // question으로 먼저 이동 후
+      router.navigate("/question");
+      // community 메인으로 이동
+      router.push("/community");
+      // 등록된 포스트로 이동
+      setTimeout(() => router.push(`/post/${postId}`));
+    } catch (error) {
+      console.log("Error during submission:", error);
+
+      // 400 또는 401 상태 코드를 받을 때 홈 화면으로 리다이렉트
+      if (
+        error.response &&
+        (error.response.status === 400 || error.response.status === 401)
+      ) {
+        console.log("권한이 없거나 요청이 잘못됨, 홈으로 리다이렉트 중...");
+        router.replace("/"); // 홈 라우터로 이동 (로그인 페이지 등으로 리다이렉트)
+      }
+
+      // 기타 다른 에러 처리 로직
+      setSubmitLoading(false);
+    }
   };
 
   return (

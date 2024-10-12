@@ -29,8 +29,29 @@ cd UniSolve-Frontend/unisolve/
 npm i
 ```
 
+### 환경 변수 세팅
+
+- unisolve/`.env` 파일 생성
+- .env 파일에 필요한 환경 변수 세팅
+
+```
+EXPO_PUBLIC_SERVER_BASE_URL=http://[서버아이피]:[서버포트]
+```
+
+ex)
+
+```
+EXPO_PUBLIC_SERVER_BASE_URL=http://127.0.0.1:5555
+```
+
 ### 프로젝트 실행
 
 ```bash
 npm run start
 ```
+
+### Git Pull 이후 오작동 날 경우
+
+- unisolve/node_modules 삭제
+- unisolve/.expo 삭제
+- `UniSolve-Frontend/unisolve` 경로에서 `npm i` 실행하여 다시 패키지 설치

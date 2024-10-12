@@ -1,0 +1,176 @@
+import { Ionicons } from "@expo/vector-icons";
+import {
+  useFocusEffect,
+  useLocalSearchParams,
+  usePathname,
+  useRouter,
+} from "expo-router";
+import {
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  TextInput,
+} from "react-native";
+import styles from "../../../../styles/post/PostStyles";
+import { useCallback, useState } from "react";
+import _axios from "../../../../api";
+
+const Post = () => {
+  const { id } = useLocalSearchParams();
+  const [data, setData] = useState(null);
+  const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
+
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useFocusEffect(
+    useCallback(() => {
+      const getData = async () => {
+        _axios
+          .get(`/post/${id}`)
+          .then((response) => {
+            setData({
+              id: response.data.id,
+              private: Boolean(response.data.is_private),
+              user: response.data.author_id,
+              title: response.data.title,
+              content: response.data.description,
+              timestamp: response.data.timestamp,
+              image: response.data.image,
+              comments: response.data.comments,
+              commentsCount: response.data.comments_count,
+            });
+          })
+          .catch((error) => {
+            router.replace("community");
+          });
+      };
+      getData();
+    }, [id])
+  );
+
+  if (!data) {
+    return <></>;
+  }
+
+  // 현재는 상위 댓글 추가만 구현
+  // ToDo 하위 댓글은 추후 구현 예정
+  const handleAddComment = async () => {
+    try {
+      let data = JSON.stringify({
+        post_id: id,
+        content: newComment,
+      });
+      const response = await _axios.post("/comment", data);
+
+      // 댓글 추가 후 댓글 목록만 다시 불러옴
+      const updatedPost = await _axios.get(`/post/${id}`);
+      setData((prev) => ({
+        ...prev,
+        comments: updatedPost.data.comments,
+        commentsCount: updatedPost.data.comments_count,
+      }));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setNewComment(""); // 제출 후 댓글창 초기화
+    }
+  };
+
+  const renderReplies = (replies) => {
+    return replies.map((reply, index) => (
+      <View
+        key={index}
+        style={styles.replyItem} // 대댓글 스타일 적용
+      >
+        <View style={styles.replyIndent}>
+          <Text style={styles.replyUser}>{reply.author_id}</Text>
+          <Text style={styles.replyTimestamp}>{reply.created_at}</Text>
+          <Text style={styles.replyContent}>{reply.content}</Text>
+        </View>
+      </View>
+    ));
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.contentContainer}>
+        {data.image && (
+          <Image
+            source={{ uri: data.image }}
+            style={styles.image}
+          />
+        )}
+        <Text style={styles.title}>{data.title}</Text>
+        <View style={styles.privateStatusContainer}>
+          <Ionicons
+            name={data.private ? "lock-closed" : "earth-sharp"}
+            size={16}
+            color="#666"
+            style={styles.privateStatusIcon}
+          />
+          <Text style={styles.privateStatusText}>
+            {data.private ? "비공개" : "공개"}
+          </Text>
+        </View>
+        <Text style={styles.userInfo}>
+          {data.user} • {data.timestamp}
+        </Text>
+        <Text style={styles.content}>{data.content}</Text>
+      </View>
+
+      {/* 비공개 채팅 버튼 */}
+      <View style={styles.chatButtonContainer}>
+        <TouchableOpacity
+          onPress={() => router.push(`${pathname}/chat`)}
+          style={styles.chatButtonTouchArea}
+          hitSlop={4}
+        >
+          <Text style={styles.chatButtonText}>비공개 채팅</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 댓글 입력 필드 */}
+      <View style={styles.commentInputContainer}>
+        <TextInput
+          style={styles.commentInput}
+          placeholder="댓글을 입력하세요..."
+          value={newComment}
+          onChangeText={(text) => setNewComment(text)}
+        />
+        <TouchableOpacity
+          style={styles.commentButton}
+          onPress={handleAddComment}
+        >
+          <Text style={styles.commentButtonText}>댓글 작성</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 댓글 렌더링 */}
+      <View style={styles.commentContainer}>
+        <Text style={styles.commentTitle}>댓글 {data.commentsCount}개</Text>
+        {data.comments.map((comment, index) => (
+          <View
+            key={index}
+            style={styles.commentItem} // 댓글 스타일 적용
+          >
+            <Text style={styles.commentUser}>{comment.author_id}</Text>
+            <Text style={styles.commentTimestamp}>{comment.created_at}</Text>
+            <Text style={styles.commentContent}>{comment.content}</Text>
+
+            {/* 하위 댓글 렌더링 */}
+            {comment.replies && comment.replies.length > 0 && (
+              <View style={styles.repliesContainer}>
+                {renderReplies(comment.replies)}
+              </View>
+            )}
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
+};
+
+export default Post;
