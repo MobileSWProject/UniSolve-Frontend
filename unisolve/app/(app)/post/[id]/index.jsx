@@ -21,16 +21,15 @@ import {
   useReplyCommentId,
 } from "../../../../components/post/ReplyCommentIdContext";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import decodeJWT from "../../../../utils/decodeJWT";
+import useUserId from "../../../../hooks/useUserId"; // 커스텀 훅 불러오기
 
 const Post = () => {
   const { id } = useLocalSearchParams();
   const [data, setData] = useState(null);
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
   const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
-  const [curUserId, setUser] = useState(null);
 
+  const userId = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
 
   const pathname = usePathname();
@@ -65,19 +64,11 @@ const Post = () => {
             router.replace("community");
           });
       };
-      const getUser = async () => {
-        const token = await AsyncStorage.getItem("token");
-        const decodedToken = decodeJWT(token);
-        if (!decodedToken?.user_id) {
-          return router.replace("/login");
-        }
 
-        setUser(decodedToken.user_id);
-      };
       getData();
-      getUser();
     }, [id])
   );
+
   // 댓글 또는 대댓글 추가 로직
   const handleAddComment = async (isReply) => {
     const commentContent = isReply ? replyComment : newComment;
@@ -114,7 +105,7 @@ const Post = () => {
     try {
       const response = await _axios.delete(`/comment/${targetCommentId}`);
 
-      // 댓글 추가 후 댓글 목록만 다시 불러옴
+      // 댓글 삭제 후 댓글 목록만 다시 불러옴
       const updatedPost = await _axios.get(`/post/${id}`);
       setData((prev) => ({
         ...prev,
@@ -142,7 +133,7 @@ const Post = () => {
             }}
           >
             <Text style={styles.commentUser}>{reply.author_id}</Text>
-            {reply.author_id === curUserId && (
+            {reply.author_id === userId && (
               <TouchableOpacity
                 hitSlop={8}
                 onPress={() => handleRemoveComment(reply.comment_id)}
@@ -240,7 +231,7 @@ const Post = () => {
               }}
             >
               <Text style={styles.commentUser}>{comment.author_id}</Text>
-              {comment.author_id === curUserId && (
+              {comment.author_id === userId && (
                 <TouchableOpacity
                   hitSlop={8}
                   onPress={() => handleRemoveComment(comment.comment_id)}
