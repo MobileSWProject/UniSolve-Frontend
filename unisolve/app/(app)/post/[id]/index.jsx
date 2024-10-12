@@ -31,7 +31,8 @@ const Post = () => {
               content: response.data.description,
               timestamp: response.data.timestamp,
               image: response.data.image,
-              reply: [],
+              comments: response.data.comments,
+              commentsCount: response.data.comments_count,
             });
           })
           .catch((error) => {
@@ -39,12 +40,27 @@ const Post = () => {
           });
       };
       getData();
-    }, [id]) // id가 변경될 때만 effect 실행
+    }, [id])
   );
 
   if (!data) {
     return <></>;
   }
+
+  const renderReplies = (replies) => {
+    return replies.map((reply, index) => (
+      <View
+        key={index}
+        style={styles.replyItem} // 대댓글 스타일 적용
+      >
+        <View style={styles.replyIndent}>
+          <Text style={styles.replyUser}>{reply.author_id}</Text>
+          <Text style={styles.replyTimestamp}>{reply.created_at}</Text>
+          <Text style={styles.replyContent}>{reply.content}</Text>
+        </View>
+      </View>
+    ));
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -81,16 +97,23 @@ const Post = () => {
           <Text style={styles.chatButtonText}>비공개 채팅</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.replyContainer}>
-        <Text style={styles.replyTitle}>댓글 {data.reply.length}개</Text>
-        {data.reply.map((reply, index) => (
+      <View style={styles.commentContainer}>
+        <Text style={styles.commentTitle}>댓글 {data.commentsCount}개</Text>
+        {data.comments.map((comment, index) => (
           <View
             key={index}
-            style={styles.replyItem}
+            style={styles.commentItem} // 댓글 스타일 적용
           >
-            <Text style={styles.replyUser}>{reply.user}</Text>
-            <Text style={styles.replyTimestamp}>{reply.timestamp}</Text>
-            <Text style={styles.replyContent}>{reply.content}</Text>
+            <Text style={styles.commentUser}>{comment.author_id}</Text>
+            <Text style={styles.commentTimestamp}>{comment.created_at}</Text>
+            <Text style={styles.commentContent}>{comment.content}</Text>
+
+            {/* 하위 댓글 렌더링 */}
+            {comment.replies && comment.replies.length > 0 && (
+              <View style={styles.repliesContainer}>
+                {renderReplies(comment.replies)}
+              </View>
+            )}
           </View>
         ))}
       </View>

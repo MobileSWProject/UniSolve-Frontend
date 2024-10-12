@@ -1,8 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 import { mainColor } from "../../constants/Colors";
 
-const windowWidth = Dimensions.get("window").width;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -61,30 +59,66 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 12,
   },
-  chatButtonText: { color: "white", fontWeight: "900", fontSize: 22 },
-  replyContainer: {
+  chatButtonText: {
+    color: "white",
+    fontWeight: "900",
+    fontSize: 22,
+  },
+
+  // 댓글 관련 스타일
+  commentContainer: {
     padding: 15,
     backgroundColor: "#f8f8f8",
   },
-  replyTitle: {
+  commentTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
   },
-  replyItem: {
-    marginBottom: 15,
+  commentItem: {
+    marginBottom: 20,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
   },
-  replyUser: {
+  commentUser: {
     fontSize: 14,
     fontWeight: "bold",
   },
-  replyTimestamp: {
+  commentTimestamp: {
     fontSize: 12,
     color: "#666",
     marginBottom: 5,
   },
-  replyContent: {
+  commentContent: {
     fontSize: 14,
+  },
+
+  // 대댓글 관련 스타일
+  repliesContainer: {
+    marginLeft: 20,
+    marginTop: 10,
+    paddingLeft: 10,
+    borderLeftWidth: 1,
+    borderLeftColor: "#dcdcdc",
+  },
+  replyItem: {
+    marginBottom: 10,
+  },
+  replyIndent: {
+    marginTop: 5,
+  },
+  replyUser: {
+    fontSize: 13,
+    fontWeight: "bold",
+  },
+  replyTimestamp: {
+    fontSize: 11,
+    color: "#999",
+    marginBottom: 5,
+  },
+  replyContent: {
+    fontSize: 13,
   },
 });
 
