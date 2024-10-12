@@ -34,7 +34,7 @@ export default function HomeSubPage() {
           setNickname(response.data.data.user_nickname);
         })
         .catch((error) => {
-          router.replace("/login");
+          router.replace("/");
         });
     }, [])
   );
