@@ -1,12 +1,13 @@
-import { Link, usePathname } from "expo-router";
+import { useFocusEffect, usePathname } from "expo-router";
 import { ScrollView, View, Text, StyleSheet, FlatList } from 'react-native';
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import _axios from '../../../../api';
 
-export default function SaltCoinPage() {
+export default function expPage() {
   const pathname = usePathname();
-  const [meSalt, setMeSalt] = useState(0);
+  const [meExp, setMeExp] = useState(0);
   const [saltList, setSaltList] = useState([ //백엔드에서 Array[Object] 형태로 response
     { id: 0 }, { id: 0 },
     { id: 1, coin: 50, bouns: 10, price: 5000 },
@@ -14,6 +15,20 @@ export default function SaltCoinPage() {
     { id: 3, coin: 600, bouns: 200, price: 35000 },
     { id: 4, coin: 1000, bouns: 350, price: 50000 },
   ]);
+
+  useFocusEffect(
+    useCallback(() => {
+      _axios
+        .get("/userinfo")
+        .then((response) => {
+          setMeExp(response.data.data.exp);
+        })
+        .catch((error) => {
+          router.replace("/");
+        });
+    }, [])
+  );
+
   // 링크로 접속 시 auth 인증 value가 없으면 Login 화면으로 리다이렉트
   const items = ({item, index}) => {
     if (index === 0){
@@ -55,7 +70,7 @@ export default function SaltCoinPage() {
   <>
     <View style={styles.me}>
       <MaterialCommunityIcons name="sprinkler-variant" size={'3em'} color="black" />
-      <Text style={styles.meText}>{numConvert(meSalt)}</Text>
+      <Text style={styles.meText}>{numConvert(meExp)}</Text>
     </View>
     <ScrollView>
       <FlatList
