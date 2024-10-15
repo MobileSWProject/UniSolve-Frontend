@@ -16,40 +16,46 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [subPassword, setSubPassword] = useState("");
   const [nickname, setNickname] = useState("");
+  const [nicknameCheck, setNicknameCheck] = useState("");
   const [school, setSchool] = useState("");
   const [schoolData, SetSchoolData] = useState([]);
   const [search, setSearch] = useState("");
 
-  const IDCheckProcess = async () => {
-    await _axios.post('/existuser', {user_id: id}).then(response => {
-      setIDCheck(response.data.isNotExist || false);
+  const CheckProcess = async (value) => {
+    await _axios.post('/existuser', value).then(response => {
+      if (value.user_id) { setIDCheck(response.data.isNotExist || false); }
+      else if (value.nickname) { setNicknameCheck(response.data.isNotExist || false); }
     })
-    .catch(() => {
-      setIDCheck(false);
-    })    
+      .catch(() => {
+        if (value.user_id) { setIDCheck(false); }
+        else if (value.email) { return false; }
+        else if (value.nickname) { setNicknameCheck(false); }
+      })
   };
 
   const EmailCheckProcess = async () => {
-    await _axios.post('/send-code', {email}).then(response => {
-      setEmailCheck(response.data.isSent || false);
-    })
-    .catch(() => {
-      setEmailCheck(false);
+    setEmailCheck(false);
+    await _axios.post('/existuser', { email: email }).then(async (response) => {
+      if (response.data.isNotExist) {
+        await _axios.post('/send-code', { email }).then(response => {
+          if (response.data.isSent) setEmailCheck(response.data.isSent);
+        })
+      }
     })
   };
 
   const EmailChecksProcess = async () => {
-    await _axios.post('/verify-code', {email, code: emailConfirm }).then(response => {
+    await _axios.post('/verify-code', { email, code: emailConfirm }).then(response => {
       setEmailChecks(response.data.isVerified || false);
     })
-    .catch(() => {
-      setEmailChecks(false);
-    })
+      .catch(() => {
+        setEmailChecks(false);
+      })
   };
 
   const RegisterProcess = async () => {
-    if (id.length <= 0 || !idCheck || name.length <= 0 ||  email.length <= 0 || !emailCheck || !emailChecks || password !== subPassword || nickname.length <= 0) return;
-    await _axios.post('/register', {user_id: id, username: name, email: email, password: password, user_nickname: nickname, school: school }).then(response => {
+    if (id.length <= 0 || !idCheck || name.length <= 0 || email.length <= 0 || !emailCheck || !emailChecks || password !== subPassword || nickname.length <= 0) return;
+    await _axios.post('/register', { user_id: id, username: name, email: email, password: password, user_nickname: nickname, school: school }).then(response => {
       if (response.data.status === "success") {
         router.push('/registerOk');
       }
@@ -90,8 +96,8 @@ export default function Register() {
           onChangeText={setID}
           disabled={idCheck}
         />
-        { /^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{4,}$/.test(id) ?
-          <TouchableOpacity disabled={idCheck} style={[styles.buttonSmall, {backgroundColor: idCheck ? 'gray' : mainColor}]} onPress={() => IDCheckProcess()}>
+        {/^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{4,}$/.test(id) ?
+          <TouchableOpacity disabled={idCheck} style={[styles.buttonSmall, { backgroundColor: idCheck ? 'gray' : mainColor }]} onPress={() => CheckProcess({ user_id: id })}>
             <Text style={styles.buttonTextSmall}>중복확인</Text>
           </TouchableOpacity> :
           <></>
@@ -104,7 +110,7 @@ export default function Register() {
         style={styles.input}
         placeholder="한글, 본명을 입력하세요"
         value={name}
-        onChangeText={setName} 
+        onChangeText={setName}
       />
 
       {/* 이메일 입력 필드 */}
@@ -114,30 +120,30 @@ export default function Register() {
           style={[styles.input, styles.flexInput]}
           placeholder="이메일 @형식으로 입력하세요"
           value={email}
-          onChangeText={setEmail} 
+          onChangeText={setEmail}
           disabled={emailCheck}
         />
         {!emailCheck && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email) ?
-          <TouchableOpacity style={[styles.buttonSmall, {backgroundColor: emailCheck ? 'gray' : mainColor}]} onPress={() => EmailCheckProcess()}>
+          <TouchableOpacity style={[styles.buttonSmall, { backgroundColor: emailCheck ? 'gray' : mainColor }]} onPress={() => EmailCheckProcess()}>
             <Text style={styles.buttonTextSmall}>이메일 인증</Text>
           </TouchableOpacity> :
           <></>
         }
-        {emailCheck ? 
-        <>
-        {/* 이메일 입력 필드 */}
-        <TextInput
-          style={[styles.input, styles.flexInput]}
-          placeholder="이메일로 발송된 인증번호를 입력하세요."
-          value={emailConfirm}
-          onChangeText={setEmailConfirm} 
-          disabled={emailChecks}
-        />
-        <TouchableOpacity disabled={emailChecks} style={[styles.buttonSmall, {backgroundColor: emailChecks ? 'gray' : mainColor}]} onPress={() => EmailChecksProcess()}>
-          <Text style={styles.buttonTextSmall}>인증</Text>
-        </TouchableOpacity>
-        </> : 
-        <></>
+        {emailCheck ?
+          <>
+            {/* 이메일 입력 필드 */}
+            <TextInput
+              style={[styles.input, styles.flexInput]}
+              placeholder="이메일로 발송된 인증번호를 입력하세요."
+              value={emailConfirm}
+              onChangeText={setEmailConfirm}
+              disabled={emailChecks}
+            />
+            <TouchableOpacity disabled={emailChecks} style={[styles.buttonSmall, { backgroundColor: emailChecks ? 'gray' : mainColor }]} onPress={() => EmailChecksProcess()}>
+              <Text style={styles.buttonTextSmall}>인증</Text>
+            </TouchableOpacity>
+          </> :
+          <></>
         }
       </View>
 
@@ -149,7 +155,7 @@ export default function Register() {
             style={styles.input}
             placeholder="사용할 비밀번호를 입력하세요."
             value={password}
-            onChangeText={setPassword} 
+            onChangeText={setPassword}
             secureTextEntry={true}
           />
         </View>
@@ -161,20 +167,25 @@ export default function Register() {
             style={styles.input}
             placeholder="비밀번호를 다시 입력하세요."
             value={subPassword}
-            onChangeText={setSubPassword} 
+            onChangeText={setSubPassword}
             secureTextEntry={true}
           />
         </View>
       </View>
 
       {/* 닉네임 입력 필드 */}
-      <Text style={styles.label}>닉네임</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="앱 사용시 사용할 닉네임을 입력하세요"
-        value={nickname}
-        onChangeText={setNickname} 
-      />
+      <Text style={styles.label}>닉네임({nicknameCheck ? '확인 완료' : '중복 확인 필요'})</Text>
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, styles.flexInput]}
+          placeholder="앱 사용시 사용할 닉네임을 입력하세요"
+          value={nickname}
+          onChangeText={setNickname}
+        />
+        <TouchableOpacity disabled={nicknameCheck} style={[styles.buttonSmall, { backgroundColor: nicknameCheck ? 'gray' : mainColor }]} onPress={() => CheckProcess({ nickname: nickname })}>
+          <Text style={styles.buttonTextSmall}>중복확인</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* 소속 입력 필드 */}
       <Text style={styles.label}>소속</Text>
@@ -207,8 +218,8 @@ export default function Register() {
       </View>
 
       {/* 회원가입 버튼 */}
-      <TouchableOpacity 
-        style={[styles.button, { backgroundColor: mainColor }]} 
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: mainColor }]}
         onPress={() => RegisterProcess()}
       >
         <Text style={styles.buttonText}>회원가입</Text>
