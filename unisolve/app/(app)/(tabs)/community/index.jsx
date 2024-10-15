@@ -47,14 +47,16 @@ export default function Community() {
   return (
     <View style={{ flex: 1 }}>
       {/* 검색창 추가 */}
-      <TextInput
-        style={styles.searchInput}
-        placeholder="검색어를 입력하세요"
-        value={searchText}
-        onChangeText={handleSearch}
-      />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="검색어"
+          value={searchText}
+          onChangeText={handleSearch}
+        />
+      </View>
 
-      {/* 필터된 데이터로 FlatList 렌더링 */}
+      {/* 검색창 아래에서 시작하도록 FlatList에 marginTop 추가 */}
       <FlatList
         data={filteredCommunitys}
         keyExtractor={(item) => item.id.toString()}
@@ -66,17 +68,23 @@ export default function Community() {
             type="community"
           />
         )}
+        contentContainerStyle={{ paddingTop: 20 }}  // 검색창 높이만큼 여유 공간 추가
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  searchContainer: {
+    paddingHorizontal: 20,  // 좌우 여백
+    alignItems: "flex-end", // 검색창을 오른쪽으로 정렬
+  },
   searchInput: {
     height: 40,
+    width: 200,             // 검색창 너비를 200px로 설정
     borderColor: "gray",
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
     paddingLeft: 10,
     margin: 10,
   },
