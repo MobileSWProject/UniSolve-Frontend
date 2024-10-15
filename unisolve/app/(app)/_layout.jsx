@@ -1,6 +1,12 @@
 import { Stack } from "expo-router";
+import useUserId from "../../hooks/useUserId";
 
 export default function AppLayout() {
+  const { loading } = useUserId();
+
+  // 로딩 중일 때 빈 화면
+  if (loading) return <></>;
+
   return (
     <Stack initialRouteName="(tabs)">
       <Stack.Screen

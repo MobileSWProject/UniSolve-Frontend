@@ -30,7 +30,7 @@ const Post = () => {
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
   const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
 
-  const userId = useUserId(); // 커스텀 훅으로 userId 불러오기
+  const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
 
   const pathname = usePathname();
