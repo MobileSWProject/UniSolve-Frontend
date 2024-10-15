@@ -21,6 +21,14 @@ export default function AuthIndexPage() {
         text={"회원가입 하기"}
         onPress={() => router.push("/register")} // 회원가입 페이지로 이동
       />
+
+      <View style={styles.buttonSpacing} />
+
+      {/* 비밀번호 초기화 버튼 */}
+      <MainButton
+        text={"비밀번호 초기화 하기"}
+        onPress={() => router.push("/resetpassword")} // 비밀번호 초기화 페이지로 이동
+      />
     </View>
   );
 }
