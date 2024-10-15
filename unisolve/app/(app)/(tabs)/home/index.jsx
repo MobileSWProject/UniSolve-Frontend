@@ -19,7 +19,7 @@ export default function Home() {
     <View style={styles.container}>
       <Text style={styles.welcomeText}>환영합니다</Text>
       <Text style={styles.timeText}>현재 시간: {currentTime}</Text>
-      
+
 
       {/* 로고 페이지 */}
       <Link
@@ -27,11 +27,11 @@ export default function Home() {
         style={styles.logopage}
       >
         <Image
-          source={require('../../../../assets/logo.jpg')} 
+          source={require('../../../../assets/logo.jpg')}
           style={styles.logo}
         />
       </Link>
-      
+
       <Text >로고를 클릭하여 문제를 해결하세요!</Text>
 
       {/* 프로필 페이지 */}
@@ -40,7 +40,18 @@ export default function Home() {
         style={styles.profileLink}
       >
         <Image
-          source={require('../../../../assets/profile.png')} 
+          source={require('../../../../assets/profile.png')}
+          style={styles.extralogo}
+        />
+      </Link>
+
+      {/* 경험치 페이지 */}
+      <Link
+        href={`${pathname}/expPage`}
+        style={styles.expLink}
+      >
+        <Image
+          source={require('../../../../assets/logo.jpg')}
           style={styles.extralogo}
         />
       </Link>
@@ -51,7 +62,7 @@ export default function Home() {
         style={styles.alarmLink}
       >
         <Image
-          source={require('../../../../assets/alarm.png')} 
+          source={require('../../../../assets/alarm.png')}
           style={styles.extralogo}
         />
       </Link>
@@ -76,12 +87,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: { //로고 이미지
-    width: 250, 
+    width: 250,
     height: 250,
     marginBottom: 20,
   },
   extralogo: { //프로필, 알림 이미지
-    width: 50, 
+    width: 50,
     height: 50,
     marginBottom: 20,
   },
@@ -89,6 +100,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 10,
+  },
+  expLink: { //경험치 링크 사진
+    position: 'absolute',
+    top: 10,
+    left: 60,
   },
   alarmLink: { // 알림 링크 사진
     position: 'absolute',
