@@ -54,7 +54,7 @@ export default function PostListItem({ item, index, count, type }) {
       </View>
       <View style={styles.header}>
         <Text style={[styles.description, { fontWeight: "bold" }]} numberOfLines={3}>
-          {item.description.replace(/\n/g,' ')}
+          {item.description ? item.description.replace(/\n/g,' ') : ''}
         </Text>
         <View style={styles.header}>
           {type !== "notification" ? (
