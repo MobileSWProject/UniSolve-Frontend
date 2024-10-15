@@ -221,7 +221,7 @@ const Post = () => {
           </Text>
         </View>
         <Text style={styles.userInfo}>
-          {data.user} • {data.timestamp}
+          {formatAuthor(data.authorId)} • {data.timestamp}
         </Text>
         <Text style={styles.content}>{data.content}</Text>
       </View>
