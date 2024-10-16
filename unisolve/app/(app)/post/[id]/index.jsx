@@ -27,7 +27,8 @@ import formatAuthor from "../../../../utils/formatAuthor";
 import Markdown from "react-native-markdown-display";
 import SyntaxHighlighter from "react-native-syntax-highlighter";
 import { mainColor } from "../../../../constants/Colors";
-import { Snackbar, Provider as PaperProvider } from 'react-native-paper';
+import { Snackbar, Provider as PaperProvider } from "react-native-paper";
+import CommentSection from "../../../../components/post/CommentSection";
 
 const Post = () => {
   const { id } = useLocalSearchParams();
@@ -151,7 +152,11 @@ const Post = () => {
     if (reportReason.length < 1 || process) return;
     try {
       setProcess(true);
-      const response = await _axios.post(`/report`, { post_id: id, comment_id: commentID || null, reason: reportReason });
+      const response = await _axios.post(`/report`, {
+        post_id: id,
+        comment_id: commentID || null,
+        reason: reportReason,
+      });
       setProcess(false);
       setModalVisible(false);
       setCommentID(null);
@@ -166,55 +171,6 @@ const Post = () => {
       setSnackbarVisible(true);
       setSnackbarMessage("신고가 접수되지 않았습니다!");
     }
-  };
-
-  const renderReplies = (replies) => {
-    return replies.map((reply, index) => (
-      <View
-        key={index}
-        style={styles.replyItem} // 대댓글 스타일 적용
-      >
-        <View style={styles.replyIndent}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              height: 28,
-            }}
-          >
-            <Text style={styles.commentUser}>
-              {formatAuthor(reply.author_id)}
-            </Text>
-            {formatAuthor(reply.author_id) === formatAuthor(userId) ? (
-              <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity
-                  hitSlop={8}
-                  onPress={() => handleUpdateComment(reply.comment_id)}
-                >
-                  <Text style={{ fontSize: 12 }}>✏️</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  hitSlop={8}
-                  onPress={() => handleRemoveComment(reply.comment_id)}
-                >
-                  <Text style={{ fontSize: 12 }}>❌</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                hitSlop={8}
-                onPress={() => {setCommentID(reply.comment_id); setModalVisible(true);}}
-              >
-                <Text style={{ fontSize: 12 }}>🚨</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          <Text style={styles.replyTimestamp}>{reply.created_at}</Text>
-          <Markdown style={styles.replyContent}>{reply.content}</Markdown>
-        </View>
-      </View>
-    ));
   };
 
   // comment_id를 선택한 후 대댓글 초기화는 useEffect에서 처리
@@ -349,134 +305,32 @@ const Post = () => {
       <View style={styles.commentContainer}>
         <Text style={styles.commentTitle}>댓글 {data.commentsCount}개</Text>
         {data.comments.map((comment, index) => (
-          <View
-            key={index}
-            style={styles.commentItem} // 댓글 스타일 적용
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                height: 28,
-              }}
-            >
-              <Text style={styles.commentUser}>
-                {formatAuthor(comment.author_id)}
-              </Text>
-              {formatAuthor(comment.author_id) === formatAuthor(userId) ? (
-                <View style={{ flexDirection: "row" }}>
-                  <TouchableOpacity
-                    hitSlop={8}
-                    onPress={() => handleUpdateComment(comment.comment_id)}
-                  >
-                    <Text style={{ fontSize: 12 }}>✏️</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    hitSlop={8}
-                    onPress={() => handleRemoveComment(comment.comment_id)}
-                  >
-                    <Text style={{ fontSize: 12 }}>❌</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  hitSlop={8}
-                  onPress={() => {setCommentID(comment.comment_id); setModalVisible(true);}}
-                >
-                  <Text style={{ fontSize: 12 }}>🚨</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <Text style={styles.commentTimestamp}>{comment.created_at}</Text>
-            <Markdown
-              style={styles.commentContent}
-              rules={{
-                fence: (node, children) => {
-                  const language = node.sourceInfo || "text";
-                  const content = node.content || "";
-
-                  return (
-                    <ScrollView
-                      key={node.key}
-                      horizontal={true}
-                      showsVerticalScrollIndicator={false}
-                      showsHorizontalScrollIndicator={true}
-                      style={{
-                        width: "100%",
-                      }}
-                      contentContainerStyle={{
-                        flexGrow: 1,
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: "100%",
-                          flexDirection: "row",
-                        }}
-                      >
-                        <SyntaxHighlighter
-                          key={node.key}
-                          language={language}
-                          highlighter={"prism"}
-                          customStyle={{
-                            width: "100%",
-                            overflowX: "hidden",
-                            overflowY: "hidden",
-                          }}
-                          pointerEvents="none"
-                        >
-                          {content}
-                        </SyntaxHighlighter>
-                      </View>
-                    </ScrollView>
-                  );
-                },
-              }}
-            >
-              {comment.content}
-            </Markdown>
-            <TouchableOpacity
-              style={styles.replyButton} // 스타일 적용
-              onPress={() => handleReply(comment)} // 대댓글 작성 핸들러
-            >
-              <Text style={styles.replyButtonText}>답글 달기</Text>
-            </TouchableOpacity>
-            {selectedComment === comment.comment_id && (
-              <>
-                {/* 대댓글 입력 필드 */}
-                <View style={styles.commentInputContainer}>
-                  <TextInput
-                    style={styles.commentInput}
-                    placeholder="댓글을 입력하세요..."
-                    value={replyComment}
-                    onChangeText={(text) => setReplyComment(text)}
-                    multiline={true}
-                  />
-                  <TouchableOpacity
-                    style={styles.commentButton}
-                    onPress={() => handleAddComment(true)}
-                  >
-                    <Text style={styles.commentButtonText}>댓글 작성</Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
-
-            {/* 하위 댓글 렌더링 */}
-            {comment.replies && comment.replies.length > 0 && (
-              <View style={styles.repliesContainer}>
-                {renderReplies(comment.replies)}
-              </View>
-            )}
-          </View>
+          <CommentSection
+            key={comment.comment_id}
+            comment={comment}
+            userId={userId}
+            handleUpdateComment={handleUpdateComment}
+            handleRemoveComment={handleRemoveComment}
+            handleReportComment={() => setModalVisible(true)}
+            handleReply={handleReply}
+            handleAddComment={handleAddComment}
+            selectedComment={selectedComment}
+            setSelectedComment={setSelectedComment}
+            replyComment={replyComment}
+            setReplyComment={setReplyComment}
+            isReply={false} // Top-level comment, not a reply
+          />
         ))}
+
         <Modal
           animationType="fade"
           transparent={true}
           visible={modalVisible}
-          onRequestClose={() => { setCommentID(null); setModalVisible(false); }}>
+          onRequestClose={() => {
+            setCommentID(null);
+            setModalVisible(false);
+          }}
+        >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <TextInput
@@ -486,27 +340,50 @@ const Post = () => {
                 onChangeText={(text) => setReportReason(text)}
                 multiline={true}
               />
-              <TouchableOpacity disabled={false} style={[styles.buttonSmall, { backgroundColor: false ? 'gray' : mainColor }]} onPress={() => { setCommentID(null); setModalVisible(false); }}>
+              <TouchableOpacity
+                disabled={false}
+                style={[
+                  styles.buttonSmall,
+                  { backgroundColor: false ? "gray" : mainColor },
+                ]}
+                onPress={() => {
+                  setCommentID(null);
+                  setModalVisible(false);
+                }}
+              >
                 <Text style={styles.buttonTextSmall}>취소</Text>
               </TouchableOpacity>
-              <TouchableOpacity disabled={false} style={[styles.buttonSmall, { backgroundColor: false ? 'gray' : mainColor }]} onPress={() => handleReport()}>
+              <TouchableOpacity
+                disabled={false}
+                style={[
+                  styles.buttonSmall,
+                  { backgroundColor: false ? "gray" : mainColor },
+                ]}
+                onPress={() => handleReport()}
+              >
                 <Text style={styles.buttonTextSmall}>신고하기</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
       </View>
-      {snackbarVisible ?
-      <View style={styles.snackbarContainer}>
-        <Snackbar
-          style={styles.snackbar}
-          visible={snackbarVisible}
-          onDismiss={() => { setSnackbarVisible(false); setSnackbarMessage(""); }}
-          duration={2000}
-        >
-          {snackbarMessage}
-        </Snackbar>
-      </View> : <></>}
+      {snackbarVisible ? (
+        <View style={styles.snackbarContainer}>
+          <Snackbar
+            style={styles.snackbar}
+            visible={snackbarVisible}
+            onDismiss={() => {
+              setSnackbarVisible(false);
+              setSnackbarMessage("");
+            }}
+            duration={2000}
+          >
+            {snackbarMessage}
+          </Snackbar>
+        </View>
+      ) : (
+        <></>
+      )}
     </KeyboardAwareScrollView>
   );
 };
