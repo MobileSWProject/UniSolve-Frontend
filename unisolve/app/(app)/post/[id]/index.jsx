@@ -185,7 +185,6 @@ const Post = () => {
     }
   };
 
-<<<<<<< HEAD
   const renderReplies = (replies) => {
     return replies.map((reply, index) => (
       <View
@@ -259,8 +258,6 @@ const Post = () => {
     ));
   };
 
-=======
->>>>>>> 818d6c08895ddff9e359b0b243283824a7e35984
   // comment_id를 선택한 후 대댓글 초기화는 useEffect에서 처리
   const handleReply = (comment) => {
     setSelectedComment(comment.comment_id);
@@ -405,7 +402,6 @@ const Post = () => {
       <View style={styles.commentContainer}>
         <Text style={styles.commentTitle}>댓글 {data.commentsCount}개</Text>
         {data.comments.map((comment, index) => (
-<<<<<<< HEAD
           <View
             key={index}
             style={styles.commentItem} // 댓글 스타일 적용
@@ -554,23 +550,6 @@ const Post = () => {
               </View>
             )}
           </View>
-=======
-          <CommentSection
-            key={comment.comment_id}
-            comment={comment}
-            userId={userId}
-            handleUpdateComment={handleUpdateComment}
-            handleRemoveComment={handleRemoveComment}
-            handleReportComment={() => setModalVisible(true)}
-            handleReply={handleReply}
-            handleAddComment={handleAddComment}
-            selectedComment={selectedComment}
-            setSelectedComment={setSelectedComment}
-            replyComment={replyComment}
-            setReplyComment={setReplyComment}
-            isReply={false} // Top-level comment, not a reply
-          />
->>>>>>> 818d6c08895ddff9e359b0b243283824a7e35984
         ))}
 
         <Modal
@@ -618,35 +597,17 @@ const Post = () => {
           </View>
         </Modal>
       </View>
-<<<<<<< HEAD
       {snackbarVisible ?
-=======
-      {snackbarVisible ? (
->>>>>>> 818d6c08895ddff9e359b0b243283824a7e35984
         <View style={styles.snackbarContainer}>
           <Snackbar
             style={styles.snackbar}
             visible={snackbarVisible}
-<<<<<<< HEAD
             onDismiss={() => { setSnackbarVisible(false); setSnackbarMessage(""); }}
-=======
-            onDismiss={() => {
-              setSnackbarVisible(false);
-              setSnackbarMessage("");
-            }}
->>>>>>> 818d6c08895ddff9e359b0b243283824a7e35984
             duration={2000}
           >
             {snackbarMessage}
           </Snackbar>
-<<<<<<< HEAD
         </View> : <></>}
-=======
-        </View>
-      ) : (
-        <></>
-      )}
->>>>>>> 818d6c08895ddff9e359b0b243283824a7e35984
     </KeyboardAwareScrollView>
   );
 };
