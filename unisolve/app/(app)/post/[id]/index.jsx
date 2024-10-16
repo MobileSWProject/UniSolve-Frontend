@@ -23,7 +23,8 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useUserId from "../../../../hooks/useUserId"; // 커스텀 훅 불러오기
 import formatAuthor from "../../../../utils/formatAuthor";
-import Markdown from 'react-native-markdown-display';
+import Markdown from "react-native-markdown-display";
+import SyntaxHighlighter from "react-native-syntax-highlighter";
 
 const Post = () => {
   const { id } = useLocalSearchParams();
@@ -173,22 +174,18 @@ const Post = () => {
               {formatAuthor(reply.author_id)}
             </Text>
             {formatAuthor(reply.author_id) === formatAuthor(userId) ? (
-              <View style={{ flexDirection: 'row' }}>
+              <View style={{ flexDirection: "row" }}>
                 <TouchableOpacity
                   hitSlop={8}
                   onPress={() => handleUpdateComment(reply.comment_id)}
                 >
-                  <Text style={{ fontSize: 12 }}>
-                    ✏️
-                  </Text>
+                  <Text style={{ fontSize: 12 }}>✏️</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   hitSlop={8}
                   onPress={() => handleRemoveComment(reply.comment_id)}
                 >
-                  <Text style={{ fontSize: 12 }}>
-                    ❌
-                  </Text>
+                  <Text style={{ fontSize: 12 }}>❌</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -196,9 +193,7 @@ const Post = () => {
                 hitSlop={8}
                 onPress={() => handleReportComment(reply.comment_id)}
               >
-                <Text style={{ fontSize: 12 }}>
-                  🚨
-                </Text>
+                <Text style={{ fontSize: 12 }}>🚨</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -283,22 +278,18 @@ const Post = () => {
         >
           <Text style={styles.title}>{data.title}</Text>
           {formatAuthor(data.authorId) === formatAuthor(userId) ? (
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
                 hitSlop={8}
                 onPress={() => handleUpdatePost()}
               >
-                <Text style={{ fontSize: 12 }}>
-                  ✏️
-                </Text>
+                <Text style={{ fontSize: 12 }}>✏️</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 hitSlop={8}
                 onPress={() => handleRemovePost()}
               >
-                <Text style={{ fontSize: 12 }}>
-                  ❌
-                </Text>
+                <Text style={{ fontSize: 12 }}>❌</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -306,9 +297,7 @@ const Post = () => {
               hitSlop={8}
               onPress={() => handleReportPost()}
             >
-              <Text style={{ fontSize: 12 }}>
-                🚨
-              </Text>
+              <Text style={{ fontSize: 12 }}>🚨</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -377,22 +366,18 @@ const Post = () => {
                 {formatAuthor(comment.author_id)}
               </Text>
               {formatAuthor(comment.author_id) === formatAuthor(userId) ? (
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: "row" }}>
                   <TouchableOpacity
                     hitSlop={8}
                     onPress={() => handleUpdateComment(comment.comment_id)}
                   >
-                    <Text style={{ fontSize: 12 }}>
-                      ✏️
-                    </Text>
+                    <Text style={{ fontSize: 12 }}>✏️</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     hitSlop={8}
                     onPress={() => handleRemoveComment(comment.comment_id)}
                   >
-                    <Text style={{ fontSize: 12 }}>
-                      ❌
-                    </Text>
+                    <Text style={{ fontSize: 12 }}>❌</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -400,14 +385,32 @@ const Post = () => {
                   hitSlop={8}
                   onPress={() => handleReportComment(comment.comment_id)}
                 >
-                  <Text style={{ fontSize: 12 }}>
-                    🚨
-                  </Text>
+                  <Text style={{ fontSize: 12 }}>🚨</Text>
                 </TouchableOpacity>
               )}
             </View>
             <Text style={styles.commentTimestamp}>{comment.created_at}</Text>
-            <Markdown style={styles.commentContent}>{comment.content}</Markdown>
+            <Markdown
+              style={styles.commentContent}
+              rules={{
+                fence: (node, children) => {
+                  const language = node.sourceInfo || "text";
+                  const content = node.content || "";
+
+                  return (
+                    <SyntaxHighlighter
+                      key={node.key}
+                      language={language}
+                      highlighter={"prism"}
+                    >
+                      {content}
+                    </SyntaxHighlighter>
+                  );
+                },
+              }}
+            >
+              {comment.content}
+            </Markdown>
             <TouchableOpacity
               style={styles.replyButton} // 스타일 적용
               onPress={() => handleReply(comment)} // 대댓글 작성 핸들러
