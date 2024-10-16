@@ -1,4 +1,4 @@
-import { FlatList, TextInput, View, StyleSheet } from "react-native";
+import { FlatList, TextInput, View, StyleSheet, ActivityIndicator} from "react-native";
 import { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import List from "../../../../components/tabs/List/List";
@@ -15,27 +15,39 @@ export default function Community() {
       reply: 0,
     },
   ]);
-
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [filteredCommunitys, setFilteredCommunitys] = useState(communitys);
+  const [process, setProcess] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
-      _axios
-        .get("/community")
-        .then((response) => {
-          const reversedData = response.data.reverse() || [];
-          setCommunitys(reversedData);
-          setFilteredCommunitys(reversedData);
-        })
-        .catch((error) => {
-          setCommunitys([]);
-          setFilteredCommunitys([]);
-        });
+      setPage(1);
+      getList(1);
     }, [])
   );
+  const getList = async (tempPage) => {
+    if (process) return;
+    setProcess(true);
+    try {
+      const response = await _axios.get(`/community?page=${tempPage}`);
+      setTotalPage(response.data.total_pages);
+      const reversedData = response.data.data || [];
+      if (tempPage === 1) {
+        setCommunitys(reversedData);
+      } else {
+        setCommunitys((prevCommunitys) => [...prevCommunitys, ...reversedData]);
+      }
+      setFilteredCommunitys((prevCommunitys) => [...prevCommunitys, ...reversedData]);
+    } catch (error) {
+      setCommunitys([]);
+      setFilteredCommunitys([]);
+    } finally {
+      setProcess(false);
+    }
+  };
 
-  // 검색 텍스트가 변경될 때마다 필터링
   const handleSearch = (text) => {
     setSearchText(text);
     const filtered = communitys.filter((item) =>
@@ -44,9 +56,16 @@ export default function Community() {
     setFilteredCommunitys(filtered);
   };
 
+  const refresh = async () => {
+    let nextPage = page + 1;
+    if (nextPage > totalPage || process) return;
+    setPage(nextPage);
+    await getList(nextPage);
+  };
+
   return (
     <View style={{ flex: 1 }}>
-      {/* 검색창 추가 */}
+      {/* 검색창 */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -56,7 +75,7 @@ export default function Community() {
         />
       </View>
 
-      {/* 검색창 아래에서 시작하도록 FlatList에 marginTop 추가 */}
+      {/* 커뮤니티 리스트 */}
       <FlatList
         data={filteredCommunitys}
         keyExtractor={(item) => item.id.toString()}
@@ -68,7 +87,12 @@ export default function Community() {
             type="community"
           />
         )}
-        contentContainerStyle={{ paddingTop: 20 }}  // 검색창 높이만큼 여유 공간 추가
+        contentContainerStyle={{ paddingTop: 20 }}
+        onEndReached={refresh}
+        ListFooterComponent={
+          process && <ActivityIndicator size="large" color="#0000ff" />
+        }
+        onEndReachedThreshold={0.05}
       />
     </View>
   );
@@ -76,12 +100,12 @@ export default function Community() {
 
 const styles = StyleSheet.create({
   searchContainer: {
-    paddingHorizontal: 20,  // 좌우 여백
-    alignItems: "flex-end", // 검색창을 오른쪽으로 정렬
+    paddingHorizontal: 20,
+    alignItems: "flex-end",
   },
   searchInput: {
     height: 40,
-    width: 200,             // 검색창 너비를 200px로 설정
+    width: 200,
     borderColor: "gray",
     borderWidth: 1,
     borderRadius: 10,
