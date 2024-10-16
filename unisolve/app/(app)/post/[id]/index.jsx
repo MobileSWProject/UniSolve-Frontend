@@ -41,6 +41,12 @@ const Post = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [process, setProcess] = useState(false);
 
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [editComment, setEditComment] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [editingInput, setEditingInput] = useState(false);
+
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
 
@@ -132,16 +138,22 @@ const Post = () => {
 
   const handleUpdateComment = async (targetCommentId) => {
     try {
-      const response = await _axios.post(`/comment/${targetCommentId}`);
-
-      // 댓글 삭제 후 댓글 목록만 다시 불러옴
-      const updatedPost = await _axios.get(`/post/${id}`);
-      setData((prev) => ({
-        ...prev,
-        comments: updatedPost.data.comments,
-        commentsCount: updatedPost.data.comments_count,
-      }));
-    } catch (error) {
+      const response = await _axios.put(`/update_comment/${targetCommentId}`, { content: editComment });
+      if (response.data.status === "success") {
+        setEditComment("");
+        setEditing(false);
+        // 댓글 수정 후 댓글 목록만 다시 불러옴
+        const updatedPost = await _axios.get(`/post/${id}`);
+        setData((prev) => ({
+          ...prev,
+          comments: updatedPost.data.comments,
+          commentsCount: updatedPost.data.comments_count,
+        }));
+      }
+      setSnackbarVisible(true);
+      setSnackbarMessage("댓글이 수정되었습니다!");
+    }
+    catch (error) {
       // "something error 😭"
       console.log("Something Error 😭");
     }
@@ -190,13 +202,29 @@ const Post = () => {
               <View style={{ flexDirection: "row" }}>
                 <TouchableOpacity
                   hitSlop={8}
-                  onPress={() => handleUpdateComment(reply.comment_id)}
+                  onPress={() => {
+                    if (editing) {
+                      handleUpdateComment(reply.comment_id);
+                      return;
+                    }
+                    else if (!editing) {
+                      setEditComment(reply.content);
+                      setEditing(true);
+                    }
+                  }}
                 >
                   <Text style={{ fontSize: 12 }}>✏️</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   hitSlop={8}
-                  onPress={() => handleRemoveComment(reply.comment_id)}
+                  onPress={() => {
+                    if (editing) {
+                      setEditing(false);
+                    } else {
+                      setEditComment("");
+                      handleRemoveComment(reply.comment_id)
+                    }
+                  }}
                 >
                   <Text style={{ fontSize: 12 }}>❌</Text>
                 </TouchableOpacity>
@@ -204,14 +232,22 @@ const Post = () => {
             ) : (
               <TouchableOpacity
                 hitSlop={8}
-                onPress={() => {setCommentID(reply.comment_id); setModalVisible(true);}}
+                onPress={() => { setCommentID(reply.comment_id); setModalVisible(true); }}
               >
                 <Text style={{ fontSize: 12 }}>🚨</Text>
               </TouchableOpacity>
             )}
           </View>
           <Text style={styles.replyTimestamp}>{reply.created_at}</Text>
-          <Markdown style={styles.replyContent}>{reply.content}</Markdown>
+          {editing ?
+            <TextInput
+              placeholder="댓글을 입력하세요..."
+              placeholderTextColor={"black"}
+              value={editComment}
+              onChangeText={(text) => setEditComment(text)}
+              multiline={true}
+            /> :
+            <Markdown style={styles.replyContent}>{reply.content}</Markdown>}
         </View>
       </View>
     ));
@@ -239,14 +275,26 @@ const Post = () => {
 
   const handleUpdatePost = async () => {
     try {
-      const response = await _axios.post(`/question/${id}`);
-
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace("/community");
+      const response = await _axios.put(`/update_post/${id}`, { title: editTitle, content: editContent });
+      if (response.data.status === "success") {
+        setEditTitle("");
+        setEditContent("");
+        setEditing(false);
+        // 게시글 수정 후 댓글 목록만 다시 불러옴
+        const updatedPost = await _axios.get(`/post/${id}`);
+        setData((prev) => ({
+          ...prev,
+          title: response.data.title,
+          content: response.data.description,
+          timestamp: response.data.timestamp,
+          comments: updatedPost.data.comments,
+          commentsCount: updatedPost.data.comments_count,
+        }));
       }
-    } catch (error) {
+      setSnackbarVisible(true);
+      setSnackbarMessage("댓글이 수정되었습니다!");
+    }
+    catch (error) {
       // "something error 😭"
       console.log("Something Error 😭");
     }
@@ -368,13 +416,29 @@ const Post = () => {
                 <View style={{ flexDirection: "row" }}>
                   <TouchableOpacity
                     hitSlop={8}
-                    onPress={() => handleUpdateComment(comment.comment_id)}
+                    onPress={() => {
+                      if (editing) {
+                        handleUpdateComment(comment.comment_id);
+                        return;
+                      }
+                      else if (!editing) {
+                        setEditComment(comment.content);
+                        setEditing(true);
+                      }
+                    }}
                   >
                     <Text style={{ fontSize: 12 }}>✏️</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     hitSlop={8}
-                    onPress={() => handleRemoveComment(comment.comment_id)}
+                    onPress={() => {
+                      if (editing) {
+                        setEditing(false);
+                      } else {
+                        setEditComment("");
+                        handleRemoveComment(comment.comment_id)
+                      }
+                    }}
                   >
                     <Text style={{ fontSize: 12 }}>❌</Text>
                   </TouchableOpacity>
@@ -382,61 +446,71 @@ const Post = () => {
               ) : (
                 <TouchableOpacity
                   hitSlop={8}
-                  onPress={() => {setCommentID(comment.comment_id); setModalVisible(true);}}
+                  onPress={() => { setCommentID(comment.comment_id); setModalVisible(true); }}
                 >
                   <Text style={{ fontSize: 12 }}>🚨</Text>
                 </TouchableOpacity>
               )}
             </View>
             <Text style={styles.commentTimestamp}>{comment.created_at}</Text>
-            <Markdown
-              style={styles.commentContent}
-              rules={{
-                fence: (node, children) => {
-                  const language = node.sourceInfo || "text";
-                  const content = node.content || "";
+            {editing ?
+              <TextInput
+                placeholder="댓글을 입력하세요..."
+                placeholderTextColor={"black"}
+                value={editComment}
+                onChangeText={(text) => setEditComment(text)}
+                multiline={true}
+              /> :
+              <>
+                <Markdown
+                  style={styles.commentContent}
+                  rules={{
+                    fence: (node, children) => {
+                      const language = node.sourceInfo || "text";
+                      const content = node.content || "";
 
-                  return (
-                    <ScrollView
-                      key={node.key}
-                      horizontal={true}
-                      showsVerticalScrollIndicator={false}
-                      showsHorizontalScrollIndicator={true}
-                      style={{
-                        width: "100%",
-                      }}
-                      contentContainerStyle={{
-                        flexGrow: 1,
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: "100%",
-                          flexDirection: "row",
-                        }}
-                      >
-                        <SyntaxHighlighter
+                      return (
+                        <ScrollView
                           key={node.key}
-                          language={language}
-                          highlighter={"prism"}
-                          customStyle={{
+                          horizontal={true}
+                          showsVerticalScrollIndicator={false}
+                          showsHorizontalScrollIndicator={true}
+                          style={{
                             width: "100%",
-                            overflowX: "hidden",
-                            overflowY: "hidden",
                           }}
-                          pointerEvents="none"
+                          contentContainerStyle={{
+                            flexGrow: 1,
+                            alignItems: "flex-start",
+                          }}
                         >
-                          {content}
-                        </SyntaxHighlighter>
-                      </View>
-                    </ScrollView>
-                  );
-                },
-              }}
-            >
-              {comment.content}
-            </Markdown>
+                          <View
+                            style={{
+                              width: "100%",
+                              flexDirection: "row",
+                            }}
+                          >
+                            <SyntaxHighlighter
+                              key={node.key}
+                              language={language}
+                              highlighter={"prism"}
+                              customStyle={{
+                                width: "100%",
+                                overflowX: "hidden",
+                                overflowY: "hidden",
+                              }}
+                              pointerEvents="none"
+                            >
+                              {content}
+                            </SyntaxHighlighter>
+                          </View>
+                        </ScrollView>
+                      );
+                    },
+                  }}
+                >
+                  {comment.content}
+                </Markdown>
+              </>}
             <TouchableOpacity
               style={styles.replyButton} // 스타일 적용
               onPress={() => handleReply(comment)} // 대댓글 작성 핸들러
@@ -497,16 +571,16 @@ const Post = () => {
         </Modal>
       </View>
       {snackbarVisible ?
-      <View style={styles.snackbarContainer}>
-        <Snackbar
-          style={styles.snackbar}
-          visible={snackbarVisible}
-          onDismiss={() => { setSnackbarVisible(false); setSnackbarMessage(""); }}
-          duration={2000}
-        >
-          {snackbarMessage}
-        </Snackbar>
-      </View> : <></>}
+        <View style={styles.snackbarContainer}>
+          <Snackbar
+            style={styles.snackbar}
+            visible={snackbarVisible}
+            onDismiss={() => { setSnackbarVisible(false); setSnackbarMessage(""); }}
+            duration={2000}
+          >
+            {snackbarMessage}
+          </Snackbar>
+        </View> : <></>}
     </KeyboardAwareScrollView>
   );
 };
