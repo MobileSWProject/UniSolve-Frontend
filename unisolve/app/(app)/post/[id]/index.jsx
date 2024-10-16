@@ -323,11 +323,12 @@ const Post = () => {
         </TouchableOpacity>
       </View>
 
-      {/* 댓글 입력 필드 */}
+      {/* 게시글 댓글 입력 필드 */}
       <View style={styles.commentInputContainer}>
         <TextInput
           style={styles.commentInput}
           placeholder="댓글을 입력하세요..."
+          placeholderTextColor={"black"}
           value={newComment}
           onChangeText={(text) => setNewComment(text)}
           multiline={true}

@@ -66,8 +66,10 @@ const styles = StyleSheet.create({
 
   // 댓글 관련 스타일
   commentContainer: {
-    padding: 15,
     backgroundColor: "#f8f8f8",
+    paddingTop: 20,
+    paddingBottom: 60,
+    paddingHorizontal: 24,
   },
   commentTitle: {
     fontSize: 18,
@@ -90,35 +92,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   commentContent: {
-    body: { fontSize: 14, lineHeight: 20 },
-    fence: { backgroundColor: "black", color: "white" },
-  },
-
-  // 대댓글 관련 스타일
-  repliesContainer: {
-    marginLeft: 20,
-    marginTop: 10,
-    paddingLeft: 10,
-    borderLeftWidth: 1,
-    borderLeftColor: "#dcdcdc",
-  },
-  replyItem: {
-    marginBottom: 10,
-  },
-  replyIndent: {
-    marginTop: 5,
-  },
-  replyUser: {
-    fontSize: 13,
-    fontWeight: "bold",
-  },
-  replyTimestamp: {
-    fontSize: 11,
-    color: "#999",
-    marginBottom: 5,
-  },
-  replyContent: {
-    body: { fontSize: 13, lineHeight: "2em" },
+    body: { fontSize: 14 },
     fence: { backgroundColor: "black", color: "white" },
   },
 
@@ -149,21 +123,6 @@ const styles = StyleSheet.create({
   },
   commentButtonText: {
     color: "#fff",
-    fontWeight: "bold",
-  },
-
-  // 대댓글 버튼
-  replyButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    backgroundColor: mainColor,
-    borderRadius: 5,
-    marginTop: 8,
-    alignSelf: "flex-start", // 버튼을 왼쪽에 배치
-  },
-  replyButtonText: {
-    color: "#FFFFFF", // 텍스트 색상: 흰색
-    fontSize: 12, // 텍스트 크기: 작게
     fontWeight: "bold",
   },
 
