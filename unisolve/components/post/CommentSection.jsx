@@ -100,6 +100,7 @@ const CommentSection = ({
                   <SyntaxHighlighter
                     key={node.key}
                     language={language}
+                    highlighter={"prism"}
                     customStyle={{
                       width: "100%",
                       overflowX: "hidden",
