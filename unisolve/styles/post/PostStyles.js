@@ -90,8 +90,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   commentContent: {
-    body: {fontSize: 14, lineHeight: '2em'},
-    fence: {backgroundColor: 'black', color: 'white'}
+    body: { fontSize: 14, lineHeight: 20 },
+    fence: { backgroundColor: "black", color: "white" },
   },
 
   // 대댓글 관련 스타일
@@ -118,8 +118,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   replyContent: {
-    body: {fontSize: 13, lineHeight: '2em'},
-    fence: {backgroundColor: 'black', color: 'white'}
+    body: { fontSize: 13, lineHeight: "2em" },
+    fence: { backgroundColor: "black", color: "white" },
   },
 
   // 댓글 입력 칸
