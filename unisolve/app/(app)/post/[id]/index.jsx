@@ -120,6 +120,40 @@ const Post = () => {
     }
   };
 
+  const handleUpdateComment = async (targetCommentId) => {
+    try {
+      const response = await _axios.post(`/comment/${targetCommentId}`);
+
+      // 댓글 삭제 후 댓글 목록만 다시 불러옴
+      const updatedPost = await _axios.get(`/post/${id}`);
+      setData((prev) => ({
+        ...prev,
+        comments: updatedPost.data.comments,
+        commentsCount: updatedPost.data.comments_count,
+      }));
+    } catch (error) {
+      // "something error 😭"
+      console.log("Something Error 😭");
+    }
+  };
+
+  const handleReportComment = async (targetCommentId) => {
+    try {
+      const response = await _axios.post(`/report/${targetCommentId}`);
+
+      // 댓글 삭제 후 댓글 목록만 다시 불러옴
+      const updatedPost = await _axios.get(`/post/${id}`);
+      setData((prev) => ({
+        ...prev,
+        comments: updatedPost.data.comments,
+        commentsCount: updatedPost.data.comments_count,
+      }));
+    } catch (error) {
+      // "something error 😭"
+      console.log("Something Error 😭");
+    }
+  };
+
   const renderReplies = (replies) => {
     return replies.map((reply, index) => (
       <View
@@ -138,13 +172,32 @@ const Post = () => {
             <Text style={styles.commentUser}>
               {formatAuthor(reply.author_id)}
             </Text>
-            {formatAuthor(reply.author_id) === formatAuthor(userId) && (
+            {formatAuthor(reply.author_id) === formatAuthor(userId) ? (
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                  hitSlop={8}
+                  onPress={() => handleUpdateComment(reply.comment_id)}
+                >
+                  <Text style={{ fontSize: 12 }}>
+                    ✏️
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  hitSlop={8}
+                  onPress={() => handleRemoveComment(reply.comment_id)}
+                >
+                  <Text style={{ fontSize: 12 }}>
+                    ❌
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
               <TouchableOpacity
                 hitSlop={8}
-                onPress={() => handleRemoveComment(reply.comment_id)}
+                onPress={() => handleReportComment(reply.comment_id)}
               >
-                <Text style={{ color: "red", fontSize: 24, fontWeight: 700 }}>
-                  ×
+                <Text style={{ fontSize: 12 }}>
+                  🚨
                 </Text>
               </TouchableOpacity>
             )}
@@ -164,6 +217,36 @@ const Post = () => {
   const handleRemovePost = async () => {
     try {
       const response = await _axios.delete(`/question/${id}`);
+
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/community");
+      }
+    } catch (error) {
+      // "something error 😭"
+      console.log("Something Error 😭");
+    }
+  };
+
+  const handleUpdatePost = async () => {
+    try {
+      const response = await _axios.post(`/question/${id}`);
+
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/community");
+      }
+    } catch (error) {
+      // "something error 😭"
+      console.log("Something Error 😭");
+    }
+  };
+
+  const handleReportPost = async () => {
+    try {
+      const response = await _axios.put(`/reporting/${id}`);
 
       if (router.canGoBack()) {
         router.back();
@@ -199,13 +282,32 @@ const Post = () => {
           }}
         >
           <Text style={styles.title}>{data.title}</Text>
-          {formatAuthor(data.authorId) === formatAuthor(userId) && (
+          {formatAuthor(data.authorId) === formatAuthor(userId) ? (
+            <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity
+                hitSlop={8}
+                onPress={() => handleUpdatePost()}
+              >
+                <Text style={{ fontSize: 12 }}>
+                  ✏️
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                hitSlop={8}
+                onPress={() => handleRemovePost()}
+              >
+                <Text style={{ fontSize: 12 }}>
+                  ❌
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
             <TouchableOpacity
               hitSlop={8}
-              onPress={handleRemovePost}
+              onPress={() => handleReportPost()}
             >
-              <Text style={{ color: "red", fontSize: 24, fontWeight: 700 }}>
-                ×
+              <Text style={{ fontSize: 12 }}>
+                🚨
               </Text>
             </TouchableOpacity>
           )}
@@ -245,7 +347,7 @@ const Post = () => {
           placeholder="댓글을 입력하세요..."
           value={newComment}
           onChangeText={(text) => setNewComment(text)}
-          multiline = {true}
+          multiline={true}
         />
         <TouchableOpacity
           style={styles.commentButton}
@@ -274,13 +376,32 @@ const Post = () => {
               <Text style={styles.commentUser}>
                 {formatAuthor(comment.author_id)}
               </Text>
-              {formatAuthor(comment.author_id) === formatAuthor(userId) && (
+              {formatAuthor(comment.author_id) === formatAuthor(userId) ? (
+                <View style={{ flexDirection: 'row' }}>
+                  <TouchableOpacity
+                    hitSlop={8}
+                    onPress={() => handleUpdateComment(comment.comment_id)}
+                  >
+                    <Text style={{ fontSize: 12 }}>
+                      ✏️
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    hitSlop={8}
+                    onPress={() => handleRemoveComment(comment.comment_id)}
+                  >
+                    <Text style={{ fontSize: 12 }}>
+                      ❌
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
                 <TouchableOpacity
                   hitSlop={8}
-                  onPress={() => handleRemoveComment(comment.comment_id)}
+                  onPress={() => handleReportComment(comment.comment_id)}
                 >
-                  <Text style={{ color: "red", fontSize: 24, fontWeight: 700 }}>
-                    ×
+                  <Text style={{ fontSize: 12 }}>
+                    🚨
                   </Text>
                 </TouchableOpacity>
               )}
@@ -302,7 +423,7 @@ const Post = () => {
                     placeholder="댓글을 입력하세요..."
                     value={replyComment}
                     onChangeText={(text) => setReplyComment(text)}
-                    multiline = {true}
+                    multiline={true}
                   />
                   <TouchableOpacity
                     style={styles.commentButton}
