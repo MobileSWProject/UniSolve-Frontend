@@ -398,13 +398,40 @@ const Post = () => {
                   const content = node.content || "";
 
                   return (
-                    <SyntaxHighlighter
+                    <ScrollView
                       key={node.key}
-                      language={language}
-                      highlighter={"prism"}
+                      horizontal={true}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={true}
+                      style={{
+                        width: "100%",
+                      }}
+                      contentContainerStyle={{
+                        flexGrow: 1,
+                        alignItems: "flex-start",
+                      }}
                     >
-                      {content}
-                    </SyntaxHighlighter>
+                      <View
+                        style={{
+                          width: "100%",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <SyntaxHighlighter
+                          key={node.key}
+                          language={language}
+                          highlighter={"prism"}
+                          customStyle={{
+                            width: "100%",
+                            overflowX: "hidden",
+                            overflowY: "hidden",
+                          }}
+                          pointerEvents="none"
+                        >
+                          {content}
+                        </SyntaxHighlighter>
+                      </View>
+                    </ScrollView>
                   );
                 },
               }}
