@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
   TextInput,
+  Modal,
 } from "react-native";
 import styles from "../../../../styles/post/PostStyles";
 import { useCallback, useState, useEffect } from "react";
@@ -25,12 +26,19 @@ import useUserId from "../../../../hooks/useUserId"; // 커스텀 훅 불러오�
 import formatAuthor from "../../../../utils/formatAuthor";
 import Markdown from "react-native-markdown-display";
 import SyntaxHighlighter from "react-native-syntax-highlighter";
+import { mainColor } from "../../../../constants/Colors";
+import { Snackbar, Provider as PaperProvider } from 'react-native-paper';
 
 const Post = () => {
   const { id } = useLocalSearchParams();
   const [data, setData] = useState(null);
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
   const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
+  const [modalVisible, setModalVisible] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [commentID, setCommentID] = useState(null);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
@@ -138,20 +146,21 @@ const Post = () => {
     }
   };
 
-  const handleReportComment = async (targetCommentId) => {
+  const handleReport = async () => {
+    if (reportReason.length < 1) return;
     try {
-      const response = await _axios.post(`/report/${targetCommentId}`);
-
-      // 댓글 삭제 후 댓글 목록만 다시 불러옴
-      const updatedPost = await _axios.get(`/post/${id}`);
-      setData((prev) => ({
-        ...prev,
-        comments: updatedPost.data.comments,
-        commentsCount: updatedPost.data.comments_count,
-      }));
+      const response = await _axios.post(`/report`, { post_id: id, comment_id: commentID || null, reason: reportReason });
+      setModalVisible(false);
+      setCommentID(null);
+      if (response.data.status === "success") {
+        setReportReason("");
+        setSnackbarVisible(true);
+        setSnackbarMessage("신고가 접수되었습니다!");
+      }
     } catch (error) {
-      // "something error 😭"
-      console.log("Something Error 😭");
+      setModalVisible(false);
+      setSnackbarVisible(true);
+      setSnackbarMessage("신고가 접수되지 않았습니다!");
     }
   };
 
@@ -191,7 +200,7 @@ const Post = () => {
             ) : (
               <TouchableOpacity
                 hitSlop={8}
-                onPress={() => handleReportComment(reply.comment_id)}
+                onPress={() => {setCommentID(reply.comment_id); setModalVisible(true);}}
               >
                 <Text style={{ fontSize: 12 }}>🚨</Text>
               </TouchableOpacity>
@@ -227,21 +236,6 @@ const Post = () => {
   const handleUpdatePost = async () => {
     try {
       const response = await _axios.post(`/question/${id}`);
-
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace("/community");
-      }
-    } catch (error) {
-      // "something error 😭"
-      console.log("Something Error 😭");
-    }
-  };
-
-  const handleReportPost = async () => {
-    try {
-      const response = await _axios.put(`/reporting/${id}`);
 
       if (router.canGoBack()) {
         router.back();
@@ -295,7 +289,7 @@ const Post = () => {
           ) : (
             <TouchableOpacity
               hitSlop={8}
-              onPress={() => handleReportPost()}
+              onPress={() => setModalVisible(true)}
             >
               <Text style={{ fontSize: 12 }}>🚨</Text>
             </TouchableOpacity>
@@ -383,7 +377,7 @@ const Post = () => {
               ) : (
                 <TouchableOpacity
                   hitSlop={8}
-                  onPress={() => handleReportComment(comment.comment_id)}
+                  onPress={() => {setCommentID(comment.comment_id); setModalVisible(true);}}
                 >
                   <Text style={{ fontSize: 12 }}>🚨</Text>
                 </TouchableOpacity>
@@ -473,7 +467,41 @@ const Post = () => {
             )}
           </View>
         ))}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => { setCommentID(null); setModalVisible(false); }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <TextInput
+                style={styles.commentInput}
+                placeholder="신고 내용을 입력하세요..."
+                value={reportReason}
+                onChangeText={(text) => setReportReason(text)}
+                multiline={true}
+              />
+              <TouchableOpacity disabled={false} style={[styles.buttonSmall, { backgroundColor: false ? 'gray' : mainColor }]} onPress={() => { setCommentID(null); setModalVisible(false); }}>
+                <Text style={styles.buttonTextSmall}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity disabled={false} style={[styles.buttonSmall, { backgroundColor: false ? 'gray' : mainColor }]} onPress={() => handleReport()}>
+                <Text style={styles.buttonTextSmall}>신고하기</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
+      {snackbarVisible ?
+      <View style={styles.snackbarContainer}>
+        <Snackbar
+          style={styles.snackbar}
+          visible={snackbarVisible}
+          onDismiss={() => { setSnackbarVisible(false); setSnackbarMessage(""); }}
+          duration={2000}
+        >
+          {snackbarMessage}
+        </Snackbar>
+      </View> : <></>}
     </KeyboardAwareScrollView>
   );
 };

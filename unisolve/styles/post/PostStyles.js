@@ -166,6 +166,56 @@ const styles = StyleSheet.create({
     fontSize: 12, // 텍스트 크기: 작게
     fontWeight: "bold",
   },
+
+  centeredView: { //모달
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalView: {
+    width: 350,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  buttonSmall: {
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 35,
+    marginTop: 25,
+  },
+  buttonTextSmall: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+
+  snackbarContainer: {//스낵바
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -150 }, { translateY: -50 }],
+    backgroundColor: '#333',
+    color: 'white',
+    padding: '16px',
+    borderRadius: '10px',
+    width: '25%',
+  },
+  snackbar: {
+    width: '100%',
+  },
 });
 
 export default styles;
