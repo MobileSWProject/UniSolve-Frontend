@@ -39,6 +39,7 @@ const Post = () => {
   const [commentID, setCommentID] = useState(null);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [process, setProcess] = useState(false);
 
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
@@ -147,9 +148,11 @@ const Post = () => {
   };
 
   const handleReport = async () => {
-    if (reportReason.length < 1) return;
+    if (reportReason.length < 1 || process) return;
     try {
+      setProcess(true);
       const response = await _axios.post(`/report`, { post_id: id, comment_id: commentID || null, reason: reportReason });
+      setProcess(false);
       setModalVisible(false);
       setCommentID(null);
       if (response.data.status === "success") {
@@ -158,6 +161,7 @@ const Post = () => {
         setSnackbarMessage("신고가 접수되었습니다!");
       }
     } catch (error) {
+      setProcess(false);
       setModalVisible(false);
       setSnackbarVisible(true);
       setSnackbarMessage("신고가 접수되지 않았습니다!");
