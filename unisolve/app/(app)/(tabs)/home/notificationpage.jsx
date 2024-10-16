@@ -18,7 +18,7 @@ export default function Notification() {
     useCallback(() => {
       setPage(1);
       getList(1);
-      setHistorys([]);
+      setNotifications([]);
     }, [])
   );
   const getList = async (tempPage) => {

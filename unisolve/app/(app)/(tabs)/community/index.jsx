@@ -6,14 +6,14 @@ import _axios from "../../../../api";
 
 export default function Community() {
   const [communitys, setCommunitys] = useState([
-    {
-      id: 1324,
-      questioner: "닉네임",
-      title: "React Native 질문",
-      description: "React Native에서",
-      timestamp: "2024.8.31 20:18",
-      reply: 0,
-    },
+    // {
+    //   id: 1324,
+    //   questioner: "닉네임",
+    //   title: "React Native 질문",
+    //   description: "React Native에서",
+    //   timestamp: "2024.8.31 20:18",
+    //   reply: 0,
+    // },
   ]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
@@ -25,7 +25,8 @@ export default function Community() {
     useCallback(() => {
       setPage(1);
       getList(1);
-      setHistorys([]);
+      setCommunitys([]);
+      setFilteredCommunitys([]);
     }, [])
   );
   const getList = async (tempPage) => {
