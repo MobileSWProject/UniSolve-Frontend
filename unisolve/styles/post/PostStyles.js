@@ -66,8 +66,10 @@ const styles = StyleSheet.create({
 
   // 댓글 관련 스타일
   commentContainer: {
-    padding: 15,
     backgroundColor: "#f8f8f8",
+    paddingTop: 20,
+    paddingBottom: 60,
+    paddingHorizontal: 24,
   },
   commentTitle: {
     fontSize: 18,
