@@ -24,6 +24,10 @@ const CommentSection = ({
   replyComment,
   setReplyComment,
   isReply = false,
+  setEditComment,
+  setEditing,
+  editing,
+  editComment,
 }) => {
   const isReplying = selectedComment === comment.comment_id;
 
@@ -51,13 +55,28 @@ const CommentSection = ({
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
               hitSlop={8}
-              onPress={() => handleUpdateComment(comment.comment_id)}
+              onPress={() => {
+                if (editing) {
+                  handleUpdateComment(comment.comment_id);
+                  return;
+                } else if (!editing) {
+                  setEditComment(comment.content);
+                  setEditing(true);
+                }
+              }}
             >
               <Text style={{ fontSize: 12 }}>✏️</Text>
             </TouchableOpacity>
             <TouchableOpacity
               hitSlop={8}
-              onPress={() => handleRemoveComment(comment.comment_id)}
+              onPress={() => {
+                if (editing) {
+                  setEditing(false);
+                } else {
+                  setEditComment("");
+                  handleRemoveComment(comment.comment_id);
+                }
+              }}
             >
               <Text style={{ fontSize: 12 }}>❌</Text>
             </TouchableOpacity>
@@ -74,50 +93,60 @@ const CommentSection = ({
       <Text style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>
         {comment.created_at}
       </Text>
-      <Markdown
-        style={{
-          body: { fontSize: 14 },
-          fence: { backgroundColor: "black", color: "white" },
-        }}
-        rules={{
-          fence: (node) => {
-            const language = node.sourceInfo || "text";
-            const content = node.content || "";
+      {editing ? (
+        <TextInput
+          placeholder="댓글을 입력하세요..."
+          placeholderTextColor={"black"}
+          value={editComment}
+          onChangeText={(text) => setEditComment(text)}
+          multiline={true}
+        />
+      ) : (
+        <Markdown
+          style={{
+            body: { fontSize: 14 },
+            fence: { backgroundColor: "black", color: "white" },
+          }}
+          rules={{
+            fence: (node) => {
+              const language = node.sourceInfo || "text";
+              const content = node.content || "";
 
-            return (
-              <ScrollView
-                key={node.key}
-                horizontal={true}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={true}
-                style={{ width: "100%" }}
-                contentContainerStyle={{
-                  flexGrow: 1,
-                  alignItems: "flex-start",
-                }}
-              >
-                <View style={{ width: "100%", flexDirection: "row" }}>
-                  <SyntaxHighlighter
-                    key={node.key}
-                    language={language}
-                    highlighter={"prism"}
-                    customStyle={{
-                      width: "100%",
-                      overflowX: "hidden",
-                      overflowY: "hidden",
-                    }}
-                    pointerEvents="none"
-                  >
-                    {content}
-                  </SyntaxHighlighter>
-                </View>
-              </ScrollView>
-            );
-          },
-        }}
-      >
-        {comment.content}
-      </Markdown>
+              return (
+                <ScrollView
+                  key={node.key}
+                  horizontal={true}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={true}
+                  style={{ width: "100%" }}
+                  contentContainerStyle={{
+                    flexGrow: 1,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <View style={{ width: "100%", flexDirection: "row" }}>
+                    <SyntaxHighlighter
+                      key={node.key}
+                      language={language}
+                      highlighter={"prism"}
+                      customStyle={{
+                        width: "100%",
+                        overflowX: "hidden",
+                        overflowY: "hidden",
+                      }}
+                      pointerEvents="none"
+                    >
+                      {content}
+                    </SyntaxHighlighter>
+                  </View>
+                </ScrollView>
+              );
+            },
+          }}
+        >
+          {comment.content}
+        </Markdown>
+      )}
 
       {/* Render the reply button only for top-level comments */}
       {!isReply && (
@@ -200,6 +229,10 @@ const CommentSection = ({
               replyComment={replyComment}
               setReplyComment={setReplyComment}
               isReply={true} // Indicating this is a reply
+              setEditComment={setEditComment}
+              setEditing={setEditing}
+              editing={editing}
+              editComment={editComment}
             />
           </View>
         ))}
