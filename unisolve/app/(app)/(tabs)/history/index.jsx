@@ -42,6 +42,7 @@ export default function History() {
     useCallback(() => {
       setPage(1);
       getList(1);
+      setHistorys([]);
     }, [])
   );
   const getList = async (tempPage) => {
