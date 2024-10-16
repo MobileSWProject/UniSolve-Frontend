@@ -23,6 +23,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useUserId from "../../../../hooks/useUserId"; // 커스텀 훅 불러오기
 import formatAuthor from "../../../../utils/formatAuthor";
+import Markdown from 'react-native-markdown-display';
 
 const Post = () => {
   const { id } = useLocalSearchParams();
@@ -149,7 +150,7 @@ const Post = () => {
             )}
           </View>
           <Text style={styles.replyTimestamp}>{reply.created_at}</Text>
-          <Text style={styles.replyContent}>{reply.content}</Text>
+          <Markdown style={styles.replyContent}>{reply.content}</Markdown>
         </View>
       </View>
     ));
@@ -244,6 +245,7 @@ const Post = () => {
           placeholder="댓글을 입력하세요..."
           value={newComment}
           onChangeText={(text) => setNewComment(text)}
+          multiline = {true}
         />
         <TouchableOpacity
           style={styles.commentButton}
@@ -284,7 +286,7 @@ const Post = () => {
               )}
             </View>
             <Text style={styles.commentTimestamp}>{comment.created_at}</Text>
-            <Text style={styles.commentContent}>{comment.content}</Text>
+            <Markdown style={styles.commentContent}>{comment.content}</Markdown>
             <TouchableOpacity
               style={styles.replyButton} // 스타일 적용
               onPress={() => handleReply(comment)} // 대댓글 작성 핸들러
@@ -300,6 +302,7 @@ const Post = () => {
                     placeholder="댓글을 입력하세요..."
                     value={replyComment}
                     onChangeText={(text) => setReplyComment(text)}
+                    multiline = {true}
                   />
                   <TouchableOpacity
                     style={styles.commentButton}
