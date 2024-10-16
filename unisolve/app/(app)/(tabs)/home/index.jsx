@@ -1,10 +1,13 @@
 import { Link, usePathname } from "expo-router";
 import { useState, useEffect } from "react";
-import { Text, View, Image, StyleSheet } from "react-native";
+import { Text, View, Image, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import { mainColor } from "../../../../constants/Colors";
+import Exp from "../../../../components/tabs/home/Exp";
 
 export default function Home() {
   const pathname = usePathname();
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Update the current time every second
   useEffect(() => {
@@ -46,15 +49,29 @@ export default function Home() {
       </Link>
 
       {/* 경험치 페이지 */}
-      <Link
-        href={`${pathname}/expPage`}
+      <TouchableOpacity
+        onPress={() => setModalVisible(true)}
         style={styles.expLink}
       >
         <Image
           source={require('../../../../assets/logo.jpg')}
           style={styles.extralogo}
         />
-      </Link>
+      </TouchableOpacity>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Exp/>
+            <TouchableOpacity disabled={false} style={[styles.buttonSmall, { backgroundColor: false ? 'gray' : mainColor }]} onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonTextSmall}>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* 알림 페이지 */}
       <Link
@@ -66,7 +83,7 @@ export default function Home() {
           style={styles.extralogo}
         />
       </Link>
-    </View>
+    </View >
   );
 }
 
@@ -110,5 +127,39 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  buttonSmall: {
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 35,
+    marginTop: 25,
+  },
+  buttonTextSmall: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  modalView: {
+    width: 350,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
