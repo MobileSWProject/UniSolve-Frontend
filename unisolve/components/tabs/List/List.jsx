@@ -4,14 +4,20 @@ import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import formatAuthor from "../../../utils/formatAuthor";
+import _axios from "../../../api";
 
 export default function PostListItem({ item, index, count, type }) {
   const typeConvert = { 0: "시스템 알림", 1: "새로운 질문", 2: "새로운 답변", 3: "새로운 댓글", 4: "새로운 대댓글" };
   const router = useRouter();
 
+  const updateNotification = async (id) => {
+    try {
+      const response = await _axios.patch(`/notification/${id}`, {is_read: true});
+    } catch (error) {
+    }
+  };
+
   return (
-    // 각 게시글에 대한 링크 → https://unisolve.com/post/1234 (https://localhost:8081/post/1234)
-    // 링크로 접속 시 auth 인증 데이터가 없으면 Login 화면으로 리다이렉트
     <TouchableOpacity
       style={[
         styles.main,
@@ -20,7 +26,10 @@ export default function PostListItem({ item, index, count, type }) {
           ? { backgroundColor: "#BABABA" }
           : null,
       ]}
-      onPress={() => router.push(`post/${item.id}`)}
+      onPress={async () => {
+        if (type === "notification") await updateNotification(item.not_id);
+        router.push(`post/${item.id}`);
+      }}
     >
       <View style={styles.header}>
         <Text

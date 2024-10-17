@@ -24,8 +24,6 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useUserId from "../../../../hooks/useUserId"; // 커스텀 훅 불러오기
 import formatAuthor from "../../../../utils/formatAuthor";
-import Markdown from "react-native-markdown-display";
-import SyntaxHighlighter from "react-native-syntax-highlighter";
 import { mainColor } from "../../../../constants/Colors";
 import { Snackbar, Provider as PaperProvider } from "react-native-paper";
 import CommentSection from "../../../../components/post/CommentSection";
