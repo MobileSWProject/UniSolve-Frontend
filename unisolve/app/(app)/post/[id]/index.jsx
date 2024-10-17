@@ -46,7 +46,8 @@ const Post = () => {
   const [editContent, setEditContent] = useState("");
   const [editComment, setEditComment] = useState("");
   const [editing, setEditing] = useState(false);
-  const [editingInput, setEditingInput] = useState(false);
+
+  const [editPost, setEditPost] = useState(false);
 
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
@@ -175,14 +176,14 @@ const Post = () => {
       setCommentID(null);
       if (response.data.status === "success") {
         setReportReason("");
-        setSnackbarVisible(true);
         setSnackbarMessage("신고가 접수되었습니다!");
+        setSnackbarVisible(true);
       }
     } catch (error) {
       setProcess(false);
       setModalVisible(false);
-      setSnackbarVisible(true);
       setSnackbarMessage("신고가 접수되지 않았습니다!");
+      setSnackbarVisible(true);
     }
   };
 
@@ -208,29 +209,33 @@ const Post = () => {
 
   const handleUpdatePost = async () => {
     try {
+      if (editTitle.length < 1 || editContent.length < 1 || process) return;
+      setModalVisible(false);
+      setEditTitle("");
+      setEditContent("");
+      setEditing(false);
+      setProcess(true);
       const response = await _axios.put(`/update_post/${id}`, {
         title: editTitle,
         content: editContent,
       });
       if (response.data.status === "success") {
-        setEditTitle("");
-        setEditContent("");
-        setEditing(false);
-        // 게시글 수정 후 댓글 목록만 다시 불러옴
+        // 게시글 수정 후 다시 불러오기
         const updatedPost = await _axios.get(`/post/${id}`);
         setData((prev) => ({
           ...prev,
-          title: response.data.title,
-          content: response.data.description,
-          timestamp: response.data.timestamp,
+          title: updatedPost.data.title,
+          content: updatedPost.data.description,
+          timestamp: updatedPost.data.timestamp,
           comments: updatedPost.data.comments,
           commentsCount: updatedPost.data.comments_count,
         }));
       }
+      setSnackbarMessage("게시글이 수정되었습니다!");
       setSnackbarVisible(true);
-      setSnackbarMessage("댓글이 수정되었습니다!");
+      setProcess(false);
     } catch (error) {
-      // "something error 😭"
+      setProcess(false);
       console.log("Something Error 😭");
     }
   };
@@ -262,7 +267,7 @@ const Post = () => {
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
                 hitSlop={8}
-                onPress={() => handleUpdatePost()}
+                onPress={() => { setEditPost(true); setEditTitle(data.title); setEditContent(data.content); setModalVisible(true); }}
               >
                 <Text style={{ fontSize: 12 }}>✏️</Text>
               </TouchableOpacity>
@@ -276,7 +281,7 @@ const Post = () => {
           ) : (
             <TouchableOpacity
               hitSlop={8}
-              onPress={() => setModalVisible(true)}
+              onPress={() => { setEditPost(false); setModalVisible(true); }}
             >
               <Text style={{ fontSize: 12 }}>🚨</Text>
             </TouchableOpacity>
@@ -338,7 +343,7 @@ const Post = () => {
             userId={userId}
             handleUpdateComment={handleUpdateComment}
             handleRemoveComment={handleRemoveComment}
-            handleReportComment={() => setModalVisible(true)}
+            handleReportComment={() => { setEditPost(false); setModalVisible(true); }}
             handleReply={handleReply}
             handleAddComment={handleAddComment}
             selectedComment={selectedComment}
@@ -360,17 +365,38 @@ const Post = () => {
           onRequestClose={() => {
             setCommentID(null);
             setModalVisible(false);
+            setEditTitle("");
+            setEditContent("");
           }}
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <TextInput
-                style={styles.commentInput}
-                placeholder="신고 내용을 입력하세요..."
-                value={reportReason}
-                onChangeText={(text) => setReportReason(text)}
-                multiline={true}
-              />
+              {editPost ?
+                <>
+                  <TextInput
+                    style={styles.commentInput}
+                    placeholder="제목"
+                    value={editTitle}
+                    onChangeText={(text) => setEditTitle(text)}
+                    multiline={true}
+                  />
+                  <TextInput
+                    style={styles.commentInput}
+                    placeholder="내용"
+                    value={editContent}
+                    onChangeText={(text) => setEditContent(text)}
+                    multiline={true}
+                  />
+                </>
+                :
+                <TextInput
+                  style={styles.commentInput}
+                  placeholder="신고 내용을 입력하세요..."
+                  value={reportReason}
+                  onChangeText={(text) => setReportReason(text)}
+                  multiline={true}
+                />
+              }
               <TouchableOpacity
                 disabled={false}
                 style={[
@@ -380,6 +406,8 @@ const Post = () => {
                 onPress={() => {
                   setCommentID(null);
                   setModalVisible(false);
+                  setEditTitle("");
+                  setEditContent("");
                 }}
               >
                 <Text style={styles.buttonTextSmall}>취소</Text>
@@ -390,9 +418,9 @@ const Post = () => {
                   styles.buttonSmall,
                   { backgroundColor: false ? "gray" : mainColor },
                 ]}
-                onPress={() => handleReport()}
+                onPress={() => {editPost ? handleUpdatePost() : handleReport()}}
               >
-                <Text style={styles.buttonTextSmall}>신고하기</Text>
+                <Text style={styles.buttonTextSmall}>{editPost ? "수정하기" : "신고하기"}</Text>
               </TouchableOpacity>
             </View>
           </View>
