@@ -106,6 +106,12 @@ const CommentSection = ({
           style={{
             body: { fontSize: 14 },
             fence: { backgroundColor: "black", color: "white" },
+            code_inline: {
+              backgroundColor: "opacity",
+              border: "none",
+              fontWeight: 700,
+              padding: 0,
+            },
           }}
           rules={{
             fence: (node) => {
