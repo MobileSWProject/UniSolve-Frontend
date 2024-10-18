@@ -15,6 +15,7 @@ export default function Home() {
   const [checkID, setCheckID] = useState(false);
   const [id, setID] = useState("");
   const [pw, setPW] = useState("");
+  const [loginCheck, setLoginCheck] = useState("");
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -142,6 +143,7 @@ export default function Home() {
           await AsyncStorage.setItem("token", token);
           setSnackbarVisible(true);
           setSnackbarMessage("✅ 로그인 되었습니다!\n메인으로 이동하고 있습니다...");
+          setLoginCheck(true);
           setTimeout(() => {
             router.replace("/(app)/(tabs)/home");
           }, 1000);
@@ -328,6 +330,7 @@ export default function Home() {
           value={id}
           onChangeText={(text) => { inputID(text) }}
           onSubmitEditing={handleSend}
+          disabled={loginCheck}
         />
       </Animated.View>
       {checkID ?
@@ -340,6 +343,7 @@ export default function Home() {
             onChangeText={setPW}
             secureTextEntry={true}
             onSubmitEditing={handleSend}
+            disabled={loginCheck}
           />
         </Animated.View> :
         <></>
