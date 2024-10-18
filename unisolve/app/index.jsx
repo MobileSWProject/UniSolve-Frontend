@@ -106,9 +106,13 @@ export default function Home() {
       if (response) {
         const responseTo = await _axios.post('/send-code', { email: reEmail });
         setReEmailCheck(responseTo.data.isSent || false);
+        setSnackbarVisible(true);
+        setSnackbarMessage("✅ 인증번호를 발송했습니다!");
       }
     } catch {
       setReEmailCheck(false);
+      setSnackbarVisible(true);
+      setSnackbarMessage("❌ 인증번호를 발송하지 못했습니다.");
     }
   };
 
@@ -140,7 +144,7 @@ export default function Home() {
           setSnackbarMessage("✅ 로그인 되었습니다!\n메인으로 이동하고 있습니다...");
           setTimeout(() => {
             router.replace("/(app)/(tabs)/home");
-          }, 250);
+          }, 1000);
         } else {
           setSnackbarVisible(true);
           setSnackbarMessage("❌ 로그인 정보가 올바르지 않습니다!");
@@ -261,7 +265,7 @@ export default function Home() {
   const registerProcess = async () => {
     if (reProcess) return;
     try {
-      if (reID.length <= 0 || !reIDCheck || confirmID(true) || reName.length <= 0 || reEmail.length <= 0 || !reEmailCheck || !reEmailCheckTo || !confirmPW(true) || rePw !== rePwTo || reNickname.length <= 0) {
+      if (reID.length <= 0 || !reIDCheck || !confirmID(true) || reName.length <= 0 || reEmail.length <= 0 || !reEmailCheck || !reEmailCheckTo || !confirmPW(true) || rePw !== rePwTo || reNickname.length <= 0) {
         setSnackbarVisible(true);
         setSnackbarMessage("❌ 정보가 누락되었거나 확인되지 않은 항목이 있습니다.");
         return;
@@ -270,9 +274,27 @@ export default function Home() {
       const response = await _axios.post('/register', { user_id: reID, username: reName, email: reEmail, password: rePw, user_nickname: reNickname, school: reSchool })
       setReProcess(false);
       if (response.data.status === "success") {
-        router.push('/registerOk');
+        setModalVisible(false);
+        setModalType("");
+        setReID("");
+        setReIDCheck(false);
+        setReName("");
+        setReEmail("");
+        setRePw("");
+        setReEmailCheck(false);
+        setReEmailCheckTo(false);
+        setReEmailTo("");
+        setRePwTo("");
+        setReNickname("");
+        setReNicknameCheck(false);
+        setReSchool("");
+        setReProcess(false);
+        setSnackbarVisible(true);
+        setSnackbarMessage("✅ 회원 가입이 완료되었습니다!\n로그인이 필요합니다.");
       }
     } catch {
+      setSnackbarVisible(true);
+      setSnackbarMessage("❌ 회원 가입에 실패했습니다.\n잠시 후 다시 시도해 주세요.");
       setReProcess(false);
     }
   };
