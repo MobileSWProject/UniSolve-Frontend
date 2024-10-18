@@ -30,7 +30,7 @@ export default function Home() {
         style={styles.logopage}
       >
         <Image
-          source={require('../../../../assets/logo.jpg')}
+          source={require('../../../../assets/logo.png')}
           style={styles.logo}
         />
       </Link>
@@ -54,7 +54,7 @@ export default function Home() {
         style={styles.expLink}
       >
         <Image
-          source={require('../../../../assets/logo.jpg')}
+          source={require('../../../../assets/logo.png')}
           style={styles.extralogo}
         />
       </TouchableOpacity>

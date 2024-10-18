@@ -8,7 +8,6 @@ export default function Layout() {
     >
       <Stack.Screen name="index" />
       <Stack.Screen name="(app)" />
-      <Stack.Screen name="(auth)" />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
