@@ -1,7 +1,7 @@
 import { View, FlatList, ActivityIndicator } from "react-native";
 import { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import List from "../../../../components/tabs/List/List"
+import List from "../../../../components/tabs/List/List";
 import _axios from "../../../../api";
 
 export default function Notification() {
@@ -27,7 +27,10 @@ export default function Notification() {
       if (tempPage === 1) {
         setNotifications(reversedData);
       } else {
-        setNotifications((prevCommunitys) => [...prevCommunitys, ...reversedData]);
+        setNotifications((prevCommunitys) => [
+          ...prevCommunitys,
+          ...reversedData,
+        ]);
       }
     } catch (error) {
       setNotifications([]);
@@ -47,12 +50,24 @@ export default function Notification() {
     <View style={{ flex: 1 }}>
       <FlatList
         data={notifications}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({item, index}) => (<List item={item} index={index} count={notifications.length} type='notification'/>)}
+        keyExtractor={(item) => item.not_id}
+        renderItem={({ item, index }) => (
+          <List
+            item={item}
+            index={index}
+            count={notifications.length}
+            type="notification"
+          />
+        )}
         contentContainerStyle={{ paddingTop: 20 }}
         onEndReached={refresh}
         ListFooterComponent={
-          process && <ActivityIndicator size="large" color="#0000ff" />
+          process && (
+            <ActivityIndicator
+              size="large"
+              color="#0000ff"
+            />
+          )
         }
         onEndReachedThreshold={0.05}
       />
