@@ -49,7 +49,9 @@ const CommentSection = ({
         }}
       >
         <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-          {formatAuthor(comment.author_id)}
+          {formatAuthor(
+            comment.author_nickname || `${comment.author_id}_temp_nickname`
+          )}
         </Text>
         {comment.author_id.toLowerCase() === userId.toLowerCase() ? (
           <View style={{ flexDirection: "row" }}>

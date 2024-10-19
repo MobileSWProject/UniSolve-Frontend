@@ -70,6 +70,10 @@ const Post = () => {
               id: response.data.id,
               private: Boolean(response.data.is_private),
               authorId: formatAuthor(response.data.author_id),
+              nickname: formatAuthor(
+                response.data.author_nickname ||
+                  `${response.data.author_id}_temp_nickname`
+              ),
               title: response.data.title,
               content: response.data.description,
               timestamp: response.data.timestamp,
@@ -265,7 +269,12 @@ const Post = () => {
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
                 hitSlop={8}
-                onPress={() => { setEditPost(true); setEditTitle(data.title); setEditContent(data.content); setModalVisible(true); }}
+                onPress={() => {
+                  setEditPost(true);
+                  setEditTitle(data.title);
+                  setEditContent(data.content);
+                  setModalVisible(true);
+                }}
               >
                 <Text style={{ fontSize: 12 }}>✏️</Text>
               </TouchableOpacity>
@@ -279,7 +288,10 @@ const Post = () => {
           ) : (
             <TouchableOpacity
               hitSlop={8}
-              onPress={() => { setEditPost(false); setModalVisible(true); }}
+              onPress={() => {
+                setEditPost(false);
+                setModalVisible(true);
+              }}
             >
               <Text style={{ fontSize: 12 }}>🚨</Text>
             </TouchableOpacity>
@@ -297,7 +309,7 @@ const Post = () => {
           </Text>
         </View>
         <Text style={styles.userInfo}>
-          {formatAuthor(data.authorId)} • {data.timestamp}
+          {formatAuthor(data.nickname)} • {data.timestamp}
         </Text>
         <Text style={styles.content}>{data.content}</Text>
       </View>
@@ -341,7 +353,10 @@ const Post = () => {
             userId={userId}
             handleUpdateComment={handleUpdateComment}
             handleRemoveComment={handleRemoveComment}
-            handleReportComment={() => { setEditPost(false); setModalVisible(true); }}
+            handleReportComment={() => {
+              setEditPost(false);
+              setModalVisible(true);
+            }}
             handleReply={handleReply}
             handleAddComment={handleAddComment}
             selectedComment={selectedComment}
@@ -369,7 +384,7 @@ const Post = () => {
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              {editPost ?
+              {editPost ? (
                 <>
                   <TextInput
                     style={styles.commentInput}
@@ -386,7 +401,7 @@ const Post = () => {
                     multiline={true}
                   />
                 </>
-                :
+              ) : (
                 <TextInput
                   style={styles.commentInput}
                   placeholder="신고 내용을 입력하세요..."
@@ -394,7 +409,7 @@ const Post = () => {
                   onChangeText={(text) => setReportReason(text)}
                   multiline={true}
                 />
-              }
+              )}
               <TouchableOpacity
                 disabled={false}
                 style={[
@@ -416,9 +431,13 @@ const Post = () => {
                   styles.buttonSmall,
                   { backgroundColor: false ? "gray" : mainColor },
                 ]}
-                onPress={() => {editPost ? handleUpdatePost() : handleReport()}}
+                onPress={() => {
+                  editPost ? handleUpdatePost() : handleReport();
+                }}
               >
-                <Text style={styles.buttonTextSmall}>{editPost ? "수정하기" : "신고하기"}</Text>
+                <Text style={styles.buttonTextSmall}>
+                  {editPost ? "수정하기" : "신고하기"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

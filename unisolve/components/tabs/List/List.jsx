@@ -7,14 +7,21 @@ import formatAuthor from "../../../utils/formatAuthor";
 import _axios from "../../../api";
 
 export default function PostListItem({ item, index, count, type }) {
-  const typeConvert = { 0: "시스템 알림", 1: "새로운 질문", 2: "새로운 답변", 3: "새로운 댓글", 4: "새로운 대댓글" };
+  const typeConvert = {
+    0: "시스템 알림",
+    1: "새로운 질문",
+    2: "새로운 답변",
+    3: "새로운 댓글",
+    4: "새로운 대댓글",
+  };
   const router = useRouter();
 
   const updateNotification = async (id) => {
     try {
-      const response = await _axios.patch(`/notification/${id}`, {is_read: true});
-    } catch (error) {
-    }
+      const response = await _axios.patch(`/notification/${id}`, {
+        is_read: true,
+      });
+    } catch (error) {}
   };
 
   return (
@@ -47,7 +54,9 @@ export default function PostListItem({ item, index, count, type }) {
             />
           ) : null}
           {type === "community"
-            ? `#${item.id} | by ${formatAuthor(item.questioner)}`
+            ? `#${item.id} | by ${formatAuthor(
+                item.author_nickname || `${item.questioner}_temp_nickname`
+              )}`
             : type === "history"
             ? `#${item.id} | ${item.private ? "비공개" : "공개"}`
             : type === "notification"
@@ -62,8 +71,11 @@ export default function PostListItem({ item, index, count, type }) {
         <Text style={styles.title}>{item.title}</Text>
       </View>
       <View style={styles.header}>
-        <Text style={[styles.description, { fontWeight: "bold" }]} numberOfLines={3}>
-          {item.description ? item.description.replace(/\n/g,' ') : ''}
+        <Text
+          style={[styles.description, { fontWeight: "bold" }]}
+          numberOfLines={3}
+        >
+          {item.description ? item.description.replace(/\n/g, " ") : ""}
         </Text>
         <View style={styles.header}>
           {type !== "notification" ? (
