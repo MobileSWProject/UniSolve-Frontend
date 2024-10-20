@@ -353,9 +353,10 @@ const Post = () => {
             userId={userId}
             handleUpdateComment={handleUpdateComment}
             handleRemoveComment={handleRemoveComment}
-            handleReportComment={() => {
+            handleReportComment={(commentId) => {
               setEditPost(false);
               setModalVisible(true);
+              setCommentID(commentId);
             }}
             handleReply={handleReply}
             handleAddComment={handleAddComment}
