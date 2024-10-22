@@ -168,7 +168,7 @@ const Post = () => {
     if (reportReason.length < 1 || process) return;
     try {
       setProcess(true);
-      const response = await _axios.post(`/report`, {
+      const response = await _axios.post(`/reports`, {
         post_id: id,
         comment_id: commentID || null,
         reason: reportReason,
