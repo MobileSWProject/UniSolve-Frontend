@@ -12,7 +12,9 @@ export default function QuestionLayout() {
     // ImageContext Provider로 Question 탭의 모든 화면에서,
     // image와 setImage를 사용할 수 있도록 해줍니다.
     <ImageContext.Provider value={{ image, setImage }}>
-      <Stack initialRouteName="index">
+      <Stack
+        initialRouteName="index"
+        screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="index"
           options={{ title: "질문하기" }}

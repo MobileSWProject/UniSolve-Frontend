@@ -49,12 +49,12 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="history"
+        name="me"
         options={{
-          title: "History",
+          title: "Me",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={"history"}
+              name={"account"}
               color={color}
             />
           ),

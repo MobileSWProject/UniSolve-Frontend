@@ -1,8 +1,8 @@
 import { View, FlatList, ActivityIndicator } from "react-native";
 import { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import List from "../../../../components/tabs/List/List";
-import _axios from "../../../../api";
+import List from "../../../components/tabs/List/List";
+import _axios from "../../../api";
 
 export default function Notification() {
   const [notifications, setNotifications] = useState([]);
@@ -47,7 +47,7 @@ export default function Notification() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View>
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.not_id}
@@ -60,7 +60,7 @@ export default function Notification() {
           />
         )}
         contentContainerStyle={{ paddingTop: 20 }}
-        onEndReached={refresh}
+        // onEndReached={refresh}
         ListFooterComponent={
           process && (
             <ActivityIndicator

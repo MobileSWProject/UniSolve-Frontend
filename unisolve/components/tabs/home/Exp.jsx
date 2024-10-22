@@ -11,16 +11,8 @@ import _axios from "../../../api";
 import { mainColor } from "../../../constants/Colors";
 import { Table, Row, Rows } from "react-native-table-component";
 
-export default function ExpPage() {
-  const [meExp, setMeExp] = useState(0);
-  const listHeader = ["순위", "닉네임", "레벨", "증감"];
-  const [list, setList] = useState([]);
-  const [page, setPage] = useState(1);
-  const [TotalPage, setTotalPage] = useState(1);
-
-  const [process, setProcress] = useState(false);
-
-  const getExpToLevel = [
+export function getExpToLevel(index) {
+  const ExpToLevel = [
     "신생아",
     "유치원생",
     "초등학생",
@@ -32,31 +24,41 @@ export default function ExpPage() {
     "교수",
     "전문가",
   ];
-  function getLevel(exp) {
-    return (
-      Math.floor(
-        exp < 101
-          ? 1
-          : exp < 301
+  return ExpToLevel[index];
+};
+export function getLevel(exp) {
+  return (
+    Math.floor(
+      exp < 101
+        ? 1
+        : exp < 301
           ? 1 + (exp - 100) / 200
           : exp < 501
-          ? 2 + (exp - 300) / 200
-          : exp < 701
-          ? 3 + (exp - 500) / 200
-          : exp < 1001
-          ? 4 + (exp - 700) / 300
-          : exp < 1501
-          ? 5 + (exp - 1000) / 500
-          : exp < 2001
-          ? 6 + (exp - 1500) / 500
-          : exp < 3001
-          ? 7 + (exp - 2000) / 1000
-          : exp < 5001
-          ? 8 + (exp - 3000) / 2000
-          : 10
-      ) - 1
-    );
-  }
+            ? 2 + (exp - 300) / 200
+            : exp < 701
+              ? 3 + (exp - 500) / 200
+              : exp < 1001
+                ? 4 + (exp - 700) / 300
+                : exp < 1501
+                  ? 5 + (exp - 1000) / 500
+                  : exp < 2001
+                    ? 6 + (exp - 1500) / 500
+                    : exp < 3001
+                      ? 7 + (exp - 2000) / 1000
+                      : exp < 5001
+                        ? 8 + (exp - 3000) / 2000
+                        : 10
+    ) - 1
+  );
+}
+export function ExpPage() {
+  const [meExp, setMeExp] = useState(0);
+  const listHeader = ["순위", "닉네임", "레벨", "증감"];
+  const [list, setList] = useState([]);
+  const [page, setPage] = useState(1);
+  const [TotalPage, setTotalPage] = useState(1);
+
+  const [process, setProcress] = useState(false);
 
   const getList = async (temp) => {
     if (process) return;
@@ -80,7 +82,7 @@ export default function ExpPage() {
           response.data.users.map((item, index) => [
             index + 1 + tempPage * 10 - 10,
             item.nickname,
-            getExpToLevel[getLevel(item.exp)],
+            getExpToLevel(getLevel(item.exp)),
             true,
           ])
         );

@@ -8,10 +8,10 @@ export default function AppLayout() {
   if (loading) return <></>;
 
   return (
-    <Stack initialRouteName="(tabs)">
+    <Stack initialRouteName="(tabs)"
+      screenOptions={{ headerShown: false }}>
       <Stack.Screen
         name="(tabs)"
-        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="post/[id]/index"
