@@ -1,4 +1,10 @@
-import { FlatList, TextInput, View, StyleSheet, ActivityIndicator} from "react-native";
+import {
+  FlatList,
+  TextInput,
+  View,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import List from "../../../../components/tabs/List/List";
@@ -33,7 +39,7 @@ export default function Community() {
     if (process) return;
     setProcess(true);
     try {
-      const response = await _axios.get(`/community?page=${tempPage}`);
+      const response = await _axios.get(`/posts?page=${tempPage}`);
       setTotalPage(response.data.total_pages);
       const reversedData = response.data.data || [];
       if (tempPage === 1) {
@@ -41,7 +47,10 @@ export default function Community() {
       } else {
         setCommunitys((prevCommunitys) => [...prevCommunitys, ...reversedData]);
       }
-      setFilteredCommunitys((prevCommunitys) => [...prevCommunitys, ...reversedData]);
+      setFilteredCommunitys((prevCommunitys) => [
+        ...prevCommunitys,
+        ...reversedData,
+      ]);
     } catch (error) {
       setCommunitys([]);
       setFilteredCommunitys([]);
@@ -92,7 +101,12 @@ export default function Community() {
         contentContainerStyle={{ paddingTop: 20 }}
         onEndReached={refresh}
         ListFooterComponent={
-          process && <ActivityIndicator size="large" color="#0000ff" />
+          process && (
+            <ActivityIndicator
+              size="large"
+              color="#0000ff"
+            />
+          )
         }
         onEndReachedThreshold={0.05}
       />
