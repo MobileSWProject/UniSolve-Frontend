@@ -1,9 +1,10 @@
 import { Link, usePathname } from "expo-router";
 import { useState, useEffect } from "react";
-import { Text, View, Image, StyleSheet, TouchableOpacity, Modal, ProgressBar } from "react-native";
+import { Text, View, Image, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { mainColor } from "../../../../constants/Colors";
 import { Exp, getExpToLevel, getLevel, Notification } from "../../../../components/tabs/home/index";
 import _axios from "../../../../api";
+import { ProgressBar } from "react-native-paper";
 
 export default function Home() {
   const pathname = usePathname();
