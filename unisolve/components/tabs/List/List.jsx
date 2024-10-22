@@ -85,7 +85,7 @@ export default function PostListItem({ item, index, count, type }) {
               color="gray"
             />
           ) : null}
-          <Text> {item.reply}</Text>
+          <Text> {item.reply_count}</Text>
         </View>
       </View>
       {type === "notification" ? (
