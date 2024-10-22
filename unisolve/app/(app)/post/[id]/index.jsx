@@ -64,7 +64,7 @@ const Post = () => {
     useCallback(() => {
       const getData = async () => {
         _axios
-          .get(`/post/${id}`)
+          .get(`/posts/${id}`)
           .then((response) => {
             setData({
               id: response.data.id,
@@ -105,10 +105,10 @@ const Post = () => {
         content: commentContent,
         parent_id: isReply ? selectedComment : null,
       });
-      const response = await _axios.post("/comment", data);
+      const response = await _axios.post("/comments", data);
 
       // 댓글 추가 후 댓글 목록만 다시 불러옴
-      const updatedPost = await _axios.get(`/post/${id}`);
+      const updatedPost = await _axios.get(`/posts/${id}`);
       setData((prev) => ({
         ...prev,
         comments: updatedPost.data.comments,
@@ -125,10 +125,10 @@ const Post = () => {
 
   const handleRemoveComment = async (targetCommentId) => {
     try {
-      const response = await _axios.delete(`/comment/${targetCommentId}`);
+      const response = await _axios.delete(`/comments/${targetCommentId}`);
 
       // 댓글 삭제 후 댓글 목록만 다시 불러옴
-      const updatedPost = await _axios.get(`/post/${id}`);
+      const updatedPost = await _axios.get(`/posts/${id}`);
       setData((prev) => ({
         ...prev,
         comments: updatedPost.data.comments,
@@ -142,14 +142,14 @@ const Post = () => {
 
   const handleUpdateComment = async (targetCommentId) => {
     try {
-      const response = await _axios.put(`/update_comment/${targetCommentId}`, {
+      const response = await _axios.put(`/comments/${targetCommentId}`, {
         content: editComment,
       });
       if (response.data.status === "success") {
         setEditComment("");
         setEditing(false);
         // 댓글 수정 후 댓글 목록만 다시 불러옴
-        const updatedPost = await _axios.get(`/post/${id}`);
+        const updatedPost = await _axios.get(`/posts/${id}`);
         setData((prev) => ({
           ...prev,
           comments: updatedPost.data.comments,
@@ -168,7 +168,7 @@ const Post = () => {
     if (reportReason.length < 1 || process) return;
     try {
       setProcess(true);
-      const response = await _axios.post(`/report`, {
+      const response = await _axios.post(`/reports`, {
         post_id: id,
         comment_id: commentID || null,
         reason: reportReason,
@@ -196,7 +196,7 @@ const Post = () => {
 
   const handleRemovePost = async () => {
     try {
-      const response = await _axios.delete(`/question/${id}`);
+      const response = await _axios.delete(`/posts/${id}`);
 
       if (router.canGoBack()) {
         router.back();
@@ -217,13 +217,13 @@ const Post = () => {
       setEditContent("");
       setEditing(false);
       setProcess(true);
-      const response = await _axios.put(`/update_post/${id}`, {
+      const response = await _axios.put(`/posts/${id}`, {
         title: editTitle,
         content: editContent,
       });
       if (response.data.status === "success") {
         // 게시글 수정 후 다시 불러오기
-        const updatedPost = await _axios.get(`/post/${id}`);
+        const updatedPost = await _axios.get(`/posts/${id}`);
         setData((prev) => ({
           ...prev,
           title: updatedPost.data.title,

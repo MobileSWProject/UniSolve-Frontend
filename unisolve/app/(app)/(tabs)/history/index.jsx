@@ -1,4 +1,4 @@
-import { FlatList, View, ActivityIndicator} from "react-native";
+import { FlatList, View, ActivityIndicator } from "react-native";
 import { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import List from "../../../../components/tabs/List/List";
@@ -49,7 +49,7 @@ export default function History() {
     if (process) return;
     setProcess(true);
     try {
-      const response = await _axios.get(`/history?page=${tempPage}`);
+      const response = await _axios.get(`/posts/mine?page=${tempPage}`);
       setTotalPage(response.data.total_pages);
       const reversedData = response.data.data || [];
       if (tempPage === 1) {
@@ -88,7 +88,12 @@ export default function History() {
         contentContainerStyle={{ paddingTop: 20 }}
         onEndReached={refresh}
         ListFooterComponent={
-          process && <ActivityIndicator size="large" color="#0000ff" />
+          process && (
+            <ActivityIndicator
+              size="large"
+              color="#0000ff"
+            />
+          )
         }
         onEndReachedThreshold={0.05}
       />

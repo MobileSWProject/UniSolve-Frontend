@@ -36,7 +36,7 @@ export default function HomeSubPage() {
   useFocusEffect(
     useCallback(() => {
       _axios
-        .get("/userinfo")
+        .get("/accounts/mine")
         .then((response) => {
           setUser(response.data.data);
           setEmail(response.data.data.email);
@@ -51,18 +51,24 @@ export default function HomeSubPage() {
   );
 
   const CheckProcess = async (value) => {
-    await _axios.post('/existuser', value).then(response => {
-      if (value.nickname) { setNicknameCheck(response.data.isNotExist || false); }
-    })
-      .catch(() => {
-        if (value.nickname) { setNicknameCheck(false); }
+    await _axios
+      .post("/accounts/existuser", value)
+      .then((response) => {
+        if (value.nickname) {
+          setNicknameCheck(response.data.isNotExist || false);
+        }
       })
+      .catch(() => {
+        if (value.nickname) {
+          setNicknameCheck(false);
+        }
+      });
   };
 
   const DeletedProcess = async () => {
     setDeleting(true);
     await _axios
-      .delete("/delete_user")
+      .delete("/accounts")
       .then(async (response) => {
         setDeleting(false);
         if (response.data.deleted === true) {
@@ -83,18 +89,20 @@ export default function HomeSubPage() {
 
   const EmailCheckProcess = async () => {
     setEmailCheck(false);
-    await _axios.post('/existuser', { email: email }).then(async (response) => {
-      if (response.data.isNotExist) {
-        await _axios.post('/send-code', { email }).then(response => {
-          if (response.data.isSent) setEmailCheck(response.data.isSent);
-        })
-      }
-    })
+    await _axios
+      .post("/accounts/existuser", { email: email })
+      .then(async (response) => {
+        if (response.data.isNotExist) {
+          await _axios.post("/auth/send-code", { email }).then((response) => {
+            if (response.data.isSent) setEmailCheck(response.data.isSent);
+          });
+        }
+      });
   };
 
   const EmailChecksProcess = async () => {
     await _axios
-      .post("/verify-code", { email, code: emailConfirm })
+      .post("/auth/verify-code", { email, code: emailConfirm })
       .then((response) => {
         setEmailChecks(response.data.isVerified || false);
       })
@@ -115,7 +123,7 @@ export default function HomeSubPage() {
       return;
     }
     await _axios
-      .put("/update_user", {
+      .put("accounts", {
         current_password: password,
         email: email,
         new_password: newPassword,
@@ -127,7 +135,7 @@ export default function HomeSubPage() {
           setPassword("");
           setNewPassword("");
           setSubPassword("");
-          _axios.get("/userinfo").then((response) => {
+          _axios.get("/accounts/mine").then((response) => {
             setUser(response.data.data);
             setEmail(response.data.data.email);
             setEmailChecks(true);
@@ -207,8 +215,8 @@ export default function HomeSubPage() {
                 disabled={emailCheck}
               />
               {!emailCheck &&
-                email !== user.email &&
-                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email) ? (
+              email !== user.email &&
+              /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email) ? (
                 <TouchableOpacity
                   style={[
                     styles.buttonSmall,
@@ -256,8 +264,8 @@ export default function HomeSubPage() {
                   )
                     ? "규칙이 잘못됨"
                     : newPassword === subPassword
-                      ? "일치함"
-                      : "일치하지 않음"}
+                    ? "일치함"
+                    : "일치하지 않음"}
                   )
                 </Text>
                 <TextInput
@@ -278,8 +286,8 @@ export default function HomeSubPage() {
                   )
                     ? "규칙이 잘못됨"
                     : newPassword === subPassword
-                      ? "일치함"
-                      : "일치하지 않음"}
+                    ? "일치함"
+                    : "일치하지 않음"}
                   )
                 </Text>
                 <TextInput
@@ -293,7 +301,9 @@ export default function HomeSubPage() {
             </View>
 
             {/* 닉네임 입력 필드 */}
-            <Text style={styles.label}>닉네임 ({nicknameCheck ? '확인 완료' : '중복 확인 필요'})</Text>
+            <Text style={styles.label}>
+              닉네임 ({nicknameCheck ? "확인 완료" : "중복 확인 필요"})
+            </Text>
             <View style={styles.row}>
               <TextInput
                 style={styles.input}
@@ -301,13 +311,20 @@ export default function HomeSubPage() {
                 value={nickname}
                 onChangeText={(nickname) => NicknameEditCheck(nickname)}
               />
-              {
-                !nicknameCheck ?
-                  <TouchableOpacity disabled={nicknameCheck} style={[styles.buttonSmall, { backgroundColor: nicknameCheck ? 'gray' : mainColor }]} onPress={() => CheckProcess({ nickname: nickname })}>
-                    <Text style={styles.buttonTextSmall}>중복확인</Text>
-                  </TouchableOpacity> :
-                  <></>
-              }
+              {!nicknameCheck ? (
+                <TouchableOpacity
+                  disabled={nicknameCheck}
+                  style={[
+                    styles.buttonSmall,
+                    { backgroundColor: nicknameCheck ? "gray" : mainColor },
+                  ]}
+                  onPress={() => CheckProcess({ nickname: nickname })}
+                >
+                  <Text style={styles.buttonTextSmall}>중복확인</Text>
+                </TouchableOpacity>
+              ) : (
+                <></>
+              )}
             </View>
             {/* 비밀번호 입력 필드 */}
             <View style={styles.flexItem}>
