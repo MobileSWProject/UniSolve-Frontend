@@ -18,7 +18,7 @@ export default function PostListItem({ item, index, count, type }) {
 
   const updateNotification = async (id) => {
     try {
-      const response = await _axios.patch(`/notification/${id}`, {
+      const response = await _axios.put(`/notifications/${id}`, {
         is_read: true,
       });
     } catch (error) {}

@@ -21,7 +21,7 @@ export default function Notification() {
     if (process) return;
     setProcess(true);
     try {
-      const response = await _axios.get(`/notification?page=${tempPage}`);
+      const response = await _axios.get(`/notifications/mine?page=${tempPage}`);
       setTotalPage(response.data.total_pages);
       const reversedData = response.data.data || [];
       if (tempPage === 1) {
