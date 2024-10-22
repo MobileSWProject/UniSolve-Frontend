@@ -98,7 +98,7 @@ export default function Home() {
 
   const CheckProcess = async (value, type) => {
     try {
-      const response = await _axios.post("/existuser", value);
+      const response = await _axios.post("/accounts/existuser", value);
       const result = response.data.isNotExist || false;
       if (type) {
         return result === false ? true : false;
@@ -276,13 +276,13 @@ export default function Home() {
     setFindSending(true);
     try {
       if (findID.length === 0) {
-        response = await _axios.post("/find_user_id", {
+        response = await _axios.post("/accounts/find_user_id", {
           name: findName,
           email: findEmail,
         });
         setFindSending(false);
       } else if (findID.length > 0) {
-        response = await _axios.post("/reset_password_request", {
+        response = await _axios.post("/accounts/reset_password_request", {
           user_id: findID,
           username: findName,
           email: findEmail,

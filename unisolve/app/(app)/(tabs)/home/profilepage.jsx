@@ -36,7 +36,7 @@ export default function HomeSubPage() {
   useFocusEffect(
     useCallback(() => {
       _axios
-        .get("/userinfo")
+        .get("/accounts/mine")
         .then((response) => {
           setUser(response.data.data);
           setEmail(response.data.data.email);
@@ -52,7 +52,7 @@ export default function HomeSubPage() {
 
   const CheckProcess = async (value) => {
     await _axios
-      .post("/existuser", value)
+      .post("/accounts/existuser", value)
       .then((response) => {
         if (value.nickname) {
           setNicknameCheck(response.data.isNotExist || false);
@@ -68,7 +68,7 @@ export default function HomeSubPage() {
   const DeletedProcess = async () => {
     setDeleting(true);
     await _axios
-      .delete("/delete_user")
+      .delete("/accounts")
       .then(async (response) => {
         setDeleting(false);
         if (response.data.deleted === true) {
@@ -89,13 +89,15 @@ export default function HomeSubPage() {
 
   const EmailCheckProcess = async () => {
     setEmailCheck(false);
-    await _axios.post("/existuser", { email: email }).then(async (response) => {
-      if (response.data.isNotExist) {
-        await _axios.post("/auth/send-code", { email }).then((response) => {
-          if (response.data.isSent) setEmailCheck(response.data.isSent);
-        });
-      }
-    });
+    await _axios
+      .post("/accounts/existuser", { email: email })
+      .then(async (response) => {
+        if (response.data.isNotExist) {
+          await _axios.post("/auth/send-code", { email }).then((response) => {
+            if (response.data.isSent) setEmailCheck(response.data.isSent);
+          });
+        }
+      });
   };
 
   const EmailChecksProcess = async () => {
@@ -121,7 +123,7 @@ export default function HomeSubPage() {
       return;
     }
     await _axios
-      .put("/update_user", {
+      .put("accounts", {
         current_password: password,
         email: email,
         new_password: newPassword,
@@ -133,7 +135,7 @@ export default function HomeSubPage() {
           setPassword("");
           setNewPassword("");
           setSubPassword("");
-          _axios.get("/userinfo").then((response) => {
+          _axios.get("/accounts/mine").then((response) => {
             setUser(response.data.data);
             setEmail(response.data.data.email);
             setEmailChecks(true);
