@@ -67,8 +67,18 @@ export default function Home() {
       try {
         const token = await AsyncStorage.getItem("token");
         const decodedToken = decodeJWT(token);
-        certification = decodedToken?.user_id ? true : false;
-        setCertification(certification);
+        const currentTime = Math.floor(Date.now() / 1000); // 현재 시간(초 단위)
+
+        // 만료 여부 확인
+        const isTokenExpired = decodedToken.exp < currentTime;
+
+        if (isTokenExpired === true) {
+          // 토큰이 만료되었으면 토큰 지우기
+          await AsyncStorage.removeItem("token");
+        } else {
+          certification = decodedToken?.user_id ? true : false;
+          setCertification(certification);
+        }
       } catch (error) { }
       if (certification) {
         setSnackbarVisible(true);
