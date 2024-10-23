@@ -49,6 +49,7 @@ export default function Notification() {
   return (
     <View>
       <FlatList
+        style={{ width: 500, height: 600 }}
         data={notifications}
         keyExtractor={(item) => item.not_id}
         renderItem={({ item, index }) => (
@@ -60,7 +61,7 @@ export default function Notification() {
           />
         )}
         contentContainerStyle={{ paddingTop: 20 }}
-        // onEndReached={refresh}
+        onEndReached={refresh}
         ListFooterComponent={
           process && (
             <ActivityIndicator

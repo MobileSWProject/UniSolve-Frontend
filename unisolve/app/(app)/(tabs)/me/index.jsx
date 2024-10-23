@@ -12,6 +12,8 @@ import {
 import { useFocusEffect, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { mainColor } from "../../../../constants/Colors";
+import { ProgressBar } from "react-native-paper";
+import { getLevel } from "../../../../components/tabs/home/index";
 import _axios from "../../../../api";
 
 export default function MePage() {
@@ -33,6 +35,8 @@ export default function MePage() {
   const [nickname, setNickname] = useState("");
   const [nicknameCheck, setNicknameCheck] = useState("");
 
+  const [exp, setExp] = useState("");
+
   useFocusEffect(
     useCallback(() => {
       _axios
@@ -43,6 +47,7 @@ export default function MePage() {
           setEmailChecks(true);
           setNicknameCheck(true);
           setNickname(response.data.data.user_nickname);
+          setExp(response.data.data.exp || 0);
         })
         .catch((error) => {
           router.replace("/");
@@ -157,13 +162,23 @@ export default function MePage() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.experienceContainer}>
+        <Text style={styles.experienceText}>{getLevel(exp)}레벨</Text>
+        <ProgressBar
+          styleAttr="Horizontal"
+          indeterminate={false}
+          progress={exp / 100}
+          color="#00ff00"
+          style={styles.progressBar}
+        />
+      </View>
       {/* 프로필 이미지 */}
       <View style={styles.profileContainer}>
         <Image
-          source={{ uri: "" }} // 여기에 실제 이미지 URL을 넣을 수 있음
+          source={require(`../../../../assets/icons/lv${0}.png`)}
           style={styles.profileImage}
         />
-        <View style={styles.profileTextContainer}>
+        <View>
           <Text style={styles.nickname}>
             {user.username} | {user.user_nickname}
           </Text>
@@ -367,10 +382,10 @@ export default function MePage() {
       </TouchableOpacity>
       {/* 탈퇴 버튼 */}
       <TouchableOpacity
-        style={styles.Button}
+        style={[styles.button, { backgroundColor: "red" }]}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.exitButtonText}>탈퇴하시겠습니까?</Text>
+        <Text style={styles.exitButtonText}>탈퇴하기</Text>
       </TouchableOpacity>
       <Modal
         animationType="fade"
@@ -381,8 +396,7 @@ export default function MePage() {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>
-              정말로 해당 계정을 탈퇴 처리하시겠습니까?{"\n"}이 작업은 되돌릴 수
-              없습니다.
+              정말로 해당 계정을 탈퇴 처리하시겠습니까?{"\n"}이 작업은 되돌릴 수 없습니다.
             </Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
@@ -416,7 +430,7 @@ export default function MePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f2f2f2",
+    backgroundColor: mainColor,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -426,21 +440,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#ccc",
-  },
-  profileTextContainer: {
-    marginLeft: 20,
+    width: 100,
+    height: 100,
   },
   nickname: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "white",
   },
   phoneNumber: {
+    marginTop: 10,
     fontSize: 14,
-    color: "#777",
+    color: "#ccc",
   },
   buttonSmall: {
     paddingHorizontal: 16,
@@ -489,7 +500,7 @@ const styles = StyleSheet.create({
   },
   exitButtonText: {
     fontSize: 14,
-    color: "red",
+    color: "white",
   },
   centeredView: {
     flex: 1,
@@ -538,5 +549,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     marginBottom: 16,
+  },
+  experienceContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    position: "absolute",
+    top: 0,
+  },
+  experienceText: {
+    fontSize: 16,
+    color: mainColor,
+    position: "absolute",
+    zIndex: 1,
+  },
+  progressBar: {
+    width: "100%",
+    height: 15,
   },
 });

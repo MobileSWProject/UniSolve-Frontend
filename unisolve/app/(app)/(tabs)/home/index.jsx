@@ -2,9 +2,8 @@ import { Link, usePathname } from "expo-router";
 import { useState, useEffect } from "react";
 import { Text, View, Image, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { mainColor } from "../../../../constants/Colors";
-import { Exp, getExpToLevel, getLevel, Notification } from "../../../../components/tabs/home/index";
+import { Exp, Notification } from "../../../../components/tabs/home/index";
 import _axios from "../../../../api";
-import { ProgressBar } from "react-native-paper";
 
 export default function Home() {
   const pathname = usePathname();
@@ -12,10 +11,8 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(convertTime());
   const [modalVisibleNotification, setModalVisibleNotification] = useState(false);
   const [modalVisibleRanking, setModalVisibleRanking] = useState(false);
-  const [exp, setExp] = useState("");
 
   useEffect(() => {
-    getAccount();
     const interval = setInterval(() => {
       setCurrentDate(convertDate());
       setCurrentTime(convertTime());
@@ -33,25 +30,8 @@ export default function Home() {
     return `${date.getHours().toString().padStart(2, '0')}시 ${date.getMinutes().toString().padStart(2, '0')}분 ${date.getSeconds().toString().padStart(2, '0')}초`
   }
 
-  async function getAccount() {
-    await _axios.get("/accounts/mine").then((response) => {
-      const tempExp = response.data.data.exp || 0;
-      setExp(tempExp);
-    });
-  }
-
   return (
     <View style={styles.container}>
-      <View style={styles.experienceContainer}>
-        <Text style={styles.experienceText}>{getLevel(exp)}레벨</Text>
-        <ProgressBar
-          styleAttr="Horizontal"
-          indeterminate={false}
-          progress={exp / 100}
-          color="#00ff00"
-          style={styles.progressBar}
-        />
-      </View>
       <Text style={styles.timeDate}>{currentDate}</Text>
       <Text style={styles.timeText}>{currentTime}</Text>
 
@@ -75,6 +55,7 @@ export default function Home() {
         onRequestClose={() => setModalVisibleNotification(false)}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            <Text style={[styles.timeDate, {color: mainColor}]}>알림</Text>
             <Notification />
             <TouchableOpacity disabled={false} style={[styles.buttonSmall, { backgroundColor: false ? 'gray' : mainColor }]} onPress={() => setModalVisibleNotification(false)}>
               <Text style={styles.buttonTextSmall}>확인</Text>
@@ -206,10 +187,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   modalView: {
-    width: 350,
+    width: 500,
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
+    padding: 10,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -219,23 +200,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-  },
-  experienceContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    position: "absolute",
-    top: 0,
-  },
-  experienceText: {
-    fontSize: 16,
-    color: mainColor,
-    position: "absolute",
-    zIndex: 1,
-  },
-  progressBar: {
-    width: "100%",
-    height: 15,
   },
 });
