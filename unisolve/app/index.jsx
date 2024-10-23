@@ -8,6 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  FlatList,
 } from "react-native";
 import { Snackbar } from "react-native-paper";
 import { mainColor } from "../constants/Colors";
@@ -25,6 +26,8 @@ export default function Home() {
   const [id, setID] = useState("");
   const [pw, setPW] = useState("");
   const [loginCheck, setLoginCheck] = useState("");
+
+  const [schoolData, setSchoolData] = useState([]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -66,7 +69,7 @@ export default function Home() {
         const decodedToken = decodeJWT(token);
         certification = decodedToken?.user_id ? true : false;
         setCertification(certification);
-      } catch (error) {}
+      } catch (error) { }
       if (certification) {
         setSnackbarVisible(true);
         setSnackbarMessage(
@@ -321,8 +324,8 @@ export default function Home() {
     return !regEx
       ? "규칙이 잘못됨"
       : reIDCheck
-      ? "확인 완료"
-      : "중복 확인 필요";
+        ? "확인 완료"
+        : "중복 확인 필요";
   };
 
   const confirmPW = (type) => {
@@ -334,8 +337,8 @@ export default function Home() {
     return !regEx
       ? "규칙이 잘못됨"
       : rePw === rePwTo
-      ? "일치함"
-      : "일치하지 않음";
+        ? "일치함"
+        : "일치하지 않음";
   };
 
   const confirmEmail = () => {
@@ -419,6 +422,18 @@ export default function Home() {
       setReProcess(false);
     }
   };
+
+  const getSchool = () => {
+    _axios.get('/universities').then(response => {
+      setSchoolData(response.data.universities);
+    })
+  }
+
+  const searchSchool = () => {
+    return schoolData && reSchool ? schoolData.filter(item =>
+      item.univ_name.includes(reSchool)
+    ) : []
+  }
 
   return (
     <View style={styles.container}>
@@ -510,6 +525,7 @@ export default function Home() {
       <Animated.View style={{ opacity: inputOpacity, marginTop: 15 }}>
         <TouchableOpacity
           onPress={() => {
+            getSchool();
             setModalType("register");
             setModalVisible(true);
           }}
@@ -802,10 +818,29 @@ export default function Home() {
                 <Text style={styles.textTo}>소속</Text>
                 <TextInput
                   style={styles.inputTo}
-                  placeholder="소속을 입력하세요."
+                  placeholder="본인의 소속을 입력 후 선택하세요."
                   value={reSchool}
-                  onChangeText={setReSchool}
+                  onChangeText={(text) => setReSchool(text)}
                 />
+                {searchSchool().length > 0 ?
+                  <View
+                    style={styles.flatList}>
+                    <FlatList
+                      style={{margin: 5, marginRight: 0}}
+                      data={searchSchool()}
+                      keyExtractor={item => item.univ_id.toString()}
+                      renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => setReSchool(item.univ_name)}>
+                          <Text style={styles.item}>
+                            {item.univ_name}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                      ListEmptyComponent={<Text style={styles.empty}></Text>}
+                    />
+                  </View> :
+                  <></>
+                }
               </>
             )}
             <View style={{ flexDirection: "row" }}>
@@ -887,6 +922,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontWeight: "bold",
     alignSelf: "flex-start",
+  },
+  flatList: {
+    width: "93%",
+    maxHeight: 100,
+    borderWidth: 3,
+    borderColor: 'black',
+    borderTopWidth: 0,
   },
   sendButton: {
     backgroundColor: "transparent",
