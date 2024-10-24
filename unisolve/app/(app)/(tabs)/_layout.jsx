@@ -8,8 +8,14 @@ export default function TabsLayout() {
       initialRouteName="home/index"
       screenOptions={{
         tabBarActiveTintColor: mainColor,
-        tabBarInactiveTintColor: "gray",
+        tabBarInactiveTintColor: "#000",
         headerShown: false,
+        tabBarStyle: {
+          position: 'absolute',
+          elevation: 0,
+          backgroundColor: "#fff",
+          height: 50,
+        },
       }}
     >
       <Tabs.Screen
@@ -54,7 +60,7 @@ export default function TabsLayout() {
           title: "Me",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={"account"}
+              name={focused ? "account" : "account-outline"}
               color={color}
             />
           ),
