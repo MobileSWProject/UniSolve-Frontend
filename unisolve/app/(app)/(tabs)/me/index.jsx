@@ -91,10 +91,10 @@ export default function MePage() {
   };
 
   const DeletedProcess = async () => {
-    if (deleting || !password || password.length < 8) return;
+    if (deleting || !password) return;
     setDeleting(true);
     await _axios
-      .delete("/accounts", { password })
+      .delete("/accounts", { data: { password } })
       .then(async (response) => {
         setDeleting(false);
         if (response.data.deleted === true) {
@@ -282,6 +282,7 @@ export default function MePage() {
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>계정</Text>
       <TouchableOpacity
         onPress={() => {
+          setPassword("");
           setModalType("edit");
           setModalVisible(true);
         }}
@@ -322,6 +323,7 @@ export default function MePage() {
       </TouchableOpacity>
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>기타</Text>
       <TouchableOpacity onPress={() => {
+        setPassword("");
         setModalType("delete");
         setModalVisible(true)
       }}>
