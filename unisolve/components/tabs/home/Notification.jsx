@@ -47,9 +47,14 @@ export default function Notification() {
   };
 
   return (
-    <View>
+    <View
+      style={{
+        width: "100%",
+        flex: 1,
+      }}
+    >
       <FlatList
-        style={{ width: 500, height: 600 }}
+        style={{}}
         data={notifications}
         keyExtractor={(item) => item.not_id}
         renderItem={({ item, index }) => (

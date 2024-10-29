@@ -1,6 +1,13 @@
 import { Link, usePathname } from "expo-router";
 import { useState, useEffect } from "react";
-import { Text, View, Image, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
 import { mainColor } from "../../../../constants/Colors";
 import { Exp, Notification } from "../../../../components/tabs/home/index";
 import _axios from "../../../../api";
@@ -9,7 +16,8 @@ export default function Home() {
   const pathname = usePathname();
   const [currentDate, setCurrentDate] = useState(convertDate());
   const [currentTime, setCurrentTime] = useState(convertTime());
-  const [modalVisibleNotification, setModalVisibleNotification] = useState(false);
+  const [modalVisibleNotification, setModalVisibleNotification] =
+    useState(false);
   const [modalVisibleRanking, setModalVisibleRanking] = useState(false);
 
   useEffect(() => {
@@ -17,17 +25,33 @@ export default function Home() {
       setCurrentDate(convertDate());
       setCurrentTime(convertTime());
     }, 1000);
-    return () => { clearInterval(interval); }
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   function convertDate() {
     const date = new Date();
-    const week = { 0: "일", 1: "월", 2: "화", 3: "수", 4: "목", 5: "금", 6: "토" };
-    return `${Number(date.getMonth() + 1)}월 ${date.getDate().toString().padStart(2, '0')}일 ${week[date.getDay()]}요일`
+    const week = {
+      0: "일",
+      1: "월",
+      2: "화",
+      3: "수",
+      4: "목",
+      5: "금",
+      6: "토",
+    };
+    return `${Number(date.getMonth() + 1)}월 ${date
+      .getDate()
+      .toString()
+      .padStart(2, "0")}일 ${week[date.getDay()]}요일`;
   }
   function convertTime() {
     const date = new Date();
-    return `${date.getHours().toString().padStart(2, '0')}시 ${date.getMinutes().toString().padStart(2, '0')}분 ${date.getSeconds().toString().padStart(2, '0')}초`
+    return `${date.getHours().toString().padStart(2, "0")}시 ${date
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}분 ${date.getSeconds().toString().padStart(2, "0")}초`;
   }
 
   return (
@@ -36,11 +60,9 @@ export default function Home() {
       <Text style={styles.timeText}>{currentTime}</Text>
 
       {/* 로고 페이지 */}
-      <Link
-        href={`${pathname}/../question`}
-      >
+      <Link href={`${pathname}/../question`}>
         <Image
-          source={require('../../../../assets/logo.png')}
+          source={require("../../../../assets/logo.png")}
           style={styles.logo}
         />
       </Link>
@@ -52,12 +74,22 @@ export default function Home() {
         animationType="fade"
         transparent={true}
         visible={modalVisibleNotification}
-        onRequestClose={() => setModalVisibleNotification(false)}>
+        onRequestClose={() => setModalVisibleNotification(false)}
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={[styles.timeDate, {color: mainColor}]}>알림</Text>
+            <Text style={[styles.timeDate, { color: mainColor, marginTop: 4 }]}>
+              알림
+            </Text>
             <Notification />
-            <TouchableOpacity disabled={false} style={[styles.buttonSmall, { backgroundColor: false ? 'gray' : mainColor }]} onPress={() => setModalVisibleNotification(false)}>
+            <TouchableOpacity
+              disabled={false}
+              style={[
+                styles.buttonSmall,
+                { backgroundColor: false ? "gray" : mainColor },
+              ]}
+              onPress={() => setModalVisibleNotification(false)}
+            >
               <Text style={styles.buttonTextSmall}>확인</Text>
             </TouchableOpacity>
           </View>
@@ -69,11 +101,19 @@ export default function Home() {
         animationType="fade"
         transparent={true}
         visible={modalVisibleRanking}
-        onRequestClose={() => setModalVisibleRanking(false)}>
+        onRequestClose={() => setModalVisibleRanking(false)}
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Exp />
-            <TouchableOpacity disabled={false} style={[styles.buttonSmall, { backgroundColor: false ? 'gray' : mainColor }]} onPress={() => setModalVisibleRanking(false)}>
+            <TouchableOpacity
+              disabled={false}
+              style={[
+                styles.buttonSmall,
+                { backgroundColor: false ? "gray" : mainColor },
+              ]}
+              onPress={() => setModalVisibleRanking(false)}
+            >
               <Text style={styles.buttonTextSmall}>확인</Text>
             </TouchableOpacity>
           </View>
@@ -81,7 +121,7 @@ export default function Home() {
       </Modal>
 
       <Image
-        source={require('../../../../assets/logotypo.png')}
+        source={require("../../../../assets/logotypo.png")}
         style={styles.logotypo}
         resizeMode="contain"
       />
@@ -89,49 +129,56 @@ export default function Home() {
       {/* 알림 아이콘 */}
       <TouchableOpacity
         style={styles.alarmLink}
-        onPress={() => { setModalVisibleNotification(true) }}
+        onPress={() => {
+          setModalVisibleNotification(true);
+        }}
       >
         <Image
-          source={require('../../../../assets/alarm.png')}
+          source={require("../../../../assets/alarm.png")}
           style={styles.extralogo}
         />
       </TouchableOpacity>
-    </View >
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: mainColor,
   },
-  welcomeText: { //환영합니다
+  welcomeText: {
+    //환영합니다
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
-  timeDate: { //실시간
+  timeDate: {
+    //실시간
     fontSize: 40,
     marginBottom: 10,
-    color: 'white',
+    color: "white",
     textAlign: "center",
     fontWeight: "bold",
   },
-  timeText: { //실시간
+  timeText: {
+    //실시간
     fontSize: 50,
-    color: 'white',
+    color: "white",
     textAlign: "center",
     fontWeight: "bold",
   },
-  logo: { //로고 이미지
+  logo: {
+    //로고 이미지
     width: 250,
     height: 250,
     marginBottom: 20,
   },
-  logotypo: { //로고 이미지
-    position: 'absolute',
+  logotypo: {
+    //로고 이미지
+    position: "absolute",
     width: 180,
     height: 55,
     top: 15,
@@ -146,23 +193,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  extralogo: { //프로필, 알림 이미지
+  extralogo: {
+    //프로필, 알림 이미지
     top: 5,
     width: 50,
     height: 50,
   },
-  expLink: { //경험치 링크 사진
-    position: 'absolute',
+  expLink: {
+    //경험치 링크 사진
+    position: "absolute",
     top: 200,
     left: 60,
   },
-  alarmLink: { // 알림 링크 사진
-    position: 'absolute',
+  alarmLink: {
+    // 알림 링크 사진
+    position: "absolute",
     top: 15,
     right: 10,
   },
-  profileLink: { // 알림 링크 사진
-    position: 'absolute',
+  profileLink: {
+    // 알림 링크 사진
+    position: "absolute",
     top: 15,
     right: 10,
   },
@@ -178,8 +229,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 35,
-    marginTop: 25,
-    marginBottom: 25,
+    marginTop: 20,
+    marginBottom: 10,
   },
   buttonTextSmall: {
     color: "#FFFFFF",
@@ -187,7 +238,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   modalView: {
-    width: 500,
+    maxWidth: "86%",
+    maxHeight: "76%",
+    aspectRatio: 5 / 7,
     backgroundColor: "white",
     borderRadius: 20,
     padding: 10,
