@@ -11,10 +11,9 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: "#000",
         headerShown: false,
         tabBarStyle: {
-          position: 'absolute',
+          position: "absolute",
           elevation: 0,
           backgroundColor: "#fff",
-          height: 50,
         },
       }}
     >
