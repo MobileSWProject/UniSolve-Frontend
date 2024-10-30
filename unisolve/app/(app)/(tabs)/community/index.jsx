@@ -13,12 +13,13 @@ import List from "../../../../components/tabs/List/List";
 export default function Community() {
   const [communitys, setCommunitys] = useState([]);
   const [page, setPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1); // 총 페이지 수 관리
   const [searchText, setSearchText] = useState("");
   const [filteredCommunitys, setFilteredCommunitys] = useState([]);
-  const [process, setProcess] = useState(false); // 요청 중인지 여부
+  const [process, setProcess] = useState(false); // 데이터 요청 중 여부
   const [lastTimestamp, setLastTimestamp] = useState(null);
   const [lastPostId, setLastPostId] = useState(null);
+  const [hasMore, setHasMore] = useState(true); // 더 가져올 데이터가 있는지 여부
 
   // 초기 데이터 로드 및 상태 초기화
   useFocusEffect(
@@ -30,15 +31,17 @@ export default function Community() {
 
   const resetState = () => {
     setPage(1);
+    setTotalPage(1); // 초기화할 때 총 페이지 수도 초기화
     setCommunitys([]);
     setFilteredCommunitys([]);
     setLastTimestamp(null);
     setLastPostId(null);
+    setHasMore(true); // 데이터가 더 있다고 초기화
   };
 
   // 서버에서 데이터 가져오기
   const getList = async (tempPage, timestamp, postId) => {
-    if (process || tempPage > totalPage) return; // 중복 요청 및 페이지 초과 방지
+    if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
     setProcess(true);
 
     try {
@@ -46,8 +49,12 @@ export default function Community() {
         `/posts?page=${tempPage}&last_timestamp=${timestamp || ""}&last_post_id=${postId || ""}`
       );
 
-      setTotalPage(response.data.total_pages);
       const newData = response.data.data || [];
+      setTotalPage(response.data.total_pages); // 총 페이지 수 설정
+
+      if (newData.length === 0) {
+        setHasMore(false); // 더 이상 데이터가 없을 때 hasMore를 false로 설정
+      }
 
       // 첫 페이지라면 데이터 초기화
       if (tempPage === 1) {
@@ -70,6 +77,8 @@ export default function Community() {
       if (lastItem) {
         setLastTimestamp(lastItem.timestamp);
         setLastPostId(lastItem.id);
+      } else {
+        setHasMore(false); // 새로운 데이터가 없으면 더 이상 요청하지 않음
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -81,7 +90,7 @@ export default function Community() {
   // 스크롤 시 다음 페이지 데이터 가져오기
   const refresh = async () => {
     const nextPage = page + 1;
-    if (process || nextPage > totalPage) return; // 중복 요청 및 페이지 초과 방지
+    if (process || !hasMore || nextPage > totalPage) return; // 중복 요청, 데이터 없음, 페이지 초과 방지
 
     setPage(nextPage); // 페이지 증가
     await getList(nextPage, lastTimestamp, lastPostId); // 다음 페이지 데이터 요청
