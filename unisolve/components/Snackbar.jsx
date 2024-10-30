@@ -1,5 +1,6 @@
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { Snackbar } from "react-native-paper";
+import { styles } from "../styles/SnackBarStyle"
 
 export default function SnackBar({ visible, message, onDismiss }) {
   return (
@@ -15,16 +16,3 @@ export default function SnackBar({ visible, message, onDismiss }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  snackbarContainer: {
-    position: "absolute",
-    zIndex: 999,
-    top: "15%",
-    width: "80%",
-    alignSelf: "center",
-  },
-  snackbar: {
-    borderRadius: 15,
-  },
-});

@@ -1,20 +1,12 @@
 import React, { useCallback, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  ActivityIndicator,
-  TextInput,
-} from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput } from "react-native";
 import { Snackbar } from "react-native-paper";
 import { useFocusEffect, useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { mainColor } from "../../../../constants/Colors";
 import { ProgressBar } from "react-native-paper";
 import { getExpToLevel, getPercent, getLevel } from "../../../../components/tabs/home/index";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ModalView from "../../../../components/form/ModalView";
 import _axios from "../../../../api";
 
 export default function MePage() {

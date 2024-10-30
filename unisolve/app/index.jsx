@@ -1,21 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Animated,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
-import { mainColor } from "../constants/Colors";
+import { View, Text, ActivityIndicator, Animated, TextInput, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import _axios from "../api";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { styles } from "../styles/IndexStyle";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import decodeJWT from "../utils/decodeJWT";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ModalView from "../components/form/ModalView";
 import SnackBar from "../components/Snackbar";
+import _axios from "../api";
 
 export default function Home() {
   const router = useRouter();
@@ -54,13 +46,10 @@ export default function Home() {
         const currentTime = Math.floor(Date.now() / 1000);
         const isTokenExpired = decodedToken.exp < currentTime;
 
-        if (isTokenExpired) {
-          await AsyncStorage.removeItem("token");
-        } else {
+        if (isTokenExpired) await AsyncStorage.removeItem("token");
+        else {
           setCertification(true);
-          snackBar(
-            "✅ 로그인 정보가 존재합니다!\n메인으로 이동하고 있습니다..."
-          );
+          snackBar("✅ 로그인 정보가 존재합니다!\n메인으로 이동하고 있습니다...");
           setTimeout(() => {
             router.replace("/home");
           }, 1500);
@@ -85,38 +74,13 @@ export default function Home() {
     checkCertification();
   }, [logoPosition, inputOpacity]);
 
-  const CheckProcess = async (value, type) => {
+  const CheckProcess = async (value) => {
     try {
       const response = await _axios.post("/accounts/existuser", value);
-      const result = response.data.isNotExist || false;
-      if (type) {
-        return result === false ? true : false;
-      } else {
-        if (!result) {
-          snackBar("❌ 잘못 입력했거나 이미 사용 중입니다.");
-        }
-        if (value.user_id) {
-          setReIDCheck(result);
-        } else if (value.email) {
-          return result;
-        } else if (value.nickname) {
-          setReNicknameCheck(result);
-        }
-      }
+      return !response.data.isNotExist;
     } catch {
       snackBar("❌ 문제가 발생했습니다!");
-      if (type) {
-        return false;
-      }
-      if (value.user_id) {
-        setReIDCheck(false);
-      }
-      if (value.email) {
-        return false;
-      }
-      if (value.nickname) {
-        setReNicknameCheck(false);
-      }
+      return false;
     }
   };
 
@@ -154,7 +118,7 @@ export default function Home() {
         }
         setSending(false);
       } else {
-        const response = await CheckProcess({ user_id: id }, true);
+        const response = await CheckProcess({ user_id: id });
         setCheckID(response);
         setSending(false);
         if (response) {
@@ -244,9 +208,7 @@ export default function Home() {
           placeholder="아이디를 입력하세요."
           placeholderTextColor="#fff"
           value={id}
-          onChangeText={(text) => {
-            inputID(text);
-          }}
+          onChangeText={(text) => { inputID(text); }}
           onSubmitEditing={handleSend}
           disabled={loginCheck}
         />
@@ -323,98 +285,3 @@ export default function Home() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: mainColor,
-  },
-  logo: {
-    width: 250,
-    height: 250,
-  },
-  input: {
-    width: 250,
-    height: 40,
-    borderColor: "#fff",
-    borderWidth: 3,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    color: "#fff",
-  },
-  inputTo: {
-    width: "100%",
-    height: 40,
-    borderColor: "#fff",
-    borderWidth: 3,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    color: "#fff",
-    borderColor: "#000",
-    color: "#000",
-    marginTop: 5,
-  },
-  text: {
-    fontSize: 12,
-    color: "#fff",
-  },
-  textTo: {
-    fontSize: 15,
-    marginLeft: 20,
-    marginBottom: -5,
-    marginTop: 20,
-    fontWeight: "bold",
-    alignSelf: "flex-start",
-  },
-  flatList: {
-    width: "93%",
-    maxHeight: 100,
-    borderWidth: 3,
-    borderColor: "black",
-    borderTopWidth: 0,
-  },
-  sendButton: {
-    backgroundColor: "transparent",
-    padding: 10,
-    borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalView: {
-    width: 350,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  buttonSmall: {
-    paddingHorizontal: 16,
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 40,
-    marginTop: 15,
-    margin: 2,
-  },
-  buttonTextSmall: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-});

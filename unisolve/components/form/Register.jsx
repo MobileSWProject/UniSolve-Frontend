@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  FlatList,
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { mainColor } from "../../constants/Colors";
-import _axios from "../../api";
+import { styles } from "../../styles/form/FormStyle"
+import { styles as FlatStyles } from "../../styles/tabs/List/ListStyles";
 import SnackBar from "../Snackbar";
+import Input from "./Input";
+import _axios from "../../api";
 
 export default function Register({ visible, setVisible }) {
   const [effect, setEffect] = useState(false);
@@ -33,6 +29,8 @@ export default function Register({ visible, setVisible }) {
   const [reSchool, setReSchool] = useState("");
   const [reProcess, setReProcess] = useState(false);
 
+  const [reEmailProcess, setReEmailProcess] = useState(false);
+
   useEffect(() => {
     if (!effect) {
       getSchool();
@@ -44,34 +42,19 @@ export default function Register({ visible, setVisible }) {
     try {
       const response = await _axios.post("/accounts/existuser", value);
       const result = response.data.isNotExist || false;
-      if (type) {
-        return result === false ? true : false;
-      } else {
-        if (!result) {
-          snackBar("❌ 잘못 입력했거나 이미 사용 중입니다.");
-        }
-        if (value.user_id) {
-          setReIDCheck(result);
-        } else if (value.email) {
-          return result;
-        } else if (value.nickname) {
-          setReNicknameCheck(result);
-        }
+      if (type) return result === false ? true : false;
+      else {
+        if (!result) snackBar("❌ 잘못 입력했거나 이미 사용 중입니다.");
+        if (value.user_id) setReIDCheck(result);
+        else if (value.email) return result;
+        else if (value.nickname) setReNicknameCheck(result);
       }
     } catch {
       snackBar("❌ 문제가 발생했습니다!");
-      if (type) {
-        return false;
-      }
-      if (value.user_id) {
-        setReIDCheck(false);
-      }
-      if (value.email) {
-        return false;
-      }
-      if (value.nickname) {
-        setReNicknameCheck(false);
-      }
+      if (type) return false;
+      if (value.user_id) setReIDCheck(false);
+      if (value.email) return false;
+      if (value.nickname) setReNicknameCheck(false);
     }
   };
 
@@ -82,18 +65,20 @@ export default function Register({ visible, setVisible }) {
 
   const CheckProcessEmail = async () => {
     try {
+      if (reEmailProcess) return;
+      setReEmailProcess(true);
       const response = await CheckProcess({ email: reEmail });
       if (response) {
         const responseTo = await _axios.post("/auth/send-code", {
           email: reEmail,
         });
         setReEmailCheck(responseTo.data.isSent || false);
-
+        setReEmailProcess(false);
         snackBar("✅ 인증번호를 발송했습니다!");
       }
     } catch {
       setReEmailCheck(false);
-
+      setReEmailProcess(false);
       snackBar("❌ 인증번호를 발송하지 못했습니다.");
     }
   };
@@ -119,24 +104,13 @@ export default function Register({ visible, setVisible }) {
   const confirmID = (type) => {
     const regEx = /^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{4,}$/.test(reID);
     if (type === true) return regEx;
-    return !regEx
-      ? "규칙이 잘못됨"
-      : reIDCheck
-      ? "확인 완료"
-      : "중복 확인 필요";
-  };
+    return !regEx ? "규칙이 잘못됨" : reIDCheck ? "확인 완료" : "중복 확인 필요" };
 
   const confirmPW = (type) => {
-    const regEx = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W])[a-zA-Z0-9\W]{8,}$/.test(
-      rePw
-    );
+    const regEx = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W])[a-zA-Z0-9\W]{8,}$/.test(rePw);
     if (type === true) return regEx && rePw === rePwTo;
     else if (type === false) return regEx;
-    return !regEx
-      ? "규칙이 잘못됨"
-      : rePw === rePwTo
-      ? "일치함"
-      : "일치하지 않음";
+    return !regEx ? "규칙이 잘못됨" : rePw === rePwTo ? "일치함" : "일치하지 않음";
   };
 
   const confirmEmail = () => {
@@ -192,7 +166,7 @@ export default function Register({ visible, setVisible }) {
         setTimeout(() => {
           setVisible(false);
           setReProcess(false);
-        }, 1000);
+        }, 2000);
       }
     } catch {
       snackBar("❌ 회원 가입에 실패했습니다.\n잠시 후 다시 시도해 주세요.");
@@ -207,9 +181,7 @@ export default function Register({ visible, setVisible }) {
   };
 
   const searchSchool = () => {
-    return schoolData && reSchool
-      ? schoolData.filter((item) => item.univ_name.includes(reSchool))
-      : [];
+    return schoolData && reSchool ? schoolData.filter((item) => item.univ_name.includes(reSchool)) : [];
   };
 
   return (
@@ -222,214 +194,83 @@ export default function Register({ visible, setVisible }) {
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
         회원가입
       </Text>
-      <Text style={styles.textTo}>
-        아이디
-        <Text
-          style={[
-            styles.textTo,
-            { fontSize: 12, color: reIDCheck ? "blue" : "red" },
-          ]}
-        >
-          ({confirmID()})
-        </Text>
-      </Text>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <TextInput
-          style={[styles.inputTo, { flex: 1, marginRight: 1 }]}
-          placeholder="사용할 아이디를 입력하세요."
-          value={reID}
-          onChangeText={(text) => inputReID(text)}
-        />
-        <TouchableOpacity
-          disabled={reIDCheck || !confirmID(true)}
-          style={[
-            styles.buttonSmall,
-            {
-              backgroundColor:
-                reIDCheck || !confirmID(true) ? "gray" : mainColor,
-            },
-          ]}
-          onPress={() => {
-            if (confirmID(true)) CheckProcess({ user_id: reID });
-          }}
-        >
-          <Text style={styles.buttonTextSmall}>확인</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.textTo}>이름</Text>
-      <TextInput
-        style={styles.inputTo}
-        placeholder="이름을 입력하세요."
-        value={reName}
+      <Input
+        title="아이디"
+        subTitle={confirmID()}
+        subTitleConfirm={reIDCheck}
+        content={reID}
+        onChangeText={(text) => inputReID(text)}
+        buttonDisabled={reIDCheck || !confirmID(true)}
+        buttonOnPress={() => { if (confirmID(true)) CheckProcess({ user_id: reID }); }}
+      />
+      <Input 
+        title="이름"
+        content={reName}
         onChangeText={setReName}
       />
-      <Text style={styles.textTo}>
-        이메일
-        <Text
-          style={[
-            styles.textTo,
-            {
-              fontSize: 12,
-              color: reEmailCheck && reEmailCheckTo ? "blue" : "red",
-            },
-          ]}
-        >
-          ({reEmailCheck && reEmailCheckTo ? "인증 완료" : "인증 필요"})
-        </Text>
-      </Text>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          width: reEmailCheck ? "100%" : "",
-        }}
-      >
-        <TextInput
-          style={styles.inputTo}
-          placeholder="이메일을 입력하세요."
-          value={reEmail}
-          onChangeText={(text) => inputEmail(text)}
-        />
-        {!reEmailCheck ? (
-          <TouchableOpacity
-            disabled={reEmailCheck || !confirmEmail(true)}
-            style={[
-              styles.buttonSmall,
-              {
-                backgroundColor:
-                  reEmailCheckTo || !confirmEmail(true) ? "gray" : mainColor,
-              },
-            ]}
-            onPress={() => {
-              if (confirmEmail(true)) CheckProcessEmail();
-            }}
-          >
-            <Text style={styles.buttonTextSmall}>확인</Text>
-          </TouchableOpacity>
-        ) : (
-          <></>
-        )}
-      </View>
-      {reEmailCheck ? (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TextInput
-            style={styles.inputTo}
-            placeholder="인증번호를 입력하세요."
-            value={reEmailTo}
-            maxLength={8}
-            disabled={reEmailCheckTo}
-            onChangeText={(text) => setReEmailTo(text.replace(/[^0-9]/g, ""))}
-          />
-          <TouchableOpacity
-            disabled={reEmailCheckTo || !confirmEmail(true)}
-            style={[
-              styles.buttonSmall,
-              {
-                backgroundColor: reEmailCheckTo ? "gray" : mainColor,
-              },
-            ]}
-            onPress={() => {
-              CheckProcessEmailTo();
-            }}
-          >
-            <Text style={styles.buttonTextSmall}>확인</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <></>
-      )}
-      <Text style={styles.textTo}>
-        비밀번호
-        <Text
-          style={[
-            styles.textTo,
-            { fontSize: 12, color: confirmPW(true) ? "blue" : "red" },
-          ]}
-        >
-          ({confirmPW()})
-        </Text>
-      </Text>
-      <TextInput
-        style={styles.inputTo}
-        placeholder="사용할 비밀번호를 입력하세요."
-        value={rePw}
-        onChangeText={(text) => inputPW(text)}
-        secureTextEntry={true}
+      <Input
+        title="이메일"
+        subTitle={reEmailCheck && reEmailCheckTo ? "인증 완료" : "인증 필요"}
+        subTitleConfirm={reEmailCheck && reEmailCheckTo}
+        content={reEmail}
+        onChangeText={(text) => inputEmail(text)}
+        buttonDisabled={reEmailCheck || !confirmEmail()}
+        buttonOnPress={() => { if (confirmEmail()) CheckProcessEmail(); }}
       />
-      {confirmPW(false) ? (
-        <>
-          <Text style={styles.textTo}>
-            비밀번호 확인
-            <Text
-              style={[
-                styles.textTo,
-                {
-                  fontSize: 12,
-                  color: confirmPW(true) ? "blue" : "red",
-                },
-              ]}
-            >
-              ({confirmPW()})
-            </Text>
-          </Text>
-          <TextInput
-            style={styles.inputTo}
-            placeholder="비밀번호를 다시 한번 입력하세요."
-            value={rePwTo}
-            onChangeText={setRePwTo}
-            secureTextEntry={true}
-          />
-        </>
-      ) : (
-        <></>
-      )}
-      <Text style={styles.textTo}>
-        닉네임
-        <Text
-          style={[
-            styles.textTo,
-            { fontSize: 12, color: reNicknameCheck ? "blue" : "red" },
-          ]}
-        >
-          ({reNicknameCheck ? "확인 완료" : "중복 확인 필요"})
-        </Text>
-      </Text>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <TextInput
-          style={[styles.inputTo, { flex: 1, marginRight: 1 }]}
-          placeholder="닉네임을 입력하세요."
-          value={reNickname}
-          onChangeText={(text) => inputReNickname(text)}
-        />
-        <TouchableOpacity
-          disabled={reNicknameCheck || reNickname.length <= 0}
-          style={[
-            styles.buttonSmall,
-            {
-              backgroundColor:
-                reNicknameCheck || reNickname.length <= 0 ? "gray" : mainColor,
-            },
-          ]}
-          onPress={() => CheckProcess({ nickname: reNickname })}
-        >
-          <Text style={styles.buttonTextSmall}>확인</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.textTo}>소속</Text>
-      <TextInput
-        style={styles.inputTo}
+      {
+        reEmailCheck ?
+        <Input
+          title="인증번호"
+          subTitle={reEmailCheck && reEmailCheckTo ? "인증 완료" : "인증 필요"}
+          subTitleConfirm={reEmailCheck && reEmailCheckTo}
+          content={reEmailTo}
+          disabled={reEmailCheckTo}
+          maxLength={8}
+          onChangeText={(text) => setReEmailTo(text.replace(/[^0-9]/g, ""))}
+          buttonDisabled={reEmailCheckTo || !confirmEmail(true)}
+          buttonOnPress={() => { CheckProcessEmailTo(); }}
+        /> :
+        null
+      }
+      <Input
+        title="비밀번호"
+        subTitle={confirmPW()}
+        subTitleConfirm={confirmPW(true)}
+        content={rePw}
+        onChangeText={(text) => inputPW(text)}
+        secure={true}
+      />
+      {
+        confirmPW(false) ?
+        <Input
+          title="비밀번호 확인"
+          placeholder="비밀번호를 다시 한번 입력하세요."
+          subTitle={confirmPW()}
+          subTitleConfirm={confirmPW(true)}
+          content={rePwTo}
+          onChangeText={setRePwTo}
+          secure={true}
+        /> :
+        null
+      }
+      <Input
+        title="닉네임"
+        subTitle={reNicknameCheck ? "확인 완료" : "중복 확인 필요"}
+        subTitleConfirm={reNicknameCheck}
+        content={reNickname}
+        onChangeText={(text) => inputReNickname(text)}
+        buttonDisabled={reNicknameCheck || reNickname.length <= 0}
+        buttonOnPress={() => CheckProcess({ nickname: reNickname })}
+      />
+      <Input
+        title="소속"
         placeholder="본인의 소속을 입력 후 선택하세요."
-        value={reSchool}
+        content={reSchool}
         onChangeText={(text) => setReSchool(text)}
       />
-      {searchSchool().length > 0 ? (
-        <View style={styles.flatList}>
+      {
+        searchSchool().length > 0 ?
+        <View style={FlatStyles.flatList}>
           <FlatList
             style={{ margin: 5, marginRight: 0 }}
             data={searchSchool()}
@@ -441,29 +282,21 @@ export default function Register({ visible, setVisible }) {
             )}
             ListEmptyComponent={<Text style={styles.empty}></Text>}
           />
-        </View>
-      ) : (
-        <></>
-      )}
+        </View> :
+        null
+      }
       <View style={{ flexDirection: "row" }}>
         <TouchableOpacity
-          style={[
-            styles.buttonSmall,
-            { backgroundColor: false ? "gray" : mainColor },
-          ]}
+          style={[styles.buttonSmall, { backgroundColor: reProcess ? "gray" : mainColor }]}
           onPress={() => setVisible(false)}
+          disabled={reProcess}
         >
           <Text style={styles.buttonTextSmall}>취소</Text>
         </TouchableOpacity>
         <TouchableOpacity
+          style={[styles.buttonSmall, { backgroundColor: reProcess ? "gray" : mainColor }]}
+          onPress={() => { registerProcess(); }}
           disabled={reProcess}
-          style={[
-            styles.buttonSmall,
-            { backgroundColor: reProcess ? "gray" : mainColor },
-          ]}
-          onPress={() => {
-            registerProcess();
-          }}
         >
           <Text style={styles.buttonTextSmall}>회원가입</Text>
         </TouchableOpacity>
@@ -471,98 +304,3 @@ export default function Register({ visible, setVisible }) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: mainColor,
-  },
-  logo: {
-    width: 250,
-    height: 250,
-  },
-  input: {
-    width: 250,
-    height: 40,
-    borderColor: "#fff",
-    borderWidth: 3,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    color: "#fff",
-  },
-  inputTo: {
-    width: "100%",
-    height: 40,
-    borderColor: "#fff",
-    borderWidth: 3,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    color: "#fff",
-    borderColor: "#000",
-    color: "#000",
-    marginTop: 5,
-  },
-  text: {
-    fontSize: 12,
-    color: "#fff",
-  },
-  textTo: {
-    fontSize: 15,
-    marginLeft: 20,
-    marginBottom: -5,
-    marginTop: 20,
-    fontWeight: "bold",
-    alignSelf: "flex-start",
-  },
-  flatList: {
-    width: "93%",
-    maxHeight: 100,
-    borderWidth: 3,
-    borderColor: "black",
-    borderTopWidth: 0,
-  },
-  sendButton: {
-    backgroundColor: "transparent",
-    padding: 10,
-    borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalView: {
-    width: 350,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  buttonSmall: {
-    paddingHorizontal: 16,
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 40,
-    marginTop: 15,
-    margin: 2,
-  },
-  buttonTextSmall: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-});

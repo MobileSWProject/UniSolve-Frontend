@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import styles from "../../../styles/tabs/List/ListStyles";
+import { styles } from "../../../styles/tabs/List/ListStyles";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
