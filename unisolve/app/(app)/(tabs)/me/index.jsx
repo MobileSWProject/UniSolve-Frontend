@@ -1,6 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, TextInput } from "react-native";
-import { Snackbar } from "react-native-paper";
+import { useCallback, useState } from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { mainColor } from "../../../../constants/Colors";
 import { ProgressBar } from "react-native-paper";
@@ -12,214 +11,40 @@ import _axios from "../../../../api";
 export default function MePage() {
   const router = useRouter();
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
+  const [userProcess, setUserProcess] = useState(false);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
-  const [deleting, setDeleting] = useState(false);
-  const [editing, setEditing] = useState(false);
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const [email, setEmail] = useState("");
-  const [emailConfirm, setEmailConfirm] = useState("");
-  const [emailCheck, setEmailCheck] = useState(false);
-  const [emailChecks, setEmailChecks] = useState(false);
-  const [password, setPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [subPassword, setSubPassword] = useState("");
-  const [nickname, setNickname] = useState("");
-  const [nicknameCheck, setNicknameCheck] = useState("");
-
   const [exp, setExp] = useState("");
 
   useFocusEffect(
-    useCallback(() => {
-      _axios
-        .get("/accounts/mine")
-        .then((response) => {
-          setUser(response.data.data);
-          setEmail(response.data.data.email);
-          setEmailCheck(true);
-          setEmailChecks(true);
-          setNicknameCheck(true);
-          setNickname(response.data.data.user_nickname);
-          setExp(response.data.data.exp || 0);
-        })
-        .catch((error) => {
-          router.replace("/");
-        });
+    useCallback(async () => { 
+      await getUser();
     }, [])
   );
 
-  const CheckProcess = async (value) => {
+  async function getUser() {
+    if (userProcess) return;
     try {
-      const response = await _axios.post("/accounts/existuser", value);
-      const result = response.data.isNotExist || false;
-      if (!result) {
-        setSnackbarVisible(true);
-        setSnackbarMessage("❌ 잘못 입력했거나 이미 사용 중입니다.");
+      setUserProcess(true);
+      const response = await _axios.get("/accounts/mine");
+      if (!response.data.data.username) {
+        await AsyncStorage.clear();
+        router.replace("/");
+        return;
       }
-      if (value.user_id) {
-        setReIDCheck(result);
-      } else if (value.email) {
-        return result;
-      } else if (value.nickname) {
-        setNicknameCheck(result);
-      }
+      setUser(response.data.data);
+      setExp(response.data.data.exp || 0);
+      setUserProcess(false);
     } catch {
-      setSnackbarVisible(true);
-      setSnackbarMessage("❌ 문제가 발생했습니다!");
-      if (type) {
-        return false;
-      }
-      if (value.email) {
-        return false;
-      }
-      if (value.nickname) {
-        setNicknameCheck(false);
-      }
+      router.replace("/");
     }
-  };
-
-  const DeletedProcess = async () => {
-    if (deleting || !password) return;
-    setDeleting(true);
-    await _axios
-      .delete("/accounts", { data: { password } })
-      .then(async (response) => {
-        setDeleting(false);
-        if (response.data.deleted === true) {
-          setModalVisible(false);
-          setSnackbarVisible(true);
-          setSnackbarMessage("✅ 회원 탈퇴가 완료되었습니다!");
-          await AsyncStorage.clear();
-          router.replace("/");
-          return;
-        }
-      })
-      .catch(() => {
-        setDeleting(false);
-        setModalVisible(false);
-        setModalType("");
-        setSnackbarVisible(true);
-        setSnackbarMessage("❌ 회원 탈퇴에 실패하였습니다.");
-      });
-  };
-
-  if (!user) {
-    return <></>;
   }
-
-  const EditProcess = async () => {
-    if (editing || password.length <= 0 || !emailChecks || (newPassword.length > 0 && newPassword !== subPassword) || nickname.length <= 0) return;
-    setEditing(true);
-    await _axios
-      .put("/accounts", {
-        current_password: password,
-        email: email,
-        new_password: newPassword,
-        user_nickname: nickname,
-      })
-      .then(async (response) => {
-        setEditing(false);
-        if (response.data.updated === true) {
-          setPassword("");
-          setNewPassword("");
-          setSubPassword("");
-          _axios.get("/accounts/mine").then((response) => {
-            setUser(response.data.data);
-            setEmail(response.data.data.email);
-            setEmailChecks(true);
-            setNicknameCheck(true);
-            setNickname(response.data.data.user_nickname);
-          });
-          setSnackbarVisible(true);
-          setSnackbarMessage("✅ 정보 수정이 완료되었습니다!");
-          setModalVisible(false);
-          setModalType("");
-        }
-      })
-      .catch(() => {
-        setEditing(false);
-        setSnackbarVisible(true);
-        setSnackbarMessage("❌ 문제가 발생했습니다!");
-      });
-  };
-
-  const inputNickname = (text) => {
-    setNickname(text);
-    if (user.user_nickname === text) setNicknameCheck(true);
-    else setNicknameCheck(false);
-  };
-
-  const CheckProcessEmail = async () => {
-    try {
-      const response = await CheckProcess({ email: email });
-      console.log(response)
-      if (response) {
-        const responseTo = await _axios.post("/auth/send-code", {
-          email: email,
-        });
-        setEmailCheck(responseTo.data.isSent || false);
-        setSnackbarVisible(true);
-        setSnackbarMessage("✅ 인증번호를 발송했습니다!");
-      }
-    } catch {
-      setEmailCheck(false);
-      setSnackbarVisible(true);
-      setSnackbarMessage("❌ 인증번호를 발송하지 못했습니다.");
-    }
-  };
-
-  const CheckProcessEmailTo = async () => {
-    try {
-      const response = await _axios.post("/auth/verify-code", {
-        email: email,
-        code: emailConfirm,
-      });
-      setEmailChecks(response.data.isVerified || false);
-    } catch {
-      setSnackbarVisible(true);
-      setSnackbarMessage("❌ 인증번호가 잘못 입력되었습니다.");
-      setEmailChecks(false);
-    }
-  };
-
-  const confirmEmail = () => {
-    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-  };
-
-  const confirmPW = (type) => {
-    const regEx = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W])[a-zA-Z0-9\W]{8,}$/.test(
-      newPassword
-    );
-    if (type === true) return regEx && newPassword === subPassword;
-    else if (type === false) return regEx;
-    return !regEx
-      ? "규칙이 잘못됨"
-      : newPassword === subPassword
-        ? "일치함"
-        : "일치하지 않음";
-  };
-
-  const inputPW = (text) => {
-    setNewPassword(text);
-    setSubPassword("");
-  };
-
-  const inputEmail = (text) => {
-    setEmail(text);
-    if (user.email === text) {
-      setEmailCheck(true);
-      setEmailChecks(true);
-    }
-    else {
-      setEmailCheck(false);
-      setEmailChecks(false);
-    }
-    setEmailConfirm("");
-  };
 
   return (
     <View style={styles.container}>
@@ -274,8 +99,7 @@ export default function MePage() {
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>계정</Text>
       <TouchableOpacity
         onPress={() => {
-          setPassword("");
-          setModalType("edit");
+          setModalType("modify");
           setModalVisible(true);
         }}
       >
@@ -314,11 +138,12 @@ export default function MePage() {
         <Text style={styles.buttonText}>개인정보 처리방침</Text>
       </TouchableOpacity>
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>기타</Text>
-      <TouchableOpacity onPress={() => {
-        setPassword("");
-        setModalType("delete");
-        setModalVisible(true)
-      }}>
+      <TouchableOpacity
+        onPress={() => {
+          setModalType("delete");
+          setModalVisible(true);
+        }}
+      >
         <Text style={styles.buttonText}>회원 계정 탈퇴</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={async () => {
@@ -327,223 +152,14 @@ export default function MePage() {
       }}>
         <Text style={styles.buttonText}>로그아웃</Text>
       </TouchableOpacity>
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-          setModalType("");
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
-              {modalType === "edit" ? "계정 정보 수정" : modalType === "delete" ? "계정 탈퇴" : ""}
-            </Text>
-            {
-              modalType === "edit" ?
-                <>
-                  <Text style={styles.textTo}>
-                    이메일 변경
-                    <Text style={[styles.textTo, { fontSize: 12, color: emailCheck && emailChecks ? "blue" : "red", },]}
-                    >
-                      (
-                      {emailCheck && emailChecks ? "인증 완료" : "인증 필요"}
-                      )
-                    </Text>
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      width: emailCheck ? "100%" : "",
-                    }}
-                  >
-                    <TextInput
-                      style={styles.inputTo}
-                      placeholder="이메일을 입력하세요."
-                      value={email}
-                      onChangeText={(text) => inputEmail(text)}
-                    />
-                    {!emailCheck ? (
-                      <TouchableOpacity
-                        disabled={emailCheck || !confirmEmail(true)}
-                        style={[
-                          styles.buttonSmall,
-                          {
-                            backgroundColor:
-                              emailChecks || !confirmEmail(true)
-                                ? "gray"
-                                : mainColor,
-                          },
-                        ]}
-                        onPress={() => {
-                          if (confirmEmail(true)) CheckProcessEmail();
-                        }}
-                      >
-                        <Text style={styles.buttonTextSmall}>확인</Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <></>
-                    )}
-                  </View>
-                  {!(user.email === email) && emailCheck ? (
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <TextInput
-                        style={styles.inputTo}
-                        placeholder="인증번호를 입력하세요."
-                        value={emailConfirm}
-                        maxLength={8}
-                        disabled={emailChecks}
-                        onChangeText={(text) =>
-                          setEmailConfirm(text.replace(/[^0-9]/g, ""))
-                        }
-                      />
-                      <TouchableOpacity
-                        disabled={emailChecks || !confirmEmail(true)}
-                        style={[
-                          styles.buttonSmall,
-                          {
-                            backgroundColor: emailChecks ? "gray" : mainColor,
-                          },
-                        ]}
-                        onPress={() => {
-                          CheckProcessEmailTo();
-                        }}
-                      >
-                        <Text style={styles.buttonTextSmall}>확인</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ) : (
-                    <></>
-                  )}
-                  <Text style={styles.textTo}>
-                    비밀번호 변경
-                    <Text
-                      style={[
-                        styles.textTo,
-                        { fontSize: 12, color: confirmPW(true) ? "blue" : "red" },
-                      ]}
-                    >
-                      ({confirmPW()})
-                    </Text>
-                  </Text>
-                  <TextInput
-                    style={styles.inputTo}
-                    placeholder="변경할 비밀번호를 입력하세요."
-                    value={newPassword}
-                    onChangeText={(text) => inputPW(text)}
-                    secureTextEntry={true}
-                  />
-                  {confirmPW(false) ? (
-                    <>
-                      <Text style={styles.textTo}>
-                        비밀번호 확인
-                        <Text
-                          style={[
-                            styles.textTo,
-                            {
-                              fontSize: 12,
-                              color: confirmPW(true) ? "blue" : "red",
-                            },
-                          ]}
-                        >
-                          ({confirmPW()})
-                        </Text>
-                      </Text>
-                      <TextInput
-                        style={styles.inputTo}
-                        placeholder="변경할 비밀번호를 다시 한번 입력하세요."
-                        value={subPassword}
-                        onChangeText={setSubPassword}
-                        secureTextEntry={true}
-                      />
-                    </>
-                  ) : (
-                    <></>
-                  )}
-                  <Text style={styles.textTo}>
-                    닉네임 변경
-                    <Text
-                      style={[
-                        styles.textTo,
-                        { fontSize: 12, color: nicknameCheck ? "blue" : "red" },
-                      ]}
-                    >
-                      ({nicknameCheck ? "확인 완료" : "중복 확인 필요"})
-                    </Text>
-                  </Text>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TextInput
-                      style={[styles.inputTo, { flex: 1, marginRight: 1 }]}
-                      placeholder="닉네임을 입력하세요."
-                      value={nickname}
-                      onChangeText={(text) => inputNickname(text)}
-                    />
-                    <TouchableOpacity
-                      disabled={nicknameCheck || nickname.length <= 0}
-                      style={[
-                        styles.buttonSmall,
-                        {
-                          backgroundColor:
-                            nicknameCheck || nickname.length <= 0
-                              ? "gray"
-                              : mainColor,
-                        },
-                      ]}
-                      onPress={() => CheckProcess({ nickname: nickname })}
-                    >
-                      <Text style={styles.buttonTextSmall}>확인</Text>
-                    </TouchableOpacity>
-                  </View>
-                </> :
-                modalType === "delete" ?
-                  <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>
-                    정말로 해당 계정을 탈퇴 처리하시겠습니까?{"\n"}이 작업은 되돌릴 수 없습니다.
-                  </Text> : <></>
-            }
-            <Text style={styles.textTo}>
-              현재 비밀번호
-            </Text>
-            <TextInput
-              style={[styles.inputTo, { borderColor: modalType === "edit" ? "" : modalType === "delete" ? "#ff0000" : "" }]}
-              placeholder="현재 비밀번호를 입력하세요."
-              value={password}
-              onChangeText={(text) => setPassword(text)}
-              secureTextEntry={true}
-            />
-            <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity
-                style={[
-                  styles.buttonSmall,
-                  { backgroundColor: false ? "gray" : mainColor },
-                ]}
-                onPress={() => {
-                  setModalVisible(false);
-                  setModalType("");
-                }}
-              >
-                <Text style={styles.buttonTextSmall}>취소</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                disabled={false}
-                style={[
-                  styles.buttonSmall,
-                  { backgroundColor: modalType === "edit" ? mainColor : modalType === "delete" ? "#ff0000" : "" },
-                ]}
-                onPress={() => {
-                  modalType === "edit" ? EditProcess() : modalType === "delete" ? DeletedProcess() : null;
-                }}
-              >
-                <Text style={styles.buttonTextSmall}>
-                  {modalType === "edit" ? "수정하기" : modalType === "delete" ? "탈퇴하기" : null}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {modalVisible ? (
+        <ModalView
+          type={modalType}
+          visible={modalVisible}
+          setVisible={setModalVisible}
+          userData={user}
+        />
+      ) : null}
     </View>
   );
 }

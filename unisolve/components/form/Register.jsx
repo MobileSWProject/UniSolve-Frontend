@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
-import { mainColor } from "../../constants/Colors";
 import { styles } from "../../styles/form/FormStyle"
 import { styles as FlatStyles } from "../../styles/tabs/List/ListStyles";
 import SnackBar from "../Snackbar";
 import Input from "./Input";
+import InputProcess from "./InputProcess";
 import _axios from "../../api";
 
 export default function Register({ visible, setVisible }) {
@@ -40,6 +40,7 @@ export default function Register({ visible, setVisible }) {
 
   const CheckProcess = async (value, type) => {
     try {
+      snackBar("〽️ 잠시만 기다려주세요...");
       const response = await _axios.post("/accounts/existuser", value);
       const result = response.data.isNotExist || false;
       if (type) return result === false ? true : false;
@@ -69,6 +70,7 @@ export default function Register({ visible, setVisible }) {
       setReEmailProcess(true);
       const response = await CheckProcess({ email: reEmail });
       if (response) {
+        snackBar("〽️ 인증번호를 발송하고 있습니다...");
         const responseTo = await _axios.post("/auth/send-code", {
           email: reEmail,
         });
@@ -85,6 +87,7 @@ export default function Register({ visible, setVisible }) {
 
   const CheckProcessEmailTo = async () => {
     try {
+      snackBar("〽️ 인증번호를 확인하고 있습니다...");
       const response = await _axios.post("/auth/verify-code", {
         email: reEmail,
         code: reEmailTo,
@@ -153,6 +156,7 @@ export default function Register({ visible, setVisible }) {
         return;
       }
       setReProcess(true);
+      snackBar("〽️ 회원 가입 처리 중입니다...");
       const response = await _axios.post("/auth/register", {
         user_id: reID,
         username: reName,
@@ -285,22 +289,14 @@ export default function Register({ visible, setVisible }) {
         </View> :
         null
       }
-      <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity
-          style={[styles.buttonSmall, { backgroundColor: reProcess ? "gray" : mainColor }]}
-          onPress={() => setVisible(false)}
-          disabled={reProcess}
-        >
-          <Text style={styles.buttonTextSmall}>취소</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.buttonSmall, { backgroundColor: reProcess ? "gray" : mainColor }]}
-          onPress={() => { registerProcess(); }}
-          disabled={reProcess}
-        >
-          <Text style={styles.buttonTextSmall}>회원가입</Text>
-        </TouchableOpacity>
-      </View>
+      <InputProcess
+        visible={visible}
+        setVisible={setVisible}
+        onPress={() => { registerProcess(); }}
+        content="회원가입"
+        cancel={reProcess}
+        disabled={reProcess}
+      />
     </>
   );
 }

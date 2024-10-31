@@ -3,8 +3,9 @@ import { styles } from "../../styles/form/ModalStyle";
 import Register from "./Register";
 import FindAccount from "./FindAccount";
 import Modify from "./ModifyAccount";
+import Delete from "./DeleteAccount";
 
-export default function ModalView({ type, visible, setVisible }) {
+export default function ModalView({ type, visible, setVisible, userData }) {
   return (
     <>
       {
@@ -20,7 +21,8 @@ export default function ModalView({ type, visible, setVisible }) {
               {
                 type === "register" ? <Register visible={visible} setVisible={setVisible}/> :
                 type === "find" ? <FindAccount visible={visible} setVisible={setVisible} /> :
-                type === "modify" ? <Modify visible={visible} setVisible={setVisible} /> :
+                type === "modify" ? <Modify visible={visible} setVisible={setVisible} userData={userData} /> :
+                type === "delete" ? <Delete visible={visible} setVisible={setVisible} /> :
                 null
               }
             </View>

@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { styles } from "../../styles/form/FormStyle";
-import { mainColor } from "../../constants/Colors";
+import { Text } from "react-native";
 import SnackBar from "../Snackbar";
 import Input from "./Input";
+import InputProcess from "./InputProcess";
 import _axios from "../../api";
 
 export default function FindAccount({ visible, setVisible }) {
@@ -21,22 +20,15 @@ export default function FindAccount({ visible, setVisible }) {
   };
 
   const findAccount = async () => {
-    if (findSending) return;
-    let response;
-    setFindSending(true);
     try {
-      if (findID.length === 0) {
-        response = await _axios.post("/accounts/find_user_id", {
-          name: findName,
-          email: findEmail,
-        });
-      } else if (findID.length > 0) {
-        response = await _axios.post("/accounts/reset_password_request", {
-          user_id: findID,
-          username: findName,
-          email: findEmail,
-        });
-      }
+      if (findSending) return;
+      let response;
+      setFindSending(true);
+      snackBar("〽️ 계정 정보를 찾고 있습니다...");
+      if (findID.length === 0)
+        response = await _axios.post("/accounts/find_user_id", { name: findName, email: findEmail });
+      else if (findID.length > 0)
+        response = await _axios.post("/accounts/reset_password_request", { user_id: findID, username: findName, email: findEmail });
       if (response.data.isSent || response.data.foundpw) 
         snackBar("✅ 해당 이메일로 계정 정보가 발송되었습니다!\n일치하지 않을 경우 발송되지 않습니다.");
     } catch {
@@ -85,24 +77,14 @@ export default function FindAccount({ visible, setVisible }) {
         /> :
         null
       }
-      <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity
-          style={[styles.buttonSmall,{ backgroundColor: findSending ? "gray" : mainColor }]}
-          onPress={() => setVisible(false)}
-          disabled={findSending}
-        >
-          <Text style={styles.buttonTextSmall}>취소</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          disabled={ findSending || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(findEmail) || !findName }
-          style={[styles.buttonSmall, { backgroundColor: findSending || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(findEmail) || !findName ? "gray" : mainColor }]}
-          onPress={() => { findAccount(); }}
-        >
-          <Text style={styles.buttonTextSmall}>
-            {findID ? "비밀번호 찾기" : "아이디 찾기"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <InputProcess
+        visible={visible}
+        setVisible={setVisible}
+        onPress={() => { findAccount(); }}
+        content={findID ? "비밀번호 찾기" : "아이디 찾기"}
+        cancel={findSending}
+        disabled={findSending || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(findEmail) || !findName}
+      />
     </>
   );
 }
