@@ -17,14 +17,11 @@ export default function MePage() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
 
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-
   const [exp, setExp] = useState("");
 
   useFocusEffect(
-    useCallback(async () => { 
-      await getUser();
+    useCallback(() => { 
+      getUser();
     }, [])
   );
 
@@ -46,29 +43,25 @@ export default function MePage() {
     }
   }
 
+  const images = [
+    require(`../../../../assets/icons/lv0.png`),
+    require(`../../../../assets/icons/lv1.png`),
+    require(`../../../../assets/icons/lv2.png`),
+    require(`../../../../assets/icons/lv3.png`),
+    require(`../../../../assets/icons/lv4.png`),
+    require(`../../../../assets/icons/lv5.png`),
+    require(`../../../../assets/icons/lv6.png`),
+    require(`../../../../assets/icons/lv7.png`),
+    require(`../../../../assets/icons/lv8.png`),
+    require(`../../../../assets/icons/lv9.png`),
+  ]
+
   return (
     <View style={styles.container}>
-      {snackbarVisible ? (
-        <View style={styles.snackbarContainer}>
-          <Snackbar
-            style={styles.snackbar}
-            visible={snackbarVisible}
-            onDismiss={() => {
-              setSnackbarVisible(false);
-              setSnackbarMessage("");
-            }}
-            duration={3000}
-          >
-            {snackbarMessage}
-          </Snackbar>
-        </View>
-      ) : (
-        <></>
-      )}
       {/* 프로필 이미지 */}
       <View style={styles.profileContainer}>
         <Image
-          source={`../../../../assets/icons/lv${getLevel(exp)}.png`}
+          source={images[getLevel(exp)]}
           style={styles.profileImage}
         />
         <View>
@@ -190,90 +183,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#ccc",
   },
-  button: {
-    width: "80%",
-    padding: 15,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 10,
-    elevation: 1,
-  },
   buttonText: {
     fontSize: 16,
     marginBottom: 4,
     color: "#fff",
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 4,
-    marginTop: 4,
-  },
-  backButton: {
-    marginTop: 50,
-  },
-  backButtonText: {
-    fontSize: 14,
-  },
-  exitButton: {
-    marginTop: 50,
-  },
-  exitButtonText: {
-    fontSize: 14,
-    color: "white",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalView: {
-    width: 350,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  buttonTextSmall: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  buttonSmall: {
-    paddingHorizontal: 16,
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 40,
-    marginTop: 15,
-    margin: 2,
-  },
-  buttonStyle: {
-    flex: 1,
-    marginHorizontal: 5,
-    paddingVertical: 12,
-    borderRadius: 30,
-    alignItems: "center",
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-    marginBottom: 16,
   },
   experienceContainer: {
     flexDirection: "row",
@@ -291,45 +204,7 @@ const styles = StyleSheet.create({
   progressBar: {
     borderWidth: 0.5,
     borderColor: "#fff",
-    width: "100%",
+    width: 150,
     height: 15,
-  },
-  input: {
-    width: 250,
-    height: 40,
-    borderColor: "#fff",
-    borderWidth: 3,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    color: "#fff",
-  },
-  inputTo: {
-    width: "100%",
-    height: 40,
-    borderColor: "#fff",
-    borderWidth: 3,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    color: "#fff",
-    borderColor: "#000",
-    color: "#000",
-    marginTop: 5,
-  },
-  textTo: {
-    fontSize: 15,
-    marginLeft: 20,
-    marginBottom: -5,
-    marginTop: 20,
-    fontWeight: "bold",
-    alignSelf: "flex-start",
-  },
-  snackbarContainer: {
-    position: "absolute",
-    zIndex: 999,
-    top: "10%",
-    width: "20%",
-  },
-  snackbar: {
-    borderRadius: 15,
   },
 });
