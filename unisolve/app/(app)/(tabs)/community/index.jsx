@@ -1,5 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,6 +9,9 @@ import {
 } from "react-native";
 import _axios from "../../../../api";
 import List from "../../../../components/tabs/List/List";
+import useScrollRefresh from "../../../../hooks/useScrollRefresh";
+import { animated, useSpring } from "react-spring";
+import Icons from "@expo/vector-icons/MaterialIcons";
 
 export default function Community() {
   const [communitys, setCommunitys] = useState([]);
@@ -46,7 +49,9 @@ export default function Community() {
 
     try {
       const response = await _axios.get(
-        `/posts?page=${tempPage}&last_timestamp=${timestamp || ""}&last_post_id=${postId || ""}`
+        `/posts?page=${tempPage}&last_timestamp=${
+          timestamp || ""
+        }&last_post_id=${postId || ""}`
       );
 
       const newData = response.data.data || [];
@@ -64,11 +69,15 @@ export default function Community() {
         // 중복 데이터 없이 추가
         setCommunitys((prev) => [
           ...prev,
-          ...newData.filter((item) => !prev.some((prevItem) => prevItem.id === item.id)),
+          ...newData.filter(
+            (item) => !prev.some((prevItem) => prevItem.id === item.id)
+          ),
         ]);
         setFilteredCommunitys((prev) => [
           ...prev,
-          ...newData.filter((item) => !prev.some((prevItem) => prevItem.id === item.id)),
+          ...newData.filter(
+            (item) => !prev.some((prevItem) => prevItem.id === item.id)
+          ),
         ]);
       }
 
@@ -88,8 +97,9 @@ export default function Community() {
   };
 
   // 스크롤 시 다음 페이지 데이터 가져오기
-  const refresh = async () => {
+  const appendNextData = async () => {
     const nextPage = page + 1;
+
     if (process || !hasMore || nextPage > totalPage) return; // 중복 요청, 데이터 없음, 페이지 초과 방지
 
     setPage(nextPage); // 페이지 증가
@@ -105,6 +115,75 @@ export default function Community() {
     setFilteredCommunitys(filtered);
   };
 
+  const getRefreshData = async () => {
+    await getList(1, null, null); // 첫 페이지 데이터 가져오기
+    setPage(1);
+  };
+
+  // 새로고침
+  const {
+    isRefreshing,
+    handleScroll,
+    handleScrollEndDrag,
+    canRefresh,
+    handleScrollStartDrag,
+  } = useScrollRefresh(getRefreshData);
+
+  const AnimatedIcons = animated(Icons);
+  const AnimatedView = animated(View);
+  const [springs, api] = useSpring(() => ({
+    marginTop: 0,
+    opacity: 0,
+    rotate: 0,
+  }));
+  const [springs2, api2] = useSpring(() => ({ y: 0 }));
+  // "READY" | "CAN_REFRESH" | "IS_REFRESHING"
+  const animationStep = useRef("READY");
+
+  useEffect(() => {
+    if (canRefresh && animationStep.current === "READY") {
+      api.start({
+        opacity: 1,
+        marginTop: 25,
+        rotate: 360,
+        config: { duration: 300 },
+      });
+      animationStep.current = "CAN_REFRESH";
+    }
+
+    if (isRefreshing && animationStep.current === "CAN_REFRESH") {
+      api.start({ cancel: "rotate" });
+      const curRotateValue = springs.rotate.get();
+      api.start({
+        from: { rotate: curRotateValue },
+        to: { rotate: curRotateValue + 360 },
+        config: { duration: 800 },
+        loop: true, // 명시적으로 무한 반복
+      });
+      api2.start({
+        y: 40,
+      });
+      animationStep.current = "IS_REFRESHING";
+    }
+
+    if (!isRefreshing && animationStep.current === "IS_REFRESHING") {
+      api.stop(); // 명시적으로 애니메이션 중지
+      api.start({ opacity: 0, marginTop: 0, rotate: 0 });
+      api2.start({ y: 0 });
+      animationStep.current = "READY";
+    }
+
+    if (!canRefresh && animationStep.current === "CAN_REFRESH") {
+      api.start({
+        opacity: 0,
+        marginTop: 0,
+        rotate: 0,
+        config: { duration: 300 },
+      });
+      animationStep.current = "READY";
+    }
+  }, [canRefresh, isRefreshing]);
+
   return (
     <View style={{ flex: 1 }}>
       {/* 검색창 */}
@@ -116,26 +195,51 @@ export default function Community() {
           onChangeText={handleSearch}
         />
       </View>
+      <View>
+        <AnimatedIcons
+          name="refresh"
+          size={28}
+          color="black"
+          style={{
+            position: "absolute",
+            alignSelf: "center",
+            top: -10,
+            ...springs,
+          }}
+        />
+      </View>
 
       {/* 커뮤니티 리스트 */}
-      <FlatList
-        data={filteredCommunitys}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item, index }) => (
-          <List
-            item={item}
-            index={index}
-            count={filteredCommunitys.length}
-            type="community"
-          />
-        )}
-        contentContainerStyle={{ paddingTop: 20 }}
-        onEndReached={refresh}
-        onEndReachedThreshold={0.1} // 적절한 임계값 설정
-        ListFooterComponent={
-          process && <ActivityIndicator size="large" color="#0000ff" />
-        }
-      />
+      <AnimatedView style={{ ...springs2, flex: 1 }}>
+        <FlatList
+          data={filteredCommunitys}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item, index }) => (
+            <List
+              item={item}
+              index={index}
+              count={filteredCommunitys.length}
+              type="community"
+            />
+          )}
+          contentContainerStyle={{ paddingTop: 20 }}
+          onEndReached={appendNextData}
+          onEndReachedThreshold={0.1} // 적절한 임계값 설정
+          onScroll={handleScroll}
+          onScrollBeginDrag={handleScrollStartDrag}
+          onScrollEndDrag={handleScrollEndDrag}
+          ListFooterComponent={
+            process ? (
+              <ActivityIndicator
+                size="large"
+                color="#0000ff"
+              />
+            ) : (
+              <View style={{ marginBottom: 100 }} />
+            )
+          }
+        />
+      </AnimatedView>
     </View>
   );
 }
