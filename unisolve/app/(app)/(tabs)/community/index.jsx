@@ -12,6 +12,7 @@ import List from "../../../../components/tabs/List/List";
 import useScrollRefresh from "../../../../hooks/useScrollRefresh";
 import { animated, useSpring } from "react-spring";
 import Icons from "@expo/vector-icons/MaterialIcons";
+import { mainColor } from "../../../../constants/Colors";
 
 export default function Community() {
   const [communitys, setCommunitys] = useState([]);
@@ -212,6 +213,7 @@ export default function Community() {
       {/* 커뮤니티 리스트 */}
       <AnimatedView style={{ ...springs2, flex: 1 }}>
         <FlatList
+          style={{backgroundColor: mainColor}}
           data={filteredCommunitys}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item, index }) => (

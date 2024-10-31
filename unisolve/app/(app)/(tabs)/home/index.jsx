@@ -1,4 +1,4 @@
-import { Link, usePathname } from "expo-router";
+import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import {
   Text,
@@ -13,7 +13,7 @@ import { Exp, Notification } from "../../../../components/tabs/home/index";
 import _axios from "../../../../api";
 
 export default function Home() {
-  const pathname = usePathname();
+  const router = useRouter();
   const [currentDate, setCurrentDate] = useState(convertDate());
   const [currentTime, setCurrentTime] = useState(convertTime());
   const [modalVisibleNotification, setModalVisibleNotification] =
@@ -60,12 +60,14 @@ export default function Home() {
       <Text style={styles.timeText}>{currentTime}</Text>
 
       {/* 로고 페이지 */}
-      <Link href={`${pathname}/../question`}>
+      <TouchableOpacity
+        onPress={() => {router.replace("/question")}}
+      >
         <Image
           source={require("../../../../assets/logo.png")}
           style={styles.logo}
         />
-      </Link>
+      </TouchableOpacity>
 
       <Text style={styles.timeDate}>로고를 클릭하여 문제를 해결하세요!</Text>
 

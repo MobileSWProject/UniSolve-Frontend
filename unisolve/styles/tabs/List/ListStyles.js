@@ -1,7 +1,10 @@
 import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   main: {
-    backgroundColor: "#DADADA",
+    borderTopWidth: 4,
+    borderTopColor: "#000",
+    borderTopStartRadius: 20,
+    borderTopEndRadius: 20,
     borderRadius: 15,
     padding: 15,
     marginVertical: 2,
@@ -19,11 +22,12 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginTop: 5,
+    color: "#ddd",
   },
   description: {
     fontSize: 14,
     marginTop: 5,
-    color: "#666",
+    color: "#222",
   },
   footer: {
     fontSize: 12,

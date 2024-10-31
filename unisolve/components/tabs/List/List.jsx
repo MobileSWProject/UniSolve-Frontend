@@ -82,7 +82,7 @@ export default function PostListItem({ item, index, count, type }) {
             <Entypo
               name="new-message"
               size={16}
-              color="gray"
+              color="#ccc"
             />
           ) : null}
           <Text> {item.reply_count}</Text>
