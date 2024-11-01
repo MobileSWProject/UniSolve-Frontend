@@ -38,18 +38,18 @@ export default function Community() {
 
   // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
-    resetState();
+    // resetState();
     getList(1, null, null); // 첫 페이지 데이터 가져오기
   }, []);
 
-  const resetState = () => {
-    setPage(1);
-    setTotalPage(1); // 초기화할 때 총 페이지 수도 초기화
-    setCommunitys([]);
-    setLastTimestamp(null);
-    setLastPostId(null);
-    setHasMore(true); // 데이터가 더 있다고 초기화
-  };
+  // const resetState = () => {
+  //   setPage(1);
+  //   setTotalPage(1); // 초기화할 때 총 페이지 수도 초기화
+  //   setCommunitys([]);
+  //   setLastTimestamp(null);
+  //   setLastPostId(null);
+  //   setHasMore(true); // 데이터가 더 있다고 초기화
+  // };
 
   // 서버에서 데이터 가져오기
   const getList = async (tempPage, timestamp, postId, isForce = false) => {
@@ -100,6 +100,7 @@ export default function Community() {
 
       // isForce: 위로 스크롤로 인한 새로고침 이거나 검색으로 인한 새로고침이면
       if (isForce) {
+        setPage(1);
         // 스크롤을 가장 위로 올리기
         if (flatListRef.current) {
           flatListRef.current.scrollToOffset({ offset: 0, animated: true });
@@ -123,7 +124,6 @@ export default function Community() {
   };
 
   useEffect(() => {
-    resetState();
     getList(1, null, null, true); // 첫 페이지 데이터 가져오기
   }, [searchText]);
 
@@ -136,7 +136,6 @@ export default function Community() {
     // 명시적으로 기다리게 하기 => 새로고침 되도록 느끼도록
     await new Promise((resolve) => setTimeout(resolve, 1200));
     await getList(1, null, null, true); // 첫 페이지 데이터 가져오기
-    setPage(1);
   };
 
   // 새로고침
