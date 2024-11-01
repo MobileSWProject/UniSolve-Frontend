@@ -15,6 +15,7 @@ import { animated, useSpring } from "react-spring";
 import Icons from "@expo/vector-icons/MaterialIcons";
 import { mainColor } from "../../../../constants/Colors";
 import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
+import { debounce } from "lodash";
 
 export default function Community() {
   const [communitys, setCommunitys] = useState([]);
@@ -25,6 +26,7 @@ export default function Community() {
   const [lastTimestamp, setLastTimestamp] = useState(null);
   const [lastPostId, setLastPostId] = useState(null);
   const [hasMore, setHasMore] = useState(true); // 더 가져올 데이터가 있는지 여부
+  const [isSearching, setIsSearching] = useState(false);
 
   const flatListRef = useRef(null); // FlatList의 ref 생성
 
@@ -59,6 +61,7 @@ export default function Community() {
       if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
     }
     setProcess(true);
+    setIsSearching(false);
 
     try {
       // console.log(searchText);
@@ -123,9 +126,27 @@ export default function Community() {
     await getList(nextPage, lastTimestamp, lastPostId); // 다음 페이지 데이터 요청
   };
 
+  // 0.5초 debounce
+  const debouncedSearch = debounce(() => {
+    getList(1, null, null, true);
+  }, 500);
+
+  // 키워드 변경시
   useEffect(() => {
-    getList(1, null, null, true); // 첫 페이지 데이터 가져오기
+    setIsSearching(true);
+    debouncedSearch();
+
+    return () => {
+      debouncedSearch.cancel();
+    };
   }, [searchText]);
+
+  // 검색 키워드 입력 중일 때 로딩 표시
+  useEffect(() => {
+    if (isSearching) {
+      setCommunitys([]);
+    }
+  }, [isSearching]);
 
   // 검색 기능
   const handleChangeText = (text) => {
@@ -252,7 +273,11 @@ export default function Community() {
           onScrollBeginDrag={handleScrollStartDrag}
           onScrollEndDrag={handleScrollEndDrag}
           ListFooterComponent={
-            process ? <SkeletonList /> : <View style={{ marginBottom: 100 }} />
+            process || isSearching ? (
+              <SkeletonList />
+            ) : (
+              <View style={{ marginBottom: 100 }} />
+            )
           }
         />
       </AnimatedView>
