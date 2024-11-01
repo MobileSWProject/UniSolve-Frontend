@@ -30,19 +30,15 @@ function AnimatedIcon({ name, color, focused }) {
 
 function TabUnderline({ index }) {
   const translateX = useSharedValue(0);
-  const tabWidth = (screenWidth - 100) / 4;
+  const tabWidth = (screenWidth - 20) / 4;
 
   useFocusEffect(
     useCallback(() => {
-      translateX.value = withTiming(index * tabWidth + tabWidth * 0.3, {
-        duration: 300,
-      });
+      translateX.value = withTiming(index * tabWidth + (tabWidth - tabWidth * 0.4) / 2, { duration: 300 });
     }, [index, tabWidth])
   );
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }));
+  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ translateX: translateX.value }] }));
 
   return (
     <Animated.View
@@ -52,7 +48,7 @@ function TabUnderline({ index }) {
           backgroundColor: mainColor,
           position: "absolute",
           bottom: 15,
-          left: 50,
+          left: 10,
           borderRadius: 20,
           width: tabWidth * 0.4,
         },
@@ -78,8 +74,8 @@ export default function TabsLayout() {
             shadowColor: "#000",
             paddingBottom: 5,
             borderRadius: 30,
-            left: 50,
-            right: 50,
+            left: 10,
+            right: 10,
             bottom: 10,
             position: "absolute",
           },
