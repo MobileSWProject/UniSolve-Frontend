@@ -19,14 +19,7 @@ export default function Input({ title, subTitle, subTitleConfirm, placeholder, c
           null
         }
       </Text>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: !buttonOnPress ? "97%" : null,
-        }}
-      >
+      <View style={styles.view}>
         <TextInput
           style={styles.inputTo}
           placeholder={placeholder ? placeholder : `${title}${lastConvert(title)} 입력하세요.`}

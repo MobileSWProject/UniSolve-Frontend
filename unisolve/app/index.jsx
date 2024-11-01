@@ -101,10 +101,8 @@ export default function Home() {
         }),
       ]).start();
       if (checkID) {
-        const response = await _axios.post(
-          "/auth/login",
-          JSON.stringify({ user_id: id, password: pw })
-        );
+        snackBar("〽️ 로그인 중입니다...");
+        const response = await _axios.post("/auth/login", JSON.stringify({ user_id: id, password: pw }));
         const token = response.data.token;
         if (token) {
           await AsyncStorage.setItem("token", token);

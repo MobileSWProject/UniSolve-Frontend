@@ -31,6 +31,9 @@ import CommentSection from "../../../../components/post/CommentSection";
 const Post = () => {
   const { id } = useLocalSearchParams();
   const [data, setData] = useState(null);
+
+  const [ban, setBan] = useState(false);
+
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
   const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
   const [modalVisible, setModalVisible] = useState(false);
@@ -66,6 +69,7 @@ const Post = () => {
         _axios
           .get(`/posts/${id}`)
           .then((response) => {
+            setBan(response.data.ban);
             setData({
               id: response.data.id,
               private: Boolean(response.data.is_private),
@@ -328,16 +332,18 @@ const Post = () => {
       {/* 게시글 댓글 입력 필드 */}
       <View style={styles.commentInputContainer}>
         <TextInput
-          style={styles.commentInput}
-          placeholder="댓글을 입력하세요..."
+          style={[styles.commentInput, {backgroundColor: ban ? "#ccc" : "#fff"}]}
+          placeholder={ban ? "운영정책 위반으로 이용제한이 적용되어 댓글을 작성할 수 없습니다." : "댓글을 입력하세요."}
           placeholderTextColor={"black"}
           value={newComment}
           onChangeText={(text) => setNewComment(text)}
           multiline={true}
+          disabled={ban}
         />
         <TouchableOpacity
-          style={styles.commentButton}
+          style={[styles.commentButton, {backgroundColor: ban ? "#ccc" : mainColor}]}
           onPress={() => handleAddComment(false)}
+          disabled={ban}
         >
           <Text style={styles.commentButtonText}>댓글 작성</Text>
         </TouchableOpacity>
@@ -348,6 +354,7 @@ const Post = () => {
         <Text style={styles.commentTitle}>댓글 {data.commentsCount}개</Text>
         {data.comments.map((comment, index) => (
           <CommentSection
+            ban={ban}
             key={comment.comment_id}
             comment={comment}
             userId={userId}

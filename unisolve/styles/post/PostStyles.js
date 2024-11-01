@@ -112,11 +112,9 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 5,
     paddingHorizontal: 10,
-    backgroundColor: "#fff",
   },
   commentButton: {
     marginLeft: 10,
-    backgroundColor: mainColor,
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,

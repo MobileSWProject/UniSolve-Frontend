@@ -88,29 +88,28 @@ export default function QuestionSubPage() {
   return (
     <KeyboardAwareScrollView>
       <View style={styles.container}>
+        {/* 작성 완료 버튼 */}
+        <TouchableOpacity
+          style={styles.submitButton}
+          hitSlop={4}
+          onPress={handleSubmit}
+          disabled={submitLoading}
+        >
+          <Text style={styles.submitButtonText}>
+            {submitLoading ? "로딩중..." : "작성 완료"}
+          </Text>
+        </TouchableOpacity>
         {/* 이미지 */}
-        {image && (
-          <Image
-            source={{ uri: image }}
-            style={styles.image}
-          />
-        )}
+        {image && <Image source={{ uri: image }} style={styles.image} />}
         {/* 제목 입력 */}
         <View style={styles.inputArea}>
           <InputTitle title="제목" />
-          <InputBox
-            height={40}
-            setState={setTitle}
-          />
+          <InputBox height={40} setState={setTitle} />
         </View>
         {/* 내용 입력 */}
         <View style={[styles.inputArea]}>
           <InputTitle title="내용" />
-          <InputBox
-            height={300}
-            multiline
-            setState={setContent}
-          />
+          <InputBox height={300} multiline setState={setContent} />
         </View>
         {/* 비공개 선택 */}
         <View style={styles.privateToggleView}>
@@ -126,27 +125,12 @@ export default function QuestionSubPage() {
               ]}
             >
               {isPrivate && (
-                <MaterialCommunityIcons
-                  name="check"
-                  size={18}
-                  color="white"
-                />
+                <MaterialCommunityIcons name="check" size={18} color="white" />
               )}
             </View>
             <Text style={styles.privateToggleText}>비공개로 질문하기</Text>
           </TouchableOpacity>
         </View>
-        {/* 작성 완료 버튼 */}
-        <TouchableOpacity
-          style={styles.submitButton}
-          hitSlop={4}
-          onPress={handleSubmit}
-          disabled={submitLoading}
-        >
-          <Text style={styles.submitButtonText}>
-            {submitLoading ? "로딩중..." : "작성 완료"}
-          </Text>
-        </TouchableOpacity>
       </View>
     </KeyboardAwareScrollView>
   );
