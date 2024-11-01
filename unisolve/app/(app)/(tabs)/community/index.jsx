@@ -46,8 +46,12 @@ export default function Community() {
   };
 
   // 서버에서 데이터 가져오기
-  const getList = async (tempPage, timestamp, postId) => {
-    if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
+  const getList = async (tempPage, timestamp, postId, isRefresh = false) => {
+    // isRefresh가 true인 경우 강제 새로고침
+    // 단, isRefresh가 true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
+    if (isRefresh === false) {
+      if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
+    }
     setProcess(true);
 
     try {
@@ -89,6 +93,7 @@ export default function Community() {
       if (lastItem) {
         setLastTimestamp(lastItem.timestamp);
         setLastPostId(lastItem.id);
+        setHasMore(true);
       } else {
         setHasMore(false); // 새로운 데이터가 없으면 더 이상 요청하지 않음
       }
@@ -121,7 +126,7 @@ export default function Community() {
   const getRefreshData = async () => {
     // 명시적으로 기다리게 하기 => 새로고침 되도록 느끼도록
     await new Promise((resolve) => setTimeout(resolve, 1200));
-    await getList(1, null, null); // 첫 페이지 데이터 가져오기
+    await getList(1, null, null, true); // 첫 페이지 데이터 가져오기
     setPage(1);
   };
 
