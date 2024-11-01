@@ -14,6 +14,7 @@ import useScrollRefresh from "../../../../hooks/useScrollRefresh";
 import { animated, useSpring } from "react-spring";
 import Icons from "@expo/vector-icons/MaterialIcons";
 import { mainColor } from "../../../../constants/Colors";
+import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
 
 export default function Community() {
   const [communitys, setCommunitys] = useState([]);
@@ -118,6 +119,8 @@ export default function Community() {
   };
 
   const getRefreshData = async () => {
+    // 명시적으로 기다리게 하기 => 새로고침 되도록 느끼도록
+    await new Promise((resolve) => setTimeout(resolve, 1200));
     await getList(1, null, null); // 첫 페이지 데이터 가져오기
     setPage(1);
   };
@@ -235,14 +238,7 @@ export default function Community() {
           onScrollBeginDrag={handleScrollStartDrag}
           onScrollEndDrag={handleScrollEndDrag}
           ListFooterComponent={
-            process ? (
-              <ActivityIndicator
-                size="large"
-                color="#0000ff"
-              />
-            ) : (
-              <View style={{ marginBottom: 100 }} />
-            )
+            process ? <SkeletonList /> : <View style={{ marginBottom: 100 }} />
           }
         />
       </AnimatedView>
