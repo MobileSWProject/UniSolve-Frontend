@@ -7,6 +7,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
+  SafeAreaView,
+  StatusBar,
 } from "react-native";
 import { mainColor } from "../../../../constants/Colors";
 import { Exp, Notification } from "../../../../components/tabs/home/index";
@@ -55,7 +57,8 @@ export default function Home() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { marginTop: StatusBar.currentHeight }]}>
+      <StatusBar backgroundColor={mainColor} barStyle="white-content" />
       <Text style={styles.timeDate}>{currentDate}</Text>
       <Text style={styles.timeText}>{currentTime}</Text>
 
@@ -140,7 +143,7 @@ export default function Home() {
           style={styles.extralogo}
         />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -181,10 +184,10 @@ const styles = StyleSheet.create({
   logotypo: {
     //로고 이미지
     position: "absolute",
-    width: 180,
-    height: 55,
-    top: 15,
-    left: 10,
+    width: 155,
+    height: 45,
+    top: 0,
+    left: 5,
   },
   box: {
     borderWidth: 2,
@@ -196,10 +199,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   extralogo: {
-    //프로필, 알림 이미지
-    top: 5,
-    width: 50,
-    height: 50,
+    //알림 이미지
+    top: 0,
+    width: 40,
+    height: 40,
   },
   expLink: {
     //경험치 링크 사진
