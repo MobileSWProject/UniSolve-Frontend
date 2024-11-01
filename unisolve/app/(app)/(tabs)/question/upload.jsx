@@ -55,7 +55,7 @@ export default function QuestionSubPage() {
     console.log("제출중...");
     setSubmitLoading(true);
     try {
-      const response = await formFetch("/questions", data);
+      const response = await formFetch("/posts", data);
       // 등록된 포스트 아이디를 가져옴
       const postId = response.postId;
 

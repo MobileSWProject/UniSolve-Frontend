@@ -49,7 +49,9 @@ const CommentSection = ({
         }}
       >
         <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-          {formatAuthor(comment.author_id)}
+          {formatAuthor(
+            comment.author_nickname || `${comment.author_id}_temp_nickname`
+          )}
         </Text>
         {comment.author_id.toLowerCase() === userId.toLowerCase() ? (
           <View style={{ flexDirection: "row" }}>
@@ -106,6 +108,12 @@ const CommentSection = ({
           style={{
             body: { fontSize: 14 },
             fence: { backgroundColor: "black", color: "white" },
+            code_inline: {
+              backgroundColor: "opacity",
+              border: "none",
+              fontWeight: 700,
+              padding: 0,
+            },
           }}
           rules={{
             fence: (node) => {

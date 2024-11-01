@@ -24,8 +24,6 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useUserId from "../../../../hooks/useUserId"; // 커스텀 훅 불러오기
 import formatAuthor from "../../../../utils/formatAuthor";
-import Markdown from "react-native-markdown-display";
-import SyntaxHighlighter from "react-native-syntax-highlighter";
 import { mainColor } from "../../../../constants/Colors";
 import { Snackbar, Provider as PaperProvider } from "react-native-paper";
 import CommentSection from "../../../../components/post/CommentSection";
@@ -46,7 +44,8 @@ const Post = () => {
   const [editContent, setEditContent] = useState("");
   const [editComment, setEditComment] = useState("");
   const [editing, setEditing] = useState(false);
-  const [editingInput, setEditingInput] = useState(false);
+
+  const [editPost, setEditPost] = useState(false);
 
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
@@ -65,12 +64,16 @@ const Post = () => {
     useCallback(() => {
       const getData = async () => {
         _axios
-          .get(`/post/${id}`)
+          .get(`/posts/${id}`)
           .then((response) => {
             setData({
               id: response.data.id,
               private: Boolean(response.data.is_private),
               authorId: formatAuthor(response.data.author_id),
+              nickname: formatAuthor(
+                response.data.author_nickname ||
+                  `${response.data.author_id}_temp_nickname`
+              ),
               title: response.data.title,
               content: response.data.description,
               timestamp: response.data.timestamp,
@@ -102,10 +105,10 @@ const Post = () => {
         content: commentContent,
         parent_id: isReply ? selectedComment : null,
       });
-      const response = await _axios.post("/comment", data);
+      const response = await _axios.post("/comments", data);
 
       // 댓글 추가 후 댓글 목록만 다시 불러옴
-      const updatedPost = await _axios.get(`/post/${id}`);
+      const updatedPost = await _axios.get(`/posts/${id}`);
       setData((prev) => ({
         ...prev,
         comments: updatedPost.data.comments,
@@ -122,10 +125,10 @@ const Post = () => {
 
   const handleRemoveComment = async (targetCommentId) => {
     try {
-      const response = await _axios.delete(`/comment/${targetCommentId}`);
+      const response = await _axios.delete(`/comments/${targetCommentId}`);
 
       // 댓글 삭제 후 댓글 목록만 다시 불러옴
-      const updatedPost = await _axios.get(`/post/${id}`);
+      const updatedPost = await _axios.get(`/posts/${id}`);
       setData((prev) => ({
         ...prev,
         comments: updatedPost.data.comments,
@@ -139,14 +142,14 @@ const Post = () => {
 
   const handleUpdateComment = async (targetCommentId) => {
     try {
-      const response = await _axios.put(`/update_comment/${targetCommentId}`, {
+      const response = await _axios.put(`/comments/${targetCommentId}`, {
         content: editComment,
       });
       if (response.data.status === "success") {
         setEditComment("");
         setEditing(false);
         // 댓글 수정 후 댓글 목록만 다시 불러옴
-        const updatedPost = await _axios.get(`/post/${id}`);
+        const updatedPost = await _axios.get(`/posts/${id}`);
         setData((prev) => ({
           ...prev,
           comments: updatedPost.data.comments,
@@ -165,7 +168,7 @@ const Post = () => {
     if (reportReason.length < 1 || process) return;
     try {
       setProcess(true);
-      const response = await _axios.post(`/report`, {
+      const response = await _axios.post(`/reports`, {
         post_id: id,
         comment_id: commentID || null,
         reason: reportReason,
@@ -175,14 +178,14 @@ const Post = () => {
       setCommentID(null);
       if (response.data.status === "success") {
         setReportReason("");
-        setSnackbarVisible(true);
         setSnackbarMessage("신고가 접수되었습니다!");
+        setSnackbarVisible(true);
       }
     } catch (error) {
       setProcess(false);
       setModalVisible(false);
-      setSnackbarVisible(true);
       setSnackbarMessage("신고가 접수되지 않았습니다!");
+      setSnackbarVisible(true);
     }
   };
 
@@ -193,7 +196,7 @@ const Post = () => {
 
   const handleRemovePost = async () => {
     try {
-      const response = await _axios.delete(`/question/${id}`);
+      const response = await _axios.delete(`/posts/${id}`);
 
       if (router.canGoBack()) {
         router.back();
@@ -208,29 +211,33 @@ const Post = () => {
 
   const handleUpdatePost = async () => {
     try {
-      const response = await _axios.put(`/update_post/${id}`, {
+      if (editTitle.length < 1 || editContent.length < 1 || process) return;
+      setModalVisible(false);
+      setEditTitle("");
+      setEditContent("");
+      setEditing(false);
+      setProcess(true);
+      const response = await _axios.put(`/posts/${id}`, {
         title: editTitle,
         content: editContent,
       });
       if (response.data.status === "success") {
-        setEditTitle("");
-        setEditContent("");
-        setEditing(false);
-        // 게시글 수정 후 댓글 목록만 다시 불러옴
-        const updatedPost = await _axios.get(`/post/${id}`);
+        // 게시글 수정 후 다시 불러오기
+        const updatedPost = await _axios.get(`/posts/${id}`);
         setData((prev) => ({
           ...prev,
-          title: response.data.title,
-          content: response.data.description,
-          timestamp: response.data.timestamp,
+          title: updatedPost.data.title,
+          content: updatedPost.data.description,
+          timestamp: updatedPost.data.timestamp,
           comments: updatedPost.data.comments,
           commentsCount: updatedPost.data.comments_count,
         }));
       }
+      setSnackbarMessage("게시글이 수정되었습니다!");
       setSnackbarVisible(true);
-      setSnackbarMessage("댓글이 수정되었습니다!");
+      setProcess(false);
     } catch (error) {
-      // "something error 😭"
+      setProcess(false);
       console.log("Something Error 😭");
     }
   };
@@ -262,7 +269,12 @@ const Post = () => {
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
                 hitSlop={8}
-                onPress={() => handleUpdatePost()}
+                onPress={() => {
+                  setEditPost(true);
+                  setEditTitle(data.title);
+                  setEditContent(data.content);
+                  setModalVisible(true);
+                }}
               >
                 <Text style={{ fontSize: 12 }}>✏️</Text>
               </TouchableOpacity>
@@ -276,7 +288,10 @@ const Post = () => {
           ) : (
             <TouchableOpacity
               hitSlop={8}
-              onPress={() => setModalVisible(true)}
+              onPress={() => {
+                setEditPost(false);
+                setModalVisible(true);
+              }}
             >
               <Text style={{ fontSize: 12 }}>🚨</Text>
             </TouchableOpacity>
@@ -294,7 +309,7 @@ const Post = () => {
           </Text>
         </View>
         <Text style={styles.userInfo}>
-          {formatAuthor(data.authorId)} • {data.timestamp}
+          {formatAuthor(data.nickname)} • {data.timestamp}
         </Text>
         <Text style={styles.content}>{data.content}</Text>
       </View>
@@ -338,7 +353,11 @@ const Post = () => {
             userId={userId}
             handleUpdateComment={handleUpdateComment}
             handleRemoveComment={handleRemoveComment}
-            handleReportComment={() => setModalVisible(true)}
+            handleReportComment={(commentId) => {
+              setEditPost(false);
+              setModalVisible(true);
+              setCommentID(commentId);
+            }}
             handleReply={handleReply}
             handleAddComment={handleAddComment}
             selectedComment={selectedComment}
@@ -360,17 +379,38 @@ const Post = () => {
           onRequestClose={() => {
             setCommentID(null);
             setModalVisible(false);
+            setEditTitle("");
+            setEditContent("");
           }}
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <TextInput
-                style={styles.commentInput}
-                placeholder="신고 내용을 입력하세요..."
-                value={reportReason}
-                onChangeText={(text) => setReportReason(text)}
-                multiline={true}
-              />
+              {editPost ? (
+                <>
+                  <TextInput
+                    style={styles.commentInput}
+                    placeholder="제목"
+                    value={editTitle}
+                    onChangeText={(text) => setEditTitle(text)}
+                    multiline={true}
+                  />
+                  <TextInput
+                    style={styles.commentInput}
+                    placeholder="내용"
+                    value={editContent}
+                    onChangeText={(text) => setEditContent(text)}
+                    multiline={true}
+                  />
+                </>
+              ) : (
+                <TextInput
+                  style={styles.commentInput}
+                  placeholder="신고 내용을 입력하세요..."
+                  value={reportReason}
+                  onChangeText={(text) => setReportReason(text)}
+                  multiline={true}
+                />
+              )}
               <TouchableOpacity
                 disabled={false}
                 style={[
@@ -380,6 +420,8 @@ const Post = () => {
                 onPress={() => {
                   setCommentID(null);
                   setModalVisible(false);
+                  setEditTitle("");
+                  setEditContent("");
                 }}
               >
                 <Text style={styles.buttonTextSmall}>취소</Text>
@@ -390,9 +432,13 @@ const Post = () => {
                   styles.buttonSmall,
                   { backgroundColor: false ? "gray" : mainColor },
                 ]}
-                onPress={() => handleReport()}
+                onPress={() => {
+                  editPost ? handleUpdatePost() : handleReport();
+                }}
               >
-                <Text style={styles.buttonTextSmall}>신고하기</Text>
+                <Text style={styles.buttonTextSmall}>
+                  {editPost ? "수정하기" : "신고하기"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
