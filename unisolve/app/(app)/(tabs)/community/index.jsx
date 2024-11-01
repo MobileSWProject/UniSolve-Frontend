@@ -26,6 +26,8 @@ export default function Community() {
   const [lastPostId, setLastPostId] = useState(null);
   const [hasMore, setHasMore] = useState(true); // 더 가져올 데이터가 있는지 여부
 
+  const flatListRef = useRef(null); // FlatList의 ref 생성
+
   // 초기 데이터 로드 및 상태 초기화
   // useFocusEffect(
   //   useCallback(() => {
@@ -50,10 +52,10 @@ export default function Community() {
   };
 
   // 서버에서 데이터 가져오기
-  const getList = async (tempPage, timestamp, postId, isRefresh = false) => {
-    // isRefresh가 true인 경우 강제 새로고침
-    // 단, isRefresh가 true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
-    if (isRefresh === false) {
+  const getList = async (tempPage, timestamp, postId, isForce = false) => {
+    // isForce true인 경우 강제 새로고침
+    // 단, isForce true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
+    if (isForce === false) {
       if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
     }
     setProcess(true);
@@ -94,6 +96,14 @@ export default function Community() {
         setHasMore(true);
       } else {
         setHasMore(false); // 새로운 데이터가 없으면 더 이상 요청하지 않음
+      }
+
+      // isForce: 위로 스크롤로 인한 새로고침 이거나 검색으로 인한 새로고침이면
+      if (isForce) {
+        // 스크롤을 가장 위로 올리기
+        if (flatListRef.current) {
+          flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+        }
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -224,6 +234,7 @@ export default function Community() {
       {/* 커뮤니티 리스트 */}
       <AnimatedView style={{ ...springs2, flex: 1 }}>
         <FlatList
+          ref={flatListRef}
           style={{ backgroundColor: mainColor }}
           data={communitys}
           keyExtractor={(item) => item.id.toString()}
