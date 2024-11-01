@@ -12,6 +12,7 @@ import { mainColor } from "../../constants/Colors";
 import formatAuthor from "../../utils/formatAuthor";
 
 const CommentSection = ({
+  ban,
   comment,
   userId,
   handleUpdateComment,
@@ -188,23 +189,25 @@ const CommentSection = ({
               borderColor: "#ddd",
               borderRadius: 5,
               paddingHorizontal: 10,
-              backgroundColor: "#fff",
+              backgroundColor: ban ? "#ccc" : "#fff",
             }}
-            placeholder="댓글을 입력하세요..."
+            placeholder={ban ? "운영정책 위반으로 이용제한이 적용되어 대댓글을 작성할 수 없습니다." : "대댓글을 입력하세요."}
             placeholderTextColor={"black"}
             value={replyComment}
             onChangeText={(text) => setReplyComment(text)}
             multiline={true}
+            disabled={ban}
           />
           <TouchableOpacity
             style={{
               marginLeft: 10,
-              backgroundColor: mainColor,
+              backgroundColor: ban ? "#ccc" : mainColor,
               paddingVertical: 10,
               paddingHorizontal: 15,
               borderRadius: 5,
             }}
             onPress={() => handleAddComment(true)}
+            disabled={ban}
           >
             <Text style={{ color: "#fff", fontWeight: "bold" }}>댓글 작성</Text>
           </TouchableOpacity>
