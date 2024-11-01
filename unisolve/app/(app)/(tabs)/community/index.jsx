@@ -3,6 +3,7 @@ import { useCallback, useState, useRef, useEffect } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  SafeAreaView,
   StyleSheet,
   TextInput,
   View,
@@ -145,8 +146,12 @@ export default function Community() {
     if (canRefresh && animationStep.current === "READY") {
       api.start({
         opacity: 1,
-        marginTop: 25,
+        marginTop: 12,
         rotate: 360,
+        config: { duration: 300 },
+      });
+      api2.start({
+        y: 30,
         config: { duration: 300 },
       });
       animationStep.current = "CAN_REFRESH";
@@ -161,16 +166,13 @@ export default function Community() {
         config: { duration: 800 },
         loop: true, // 명시적으로 무한 반복
       });
-      api2.start({
-        y: 40,
-      });
       animationStep.current = "IS_REFRESHING";
     }
 
     if (!isRefreshing && animationStep.current === "IS_REFRESHING") {
       api.stop(); // 명시적으로 애니메이션 중지
       api.start({ opacity: 0, marginTop: 0, rotate: 0 });
-      api2.start({ y: 0 });
+      api2.start({ y: 0, duration: 300 });
       animationStep.current = "READY";
     }
 
@@ -181,12 +183,13 @@ export default function Community() {
         rotate: 0,
         config: { duration: 300 },
       });
+      api2.start({ y: 0, duration: 300 });
       animationStep.current = "READY";
     }
   }, [canRefresh, isRefreshing]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: mainColor }}>
       {/* 검색창 */}
       <View style={styles.searchContainer}>
         <TextInput
@@ -194,17 +197,18 @@ export default function Community() {
           placeholder="검색어"
           value={searchText}
           onChangeText={handleSearch}
+          placeholderTextColor={"white"}
         />
       </View>
-      <View>
+      <View style={{ zIndex: 10 }}>
         <AnimatedIcons
           name="refresh"
           size={28}
-          color="black"
+          color="white"
           style={{
             position: "absolute",
             alignSelf: "center",
-            top: -10,
+            // top: -10,
             ...springs,
           }}
         />
@@ -213,7 +217,7 @@ export default function Community() {
       {/* 커뮤니티 리스트 */}
       <AnimatedView style={{ ...springs2, flex: 1 }}>
         <FlatList
-          style={{backgroundColor: mainColor}}
+          style={{ backgroundColor: mainColor }}
           data={filteredCommunitys}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item, index }) => (
@@ -242,7 +246,7 @@ export default function Community() {
           }
         />
       </AnimatedView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -254,8 +258,9 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 40,
     width: 200,
-    borderColor: "gray",
-    borderWidth: 1,
+    borderColor: "white",
+    color: "white",
+    borderWidth: 2,
     borderRadius: 10,
     paddingLeft: 10,
     margin: 10,
