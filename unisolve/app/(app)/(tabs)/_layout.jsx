@@ -1,27 +1,24 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Tabs } from "expo-router";
 import { TabBarIcon } from "../../../components/navigation/TabBarIcon";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat } from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { useFocusEffect } from "@react-navigation/native";
+import { View, Dimensions, TouchableOpacity } from "react-native";
 import { mainColor } from "../../../constants/Colors";
+
+const screenWidth = Dimensions.get("window").width;
 
 function AnimatedIcon({ name, color, focused }) {
   const scale = useSharedValue(1);
-  const translateX = useSharedValue(0);
 
   useFocusEffect(
     useCallback(() => {
-      scale.value = 1;
-      translateX.value = 0;
-      scale.value = withTiming(focused ? 1.5 : 1, { duration: 200 });
-      if (focused) {
-        translateX.value = withRepeat( withTiming(3, { duration: 100 }), 4, true );
-      }
+      scale.value = withTiming(focused ? 1.2 : 1, { duration: 200 });
     }, [focused])
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }, { translateX: translateX.value }],
+    transform: [{ scale: scale.value }],
   }));
 
   return (
@@ -31,82 +28,161 @@ function AnimatedIcon({ name, color, focused }) {
   );
 }
 
-export default function TabsLayout() {
+function TabUnderline({ index }) {
+  const translateX = useSharedValue(0);
+  const tabWidth = (screenWidth - 100) / 4;
+
+  useFocusEffect(
+    useCallback(() => {
+      translateX.value = withTiming(index * tabWidth + tabWidth * 0.3, {
+        duration: 300,
+      });
+    }, [index, tabWidth])
+  );
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
   return (
-    <Tabs
-      initialRouteName="home/index"
-      screenOptions={{
-        tabBarActiveTintColor: mainColor,
-        tabBarInactiveTintColor: "#222",
-        headerShown: false,
-        tabBarStyle: {
-          height: 60,
-          shadowColor: "#000",
-          paddingBottom: 5,
+    <Animated.View
+      style={[
+        {
+          height: 8,
+          backgroundColor: mainColor,
+          position: "absolute",
+          bottom: 15,
+          left: 50,
+          borderRadius: 20,
+          width: tabWidth * 0.4,
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          marginTop: 5,
-        },
-        tabBarIconStyle: {
-          marginBottom: -5,
-        },
-        tabBarHideOnKeyboard: true,
-        tabBarLabelPosition: "below-icon",
-      }}
-    >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedIcon
-              name={focused ? "home-variant" : "home-variant-outline"}
-              color={color}
-              focused={focused}
-            />
-          ),
+        animatedStyle,
+      ]}
+    />
+  );
+}
+
+export default function TabsLayout() {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Tabs
+        initialRouteName="home/index"
+        screenOptions={{
+          tabBarActiveTintColor: mainColor,
+          tabBarInactiveTintColor: "#222",
+          headerShown: false,
+          tabBarStyle: {
+            height: 60,
+            shadowColor: "#000",
+            paddingBottom: 5,
+            borderRadius: 30,
+            left: 50,
+            right: 50,
+            bottom: 10,
+            position: "absolute",
+          },
+          tabBarLabelStyle: {
+            opacity: 0,
+          },
+          tabBarIconStyle: {
+            marginBottom: -5,
+          },
+          tabBarHideOnKeyboard: true,
+          tabBarLabelPosition: "below-icon",
         }}
-      />
-      <Tabs.Screen
-        name="question"
-        options={{
-          title: "Question",
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedIcon
-              name={focused ? "comment-question" : "comment-question-outline"}
-              color={color}
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="community"
-        options={{
-          title: "Community",
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedIcon
-              name={focused ? "chat-processing" : "chat-processing-outline"}
-              color={color}
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="me"
-        options={{
-          title: "Me",
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedIcon
-              name={focused ? "account" : "account-outline"}
-              color={color}
-              focused={focused}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedIcon
+                name={focused ? "home-variant" : "home-variant-outline"}
+                color={color}
+                focused={focused}
+              />
+            ),
+            tabBarButton: (props) => (
+              <TouchableOpacity
+                {...props}
+                onPress={() => {
+                  props.onPress();
+                  setSelectedIndex(0);
+                }}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="question"
+          options={{
+            title: "Question",
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedIcon
+                name={focused ? "comment-question" : "comment-question-outline"}
+                color={color}
+                focused={focused}
+              />
+            ),
+            tabBarButton: (props) => (
+              <TouchableOpacity
+                {...props}
+                onPress={() => {
+                  props.onPress();
+                  setSelectedIndex(1);
+                }}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="community"
+          options={{
+            title: "Community",
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedIcon
+                name={focused ? "chat-processing" : "chat-processing-outline"}
+                color={color}
+                focused={focused}
+              />
+            ),
+            tabBarButton: (props) => (
+              <TouchableOpacity
+                {...props}
+                onPress={() => {
+                  props.onPress();
+                  setSelectedIndex(2);
+                }}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="me"
+          options={{
+            title: "Me",
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedIcon
+                name={focused ? "account" : "account-outline"}
+                color={color}
+                focused={focused}
+              />
+            ),
+            tabBarButton: (props) => (
+              <TouchableOpacity
+                {...props}
+                onPress={() => {
+                  props.onPress();
+                  setSelectedIndex(3);
+                }}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+      <TabUnderline index={selectedIndex} />
+    </View>
   );
 }

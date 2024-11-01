@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   main: {
-    borderTopWidth: 4,
-    borderTopColor: "#000",
+    borderTopWidth: 2,
+    borderTopColor: "#fff",
     borderTopStartRadius: 20,
     borderTopEndRadius: 20,
     borderRadius: 15,
