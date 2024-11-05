@@ -22,7 +22,7 @@ import { debounce } from "lodash";
 export default function Community() {
   const [communitys, setCommunitys] = useState([]);
   const [page, setPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1); // 총 페이지 수 관리
+  const [isRemain, setIsRemain] = useState(true); // 총 페이지 수 관리
   const [searchText, setSearchText] = useState("");
   const [process, setProcess] = useState(false); // 데이터 요청 중 여부
   const [lastTimestamp, setLastTimestamp] = useState(null);
@@ -60,7 +60,7 @@ export default function Community() {
     // isForce true인 경우 강제 새로고침
     // 단, isForce true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
     if (isForce === false) {
-      if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
+      if (process || !hasMore) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
     }
     setProcess(true);
     setIsSearching(false);
@@ -74,7 +74,7 @@ export default function Community() {
       );
 
       const newData = response.data.data || [];
-      setTotalPage(response.data.total_pages); // 총 페이지 수 설정
+      setIsRemain(response.data.is_remain); // 총 페이지 수 설정
 
       if (newData.length === 0) {
         setHasMore(false); // 더 이상 데이터가 없을 때 hasMore를 false로 설정
@@ -122,7 +122,7 @@ export default function Community() {
   const appendNextData = async () => {
     const nextPage = page + 1;
 
-    if (process || !hasMore || nextPage > totalPage) return; // 중복 요청, 데이터 없음, 페이지 초과 방지
+    if (process || !hasMore || !isRemain) return; // 중복 요청, 데이터 없음, 페이지 초과 방지
 
     setPage(nextPage); // 페이지 증가
     await getList(nextPage, lastTimestamp, lastPostId); // 다음 페이지 데이터 요청
