@@ -5,33 +5,66 @@ import FindAccount from "../form/FindAccount";
 import Modify from "../form/ModifyAccount";
 import Delete from "../form/DeleteAccount";
 import ModalList from "./ModalList";
+import { useEffect } from "react";
 
 export default function ModalView({ type, visible, setVisible, userData }) {
+  // type이 falsy일 때 모달을 닫기 위해 setVisible(false)를 호출
+  useEffect(() => {
+    if (!type) {
+      setVisible(false);
+      console.log("ModalView의 type이 타당하지 않음!");
+    }
+  }, [type, setVisible]);
+
   return (
     <>
       {
-        type ? 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={visible}
-          onRequestClose={() => setVisible(false)}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              {
-                type === "register" ? <Register visible={visible} setVisible={setVisible}/> :
-                type === "find" ? <FindAccount visible={visible} setVisible={setVisible} /> :
-                type === "modify" ? <Modify visible={visible} setVisible={setVisible} userData={userData} /> :
-                type === "delete" ? <Delete visible={visible} setVisible={setVisible} /> :
-                type === "notification" || "history" ? <ModalList visible={visible} setVisible={setVisible} type={type} /> :
-                type === "sanction" ? <ModalList visible={visible} setVisible={setVisible} /> :
-                null
-              }
+        type ? (
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={visible}
+            onRequestClose={() => setVisible(false)}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                {type === "register" ? (
+                  <Register
+                    visible={visible}
+                    setVisible={setVisible}
+                  />
+                ) : type === "find" ? (
+                  <FindAccount
+                    visible={visible}
+                    setVisible={setVisible}
+                  />
+                ) : type === "modify" ? (
+                  <Modify
+                    visible={visible}
+                    setVisible={setVisible}
+                    userData={userData}
+                  />
+                ) : type === "delete" ? (
+                  <Delete
+                    visible={visible}
+                    setVisible={setVisible}
+                  />
+                ) : type === "notification" || type === "history" ? (
+                  <ModalList
+                    visible={visible}
+                    setVisible={setVisible}
+                    type={type}
+                  />
+                ) : type === "sanction" ? (
+                  <ModalList
+                    visible={visible}
+                    setVisible={setVisible}
+                  />
+                ) : null}
+              </View>
             </View>
-          </View>
-        </Modal> :
-        () => { setVisible(false); }
+          </Modal>
+        ) : null // type이 falsy일 때는 아무것도 렌더링하지 않음
       }
     </>
   );
