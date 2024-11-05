@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { styles } from "../styles/IndexStyle";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import decodeJWT from "../utils/decodeJWT";
-import ModalView from "../components/form/ModalView";
+import ModalView from "../components/modal/ModalView";
 import SnackBar from "../components/Snackbar";
 import _axios from "../api";
 

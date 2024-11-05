@@ -1,9 +1,10 @@
 import { View, Modal } from "react-native";
 import { styles } from "../../styles/form/ModalStyle";
-import Register from "./Register";
-import FindAccount from "./FindAccount";
-import Modify from "./ModifyAccount";
-import Delete from "./DeleteAccount";
+import Register from "../form/Register";
+import FindAccount from "../form/FindAccount";
+import Modify from "../form/ModifyAccount";
+import Delete from "../form/DeleteAccount";
+import ModalList from "./ModalList";
 
 export default function ModalView({ type, visible, setVisible, userData }) {
   return (
@@ -23,6 +24,7 @@ export default function ModalView({ type, visible, setVisible, userData }) {
                 type === "find" ? <FindAccount visible={visible} setVisible={setVisible} /> :
                 type === "modify" ? <Modify visible={visible} setVisible={setVisible} userData={userData} /> :
                 type === "delete" ? <Delete visible={visible} setVisible={setVisible} /> :
+                type === "notification" || "history" ? <ModalList visible={visible} setVisible={setVisible} type={type} /> :
                 null
               }
             </View>

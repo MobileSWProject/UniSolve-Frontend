@@ -6,21 +6,20 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Modal,
   SafeAreaView,
   StatusBar,
 } from "react-native";
 import { mainColor } from "../../../../constants/Colors";
-import { Exp, Notification } from "../../../../components/tabs/home/index";
+import ModalView from "../../../../components/modal/ModalView";
 import _axios from "../../../../api";
 
 export default function Home() {
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState(convertDate());
   const [currentTime, setCurrentTime] = useState(convertTime());
-  const [modalVisibleNotification, setModalVisibleNotification] =
-    useState(false);
-  const [modalVisibleRanking, setModalVisibleRanking] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -74,56 +73,11 @@ export default function Home() {
 
       <Text style={styles.timeDate}>로고를 클릭하여 문제를 해결하세요!</Text>
 
-      {/* 알림 */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisibleNotification}
-        onRequestClose={() => setModalVisibleNotification(false)}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={[styles.timeDate, { color: mainColor, marginTop: 4 }]}>
-              알림
-            </Text>
-            <Notification />
-            <TouchableOpacity
-              disabled={false}
-              style={[
-                styles.buttonSmall,
-                { backgroundColor: false ? "gray" : mainColor },
-              ]}
-              onPress={() => setModalVisibleNotification(false)}
-            >
-              <Text style={styles.buttonTextSmall}>확인</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* 랭킹 */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisibleRanking}
-        onRequestClose={() => setModalVisibleRanking(false)}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Exp />
-            <TouchableOpacity
-              disabled={false}
-              style={[
-                styles.buttonSmall,
-                { backgroundColor: false ? "gray" : mainColor },
-              ]}
-              onPress={() => setModalVisibleRanking(false)}
-            >
-              <Text style={styles.buttonTextSmall}>확인</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <ModalView
+        type={modalType}
+        visible={modalVisible}
+        setVisible={setModalVisible}
+      />
 
       <Image
         source={require("../../../../assets/logotypo.png")}
@@ -135,7 +89,8 @@ export default function Home() {
       <TouchableOpacity
         style={styles.alarmLink}
         onPress={() => {
-          setModalVisibleNotification(true);
+          setModalType("notification");
+          setModalVisible(true);
         }}
       >
         <Image

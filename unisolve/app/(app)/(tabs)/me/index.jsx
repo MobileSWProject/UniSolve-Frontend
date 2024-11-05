@@ -3,9 +3,9 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { mainColor } from "../../../../constants/Colors";
 import { ProgressBar } from "react-native-paper";
-import { getExpToLevel, getPercent, getLevel } from "../../../../components/tabs/home/index";
+import { getExpToLevel, getPercent, getLevel } from "../../../../components/tabs/me/index";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ModalView from "../../../../components/form/ModalView";
+import ModalView from "../../../../components/modal/ModalView";
 import _axios from "../../../../api";
 
 export default function MePage() {
@@ -101,7 +101,12 @@ export default function MePage() {
       <TouchableOpacity onPress={() => { }}>
         <Text style={styles.buttonText}>이용 제한 내역</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { () => { router.replace("/history") } }}>
+      <TouchableOpacity
+        onPress={() => {
+          setModalType("history");
+          setModalVisible(true);
+        }}
+      >
         <Text style={styles.buttonText}>히스토리</Text>
       </TouchableOpacity>
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>앱 설정</Text>
