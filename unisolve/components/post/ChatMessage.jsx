@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 
 
 // 서버에서 만들어둔 send_message 라우터로 라우팅 필요합니다.
-const ChatMessage = ({ me, message, user }) => {
+const ChatMessage = ({ me, sender, content, sent_at }) => {
   return (
     <View
       style={{
@@ -32,7 +32,7 @@ const ChatMessage = ({ me, message, user }) => {
         }}
       >
         {/* 유저 네임 */}
-        {!me && <Text style={{ fontWeight: "600", fontSize: 16 }}>{user}</Text>}
+        {!me && <Text style={{ fontWeight: "600", fontSize: 16 }}>{sender}</Text>}
         <View
           style={{
             backgroundColor: me ? "#fffacd" : "white",
@@ -40,8 +40,9 @@ const ChatMessage = ({ me, message, user }) => {
             borderRadius: 12,
           }}
         >
-          <Text>{message}</Text>
+          <Text>{content}</Text>
         </View>
+        <Text>{sent_at}</Text>
       </View>
     </View>
   );
