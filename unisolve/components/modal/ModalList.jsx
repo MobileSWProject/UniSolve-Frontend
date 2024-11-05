@@ -23,7 +23,7 @@ export default function ModalList({ visible, setVisible, type }) {
     if (process) return;
     setProcess(true);
     try {
-      const response = await _axios.get(type === "notification" ? `/notifications/mine?page=${tempPage}` : `/posts/mine?page=${tempPage}`);
+      const response = await _axios.get(type === "notification" ? `/notifications/mine?page=${tempPage}` : type === "history" ? `/posts/mine?page=${tempPage}` : `/accounts/user/sanctions?page=${tempPage}`);
       setTotalPage(response.data.total_pages);
       const reversedData = response.data.data || [];
       if (tempPage === 1) {
@@ -51,12 +51,12 @@ export default function ModalList({ visible, setVisible, type }) {
   return (
     <>
       <Text style={[styles.timeDate, { color: mainColor, marginTop: 4 }]}>
-        {type === "notification" ? "알림" : "히스토리"}
+        {type === "notification" ? "알림" : type === "history" ? "히스토리" : "이용 제한 내역"}
       </Text>
       <FlatList
         style={{ width: "100%" }}
         data={list}
-        keyExtractor={(item) => type === "notification" ? item.not_id.toString() : item.id.toString()}
+        keyExtractor={(item) => type === "notification" ? item.not_id.toString() : type === "history" ? item.id.toString() : null}
         renderItem={({ item, index }) => (
           <List
             item={item}

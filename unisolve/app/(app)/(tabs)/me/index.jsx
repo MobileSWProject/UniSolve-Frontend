@@ -98,7 +98,11 @@ export default function MePage() {
       >
         <Text style={styles.buttonText}>정보 수정</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
+      <TouchableOpacity
+        onPress={() => {
+          setModalType("sanction");
+          setModalVisible(true);
+        }}>
         <Text style={styles.buttonText}>이용 제한 내역</Text>
       </TouchableOpacity>
       <TouchableOpacity

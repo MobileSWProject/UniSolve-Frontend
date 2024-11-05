@@ -25,6 +25,7 @@ export default function ModalView({ type, visible, setVisible, userData }) {
                 type === "modify" ? <Modify visible={visible} setVisible={setVisible} userData={userData} /> :
                 type === "delete" ? <Delete visible={visible} setVisible={setVisible} /> :
                 type === "notification" || "history" ? <ModalList visible={visible} setVisible={setVisible} type={type} /> :
+                type === "sanction" ? <ModalList visible={visible} setVisible={setVisible} /> :
                 null
               }
             </View>
