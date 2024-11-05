@@ -4,7 +4,9 @@ import {
   ActivityIndicator,
   FlatList,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   View,
 } from "react-native";
@@ -253,33 +255,49 @@ export default function Community() {
 
       {/* 커뮤니티 리스트 */}
       <AnimatedView style={{ ...springs2, flex: 1 }}>
-        <FlatList
-          ref={flatListRef}
-          style={{ backgroundColor: mainColor }}
-          data={communitys}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item, index }) => (
-            <List
-              item={item}
-              index={index}
-              count={communitys.length}
-              type="community"
+        <>
+          {communitys.length === 0 ? (
+            <>
+              {process || isSearching ? (
+                <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
+                  <SkeletonList length={20} />
+                </ScrollView>
+              ) : (
+                <View>
+                  <Text style={{ color: "white" }}>찾는 결과 없음 ㅋ.</Text>
+                </View>
+              )}
+            </>
+          ) : (
+            <FlatList
+              ref={flatListRef}
+              style={{ backgroundColor: mainColor }}
+              data={communitys}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item, index }) => (
+                <List
+                  item={item}
+                  index={index}
+                  count={communitys.length}
+                  type="community"
+                />
+              )}
+              contentContainerStyle={{ paddingTop: 20 }}
+              onEndReached={appendNextData}
+              onEndReachedThreshold={0.1} // 적절한 임계값 설정
+              onScroll={handleScroll}
+              onScrollBeginDrag={handleScrollStartDrag}
+              onScrollEndDrag={handleScrollEndDrag}
+              ListFooterComponent={
+                process || isSearching ? (
+                  <SkeletonList />
+                ) : (
+                  <View style={{ marginBottom: 100 }} />
+                )
+              }
             />
           )}
-          contentContainerStyle={{ paddingTop: 20 }}
-          onEndReached={appendNextData}
-          onEndReachedThreshold={0.1} // 적절한 임계값 설정
-          onScroll={handleScroll}
-          onScrollBeginDrag={handleScrollStartDrag}
-          onScrollEndDrag={handleScrollEndDrag}
-          ListFooterComponent={
-            process || isSearching ? (
-              <SkeletonList />
-            ) : (
-              <View style={{ marginBottom: 100 }} />
-            )
-          }
-        />
+        </>
       </AnimatedView>
     </SafeAreaView>
   );
