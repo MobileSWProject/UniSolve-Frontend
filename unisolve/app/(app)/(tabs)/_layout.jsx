@@ -34,7 +34,7 @@ function TabUnderline({ index }) {
 
   useFocusEffect(
     useCallback(() => {
-      translateX.value = withTiming(index * tabWidth + (tabWidth - tabWidth * 0.4) / 2, { duration: 300 });
+      translateX.value = withTiming(index * tabWidth, { duration: 300 });
     }, [index, tabWidth])
   );
 
@@ -106,28 +106,6 @@ export default function TabsLayout() {
                 onPress={() => {
                   props.onPress();
                   setSelectedIndex(0);
-                }}
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="question"
-          options={{
-            title: "Question",
-            tabBarIcon: ({ color, focused }) => (
-              <AnimatedIcon
-                name={focused ? "comment-question" : "comment-question-outline"}
-                color={color}
-                focused={focused}
-              />
-            ),
-            tabBarButton: (props) => (
-              <TouchableOpacity
-                {...props}
-                onPress={() => {
-                  props.onPress();
-                  setSelectedIndex(1);
                 }}
               />
             ),

@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import {
   View,
+  Text,
   FlatList,
   StyleSheet,
   TextInput,
@@ -47,8 +48,11 @@ export default function CommunityChat() {
     if (!message || message.length <= 0) return;
     setMessage("");
     const dt = new Date();
-    chatData.push({content: message, is_me: true, sent_at: "전송중..." })
-    const response = await _axios.post(`/chat/send_message`, { post_id: id, content: message });
+    chatData.push({ content: message, is_me: true, sent_at: "전송중..." });
+    const response = await _axios.post(`/chat/send_message`, {
+      post_id: id,
+      content: message,
+    });
     if (response.data.sent) {
       getData();
     } else {
@@ -65,14 +69,27 @@ export default function CommunityChat() {
         contentContainerStyle={styles.container}
         inverted // 거꾸로 출력
       />
-      <View style={{ marginLeft: 10, marginRight: 10, marginBottom: 10, flexDirection: "row"}}>
+      <View
+        style={{
+          marginLeft: 10,
+          marginRight: 10,
+          marginBottom: 10,
+          flexDirection: "row",
+        }}
+      >
         <TextInput
           value={message}
           onChangeText={setMessage}
-          style={{ flex:1, height: 100, backgroundColor: "#ccc" }}
+          style={{ flex: 1, height: 100, backgroundColor: "#ccc" }}
         ></TextInput>
-        <TouchableOpacity style={{ backgroundColor:"skyblue", fontSize: 30, color: "#000"}}
-        onPress={() => {msgSend()}}>전송</TouchableOpacity>
+        <TouchableOpacity
+          style={{ backgroundColor: "skyblue", fontSize: 30, color: "#000" }}
+          onPress={() => {
+            msgSend();
+          }}
+        >
+          <Text>전송</Text>
+        </TouchableOpacity>
       </View>
     </>
   );

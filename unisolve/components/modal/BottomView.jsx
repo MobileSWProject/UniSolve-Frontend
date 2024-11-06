@@ -1,0 +1,24 @@
+import { TouchableOpacity } from "react-native";
+import BottomSheet from "@gorhom/bottom-sheet";
+import PostCreate from "../form/PostCreate";
+import Feather from "@expo/vector-icons/Feather";
+
+export default function BottomView({ sheetRef }) {
+  return (
+    <BottomSheet
+      ref={sheetRef}
+      snapPoints={["1%", "25%", "90%"]}
+      index={-1}
+      enablePanDownToClose={true}
+      animateOnMount={true}
+    >
+      <TouchableOpacity
+        style={{ position: "absolute", zIndex: 999, left: 10 }}
+        onPress={() => { sheetRef.current?.collapse(); }}
+      >
+        <Feather name="x" size={30} color="black" />
+      </TouchableOpacity>
+      <PostCreate />
+    </BottomSheet>
+  );
+}

@@ -2,7 +2,7 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { mainColor } from "../../constants/Colors";
 import { styles } from "../../styles/form/FormStyle";
 
-export default function Input({ title, subTitle, subTitleConfirm, placeholder, content, onChangeText, disabled, maxLength, secure, buttonDisabled, buttonOnPress, buttonText }) {
+export default function Input({ title, subTitle, subTitleConfirm, placeholder, content, onChangeText, disabled, maxLength, secure, buttonDisabled, buttonOnPress, buttonText, textArea }) {
   function lastConvert(text) {
     if (/^[가-힣]$/.test(text.charAt(text.length - 1)) && (text.charAt(text.length - 1).charCodeAt(0) - 44032) % 28 !== 0) return "을";
     else return "를";
@@ -21,13 +21,14 @@ export default function Input({ title, subTitle, subTitleConfirm, placeholder, c
       </Text>
       <View style={styles.view}>
         <TextInput
-          style={styles.inputTo}
+          style={[styles.inputTo, textArea ? { height: 350 } : null]}
           placeholder={placeholder ? placeholder : `${title}${lastConvert(title)} 입력하세요.`}
           value={content}
           onChangeText={onChangeText}
           disabled={disabled}
           maxLength={maxLength ? maxLength : null}
           secureTextEntry={secure ? secure : null}
+          multiline={textArea ? true : false}
         />
         {
           buttonOnPress ?
