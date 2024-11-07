@@ -11,7 +11,8 @@ import {
   TextInput,
   View,
   TouchableOpacity,
-  RefreshControl ,
+  RefreshControl,
+  Platform,
 } from "react-native";
 import _axios from "../../../../api";
 import List from "../../../../components/tabs/List/List";
@@ -254,7 +255,11 @@ export default function Community() {
           }}
         >
           <Text style={{ left: 10 }}>
-            <Ionicons name="create" size={30} color="white" />
+            <Ionicons
+              name="create"
+              size={30}
+              color="white"
+            />
           </Text>
         </TouchableOpacity>
         <View style={{ zIndex: 10 }}>
@@ -314,10 +319,14 @@ export default function Community() {
                   )
                 }
                 refreshControl={
-                  <RefreshControl
-                    refreshing={isRefreshing}
-                    onRefresh={() => {getList(1, null, null);}}
-                  />
+                  Platform.OS === "android" ? (
+                    <RefreshControl
+                      refreshing={isRefreshing}
+                      onRefresh={() => {
+                        getList(1, null, null, true);
+                      }}
+                    />
+                  ) : null
                 }
               />
             )}
