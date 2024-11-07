@@ -175,7 +175,7 @@ const CommentSection = ({
           onPress={() => handleReply(comment)}
         >
           <Text style={{ color: "#FFFFFF", fontSize: 12, fontWeight: "bold" }}>
-            {t("Function.regist")}
+            {t("Function.reply")}
           </Text>
         </TouchableOpacity>
       )}

@@ -447,7 +447,7 @@ const Post = () => {
                 }}
               >
                 <Text style={styles.buttonTextSmall}>
-                  {editPost ? t("Function.btn_edit") : t("Function.report")}
+                  {editPost ? t("Function.btn_edit") : t("Function.btn_report")}
                 </Text>
               </TouchableOpacity>
             </View>
