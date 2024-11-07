@@ -13,8 +13,13 @@ import { mainColor } from "../../../../constants/Colors";
 import ModalView from "../../../../components/modal/ModalView";
 import _axios from "../../../../api";
 
+import { useTranslation } from 'react-i18next';
+import "../../../../i18n";
+
 export default function Home() {
   const router = useRouter();
+  const { t } = useTranslation();
+  
   const [currentDate, setCurrentDate] = useState(convertDate());
   const [currentTime, setCurrentTime] = useState(convertTime());
 
@@ -33,26 +38,17 @@ export default function Home() {
 
   function convertDate() {
     const date = new Date();
-    const week = {
-      0: "일",
-      1: "월",
-      2: "화",
-      3: "수",
-      4: "목",
-      5: "금",
-      6: "토",
-    };
-    return `${Number(date.getMonth() + 1)}월 ${date
+    return `${Number(date.getMonth() + 1)}${t("DateTime.month")} ${date
       .getDate()
       .toString()
-      .padStart(2, "0")}일 ${week[date.getDay()]}요일`;
+      .padStart(2, "0")}${t("DateTime.day")} ${t(`DateTime.week_${date.getDay().toString()}`)}`;
   }
   function convertTime() {
     const date = new Date();
-    return `${date.getHours().toString().padStart(2, "0")}시 ${date
+    return `${date.getHours().toString().padStart(2, "0")}${t("DateTime.hour")} ${date
       .getMinutes()
       .toString()
-      .padStart(2, "0")}분 ${date.getSeconds().toString().padStart(2, "0")}초`;
+      .padStart(2, "0")}${t("DateTime.minute")} ${date.getSeconds().toString().padStart(2, "0")}${t("DateTime.second")}`;
   }
 
   return (
@@ -71,7 +67,7 @@ export default function Home() {
         />
       </TouchableOpacity>
 
-      <Text style={styles.timeDate}>로고를 클릭하여 문제를 해결하세요!</Text>
+      <Text style={styles.timeDate}>{t("Function.main")}</Text>
 
       <ModalView
         type={modalType}

@@ -6,10 +6,15 @@ import { ProgressBar } from "react-native-paper";
 import { getExpToLevel, getPercent, getLevel } from "../../../../components/tabs/me/index";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModalView from "../../../../components/modal/ModalView";
+import SnackBar from "../../../../components/Snackbar";
 import _axios from "../../../../api";
+
+import { useTranslation } from 'react-i18next';
+import "../../../../i18n";
 
 export default function MePage() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
 
   const [user, setUser] = useState({});
   const [userProcess, setUserProcess] = useState(false);
@@ -19,11 +24,19 @@ export default function MePage() {
 
   const [exp, setExp] = useState("");
 
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
   useFocusEffect(
-    useCallback(() => { 
+    useCallback(() => {
       getUser();
     }, [])
   );
+
+  const snackBar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarVisible(true);
+  };
 
   async function getUser() {
     if (userProcess) return;
@@ -58,6 +71,11 @@ export default function MePage() {
 
   return (
     <View style={styles.container}>
+      <SnackBar
+        visible={snackbarVisible}
+        message={snackbarMessage}
+        onDismiss={() => setSnackbarVisible(false)}
+      />
       {/* 프로필 이미지 */}
       <View style={styles.profileContainer}>
         <Image
@@ -69,7 +87,7 @@ export default function MePage() {
             {user.username} | {user.user_nickname}
           </Text>
           <Text style={styles.phoneNumber}>
-            {user.school || "소속이 없습니다."}
+            {user.school || t("User.school")}
           </Text>
           <Text style={[styles.phoneNumber, { marginBottom: 15, fontSize: 18, fontWeight: "bold", color: "#fff" }]}>
             {getExpToLevel(getLevel(exp))}
@@ -89,21 +107,21 @@ export default function MePage() {
         </View>
       </View>
 
-      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>계정</Text>
+      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>{t("Menu.account")}</Text>
       <TouchableOpacity
         onPress={() => {
           setModalType("modify");
           setModalVisible(true);
         }}
       >
-        <Text style={styles.buttonText}>정보 수정</Text>
+        <Text style={styles.buttonText}>{t("User.edit")}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
           setModalType("sanction");
           setModalVisible(true);
         }}>
-        <Text style={styles.buttonText}>이용 제한 내역</Text>
+        <Text style={styles.buttonText}>{t("User.sanction")}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
@@ -111,33 +129,42 @@ export default function MePage() {
           setModalVisible(true);
         }}
       >
-        <Text style={styles.buttonText}>히스토리</Text>
+        <Text style={styles.buttonText}>{t("Function.history")}</Text>
       </TouchableOpacity>
-      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>앱 설정</Text>
+      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>{t("Menu.settings")}</Text>
       <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>다크 모드</Text>
+        <Text style={styles.buttonText}>{true ? t("Menu.darkmode") : t("Menu.lightmode")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>언어 변경</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>알림 설정</Text>
-      </TouchableOpacity>
-      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>이용 관련</Text>
-      <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>앱 버전</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>고객지원</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>공지사항</Text>
+      <TouchableOpacity
+        onPress={() => {
+          if (i18n.language === "ko") {
+            i18n.changeLanguage("en");
+            snackBar(`${t("Stage.success")} ${t("Menu.en")}${t("Function.convert")}`);
+          } else {
+            i18n.changeLanguage("ko")
+            snackBar(`${t("Stage.success")} ${t("Menu.ko")}${t("Function.convert")}`);
+          }
+        }}>
+        <Text style={styles.buttonText}>{`${t("Menu.lang")}(${t(i18n.language === "ko" ? "Menu.ko" : "Menu.en")})`}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>서비스 이용약관</Text>
+        <Text style={styles.buttonText}>{t("Menu.notification")}</Text>
+      </TouchableOpacity>
+      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>{t("Menu.use")}</Text>
+      <TouchableOpacity onPress={() => { }}>
+        <Text style={styles.buttonText}>{t("Menu.version")}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>개인정보 처리방침</Text>
+        <Text style={styles.buttonText}>{t("Menu.support")}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => { }}>
+        <Text style={styles.buttonText}>{t("Menu.notice")}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => { }}>
+        <Text style={styles.buttonText}>{t("Menu.operation")}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => { }}>
+        <Text style={styles.buttonText}>{t("Menu.privacy")}</Text>
       </TouchableOpacity>
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>기타</Text>
       <TouchableOpacity
@@ -146,13 +173,13 @@ export default function MePage() {
           setModalVisible(true);
         }}
       >
-        <Text style={styles.buttonText}>회원 계정 탈퇴</Text>
+        <Text style={styles.buttonText}>{t("User.delete")}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={async () => {
         await AsyncStorage.removeItem("token");
         router.replace("/");
       }}>
-        <Text style={styles.buttonText}>로그아웃</Text>
+        <Text style={styles.buttonText}>{t("User.logout")}</Text>
       </TouchableOpacity>
       {modalVisible ? (
         <ModalView

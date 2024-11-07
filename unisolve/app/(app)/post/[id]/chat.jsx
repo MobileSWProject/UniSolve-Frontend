@@ -11,7 +11,11 @@ import {
 import ChatMessage from "../../../../components/post/ChatMessage";
 import _axios from "../../../../api";
 
+import { useTranslation } from 'react-i18next';
+import "../../../../i18n";
+
 export default function CommunityChat() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const [chatData, setChatData] = useState([]);
   const [message, setMessage] = useState("");
@@ -48,7 +52,7 @@ export default function CommunityChat() {
     if (!message || message.length <= 0) return;
     setMessage("");
     const dt = new Date();
-    chatData.push({ content: message, is_me: true, sent_at: "전송중..." });
+    chatData.push({ content: message, is_me: true, sent_at: t("Function.sending") });
     const response = await _axios.post(`/chat/send_message`, {
       post_id: id,
       content: message,
@@ -88,7 +92,7 @@ export default function CommunityChat() {
             msgSend();
           }}
         >
-          <Text>전송</Text>
+          <Text>{t("Function.send")}</Text>
         </TouchableOpacity>
       </View>
     </>

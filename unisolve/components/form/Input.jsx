@@ -2,10 +2,15 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { mainColor } from "../../constants/Colors";
 import { styles } from "../../styles/form/FormStyle";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 export default function Input({ title, subTitle, subTitleConfirm, placeholder, content, onChangeText, disabled, maxLength, secure, buttonDisabled, buttonOnPress, buttonText, textArea }) {
+  const { t } = useTranslation();
+
   function lastConvert(text) {
-    if (/^[가-힣]$/.test(text.charAt(text.length - 1)) && (text.charAt(text.length - 1).charCodeAt(0) - 44032) % 28 !== 0) return "을";
-    else return "를";
+    if (/^[가-힣]$/.test(text.charAt(text.length - 1)) && (text.charAt(text.length - 1).charCodeAt(0) - 44032) % 28 !== 0) return t("Function.input_final");
+    else return t("Function.input_nofinal");
   }
   return (
     <>
@@ -22,7 +27,7 @@ export default function Input({ title, subTitle, subTitleConfirm, placeholder, c
       <View style={styles.view}>
         <TextInput
           style={[styles.inputTo, textArea ? { height: 350 } : null]}
-          placeholder={placeholder ? placeholder : `${title}${lastConvert(title)} 입력하세요.`}
+          placeholder={placeholder ? placeholder : `${title}${lastConvert(title)} ${t("Function.input")}`}
           value={content}
           onChangeText={onChangeText}
           disabled={disabled}
@@ -38,7 +43,7 @@ export default function Input({ title, subTitle, subTitleConfirm, placeholder, c
             onPress={buttonOnPress}
           >
             <Text style={styles.buttonTextSmall}>
-              {buttonText ? buttonText : "확인"}
+              {buttonText ? buttonText : t("Function.confirm")}
             </Text>
           </TouchableOpacity> : 
           null

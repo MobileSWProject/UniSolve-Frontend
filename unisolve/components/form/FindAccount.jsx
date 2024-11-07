@@ -5,7 +5,12 @@ import Input from "./Input";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 export default function FindAccount({ visible, setVisible }) {
+  const { t } = useTranslation();
+
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -24,15 +29,15 @@ export default function FindAccount({ visible, setVisible }) {
       if (findSending) return;
       let response;
       setFindSending(true);
-      snackBar("〽️ 계정 정보를 찾고 있습니다...");
+      snackBar(`${t("Stage.process")}${t("User.search_account_process")}`);
       if (findID.length === 0)
         response = await _axios.post("/accounts/find_user_id", { name: findName, email: findEmail });
       else if (findID.length > 0)
         response = await _axios.post("/accounts/reset_password_request", { user_id: findID, username: findName, email: findEmail });
       if (response.data.isSent || response.data.foundpw) 
-        snackBar("✅ 해당 이메일로 계정 정보가 발송되었습니다!\n일치하지 않을 경우 발송되지 않습니다.");
+        snackBar(`${t("Stage.success")}${t("User.search_account_success")}`);
     } catch {
-      snackBar("❌ 계정 정보 찾기에 실패했습니다.\n다시 한번 확인 후 다시 시도해 주세요.");
+      snackBar(`${t("Stage.failed")}${t("User.search_account_failed")}`);
     } finally {
       setTimeout(() => {
         setVisible(false);
@@ -49,19 +54,19 @@ export default function FindAccount({ visible, setVisible }) {
         onDismiss={() => setSnackbarVisible(false)}
       />
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
-        계정 정보 찾기
+        {t("User.search_account")}
       </Text>
       <Text style={{ fontSize: 12, marginBottom: 10 }}>
-        비밀번호 찾기는 모든 정보를 입력해야 표시됩니다.
+        {t("User.search_account_subtitle")}
       </Text>
       <Input
-        title="이름"
+        title={t("User.name")}
         content={findName}
         onChangeText={setFindName}
         disabled={findSending}
       />
       <Input
-        title="이메일"
+        title={t("User.email")}
         content={findEmail}
         onChangeText={setFindEmail}
         disabled={findSending}
@@ -69,8 +74,8 @@ export default function FindAccount({ visible, setVisible }) {
       {
         findName && findEmail ?
         <Input
-          title="아이디 (비밀번호를 찾을 경우)"
-          placeholder="아이디를 입력하세요."
+          title={`${t("User.id")}(${t("User.search_account_password_please")})`}
+          placeholder={t("User.id_please")}
           content={findID}
           onChangeText={setFindID}
           disabled={findSending}
@@ -81,7 +86,7 @@ export default function FindAccount({ visible, setVisible }) {
         visible={visible}
         setVisible={setVisible}
         onPress={() => { findAccount(); }}
-        content={findID ? "비밀번호 찾기" : "아이디 찾기"}
+        content={findID ? t("User.search_account_password") : t("User.search_account_id")}
         cancel={findSending}
         disabled={findSending || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(findEmail) || !findName}
       />

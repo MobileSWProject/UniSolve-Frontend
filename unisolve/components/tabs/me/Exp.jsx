@@ -11,20 +11,13 @@ import _axios from "../../../api";
 import { mainColor } from "../../../constants/Colors";
 import { Table, Row, Rows } from "react-native-table-component";
 
+import { useTranslation } from 'react-i18next';
+import "../../../i18n";
+
+const { t } = useTranslation();
+
 export function getExpToLevel(index) {
-  const ExpToLevel = [
-    "신생아",
-    "유치원생",
-    "초등학생",
-    "중학생",
-    "고등학생",
-    "대학생(학사)",
-    "석사",
-    "박사",
-    "교수",
-    "전문가",
-  ];
-  return ExpToLevel[index];
+  return t(`User.exp_${index}`);
 };
 export function getPercent(exp) {
   const percent = exp < 101
@@ -75,7 +68,7 @@ export function getLevel(exp) {
 }
 export function ExpPage() {
   const [meExp, setMeExp] = useState(0);
-  const listHeader = ["순위", "닉네임", "레벨", "증감"];
+  const listHeader = [t("User.ranking"), t("User.nickname"), t("User.level"), t("User.variation")];
   const [list, setList] = useState([]);
   const [page, setPage] = useState(1);
   const [TotalPage, setTotalPage] = useState(1);
@@ -128,7 +121,7 @@ export function ExpPage() {
   };
   return (
     <>
-      <Text style={styles.meSubText}>1위</Text>
+      <Text style={styles.meSubText}>{1}{t("User.rank")}</Text>
       <View style={styles.me}>
         <Text style={styles.meText}>★ {numConvert(meExp)}</Text>
       </View>
@@ -159,7 +152,7 @@ export function ExpPage() {
               getList("down");
             }}
           >
-            <Text style={styles.buttonTextSmall}>이전</Text>
+            <Text style={styles.buttonTextSmall}>{t("User.previous")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             disabled={false}
@@ -172,7 +165,7 @@ export function ExpPage() {
               getList("self");
             }}
           >
-            <Text style={styles.buttonTextSmall}>내 순위</Text>
+            <Text style={styles.buttonTextSmall}>{t("User.rank_me")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             disabled={false}
@@ -185,7 +178,7 @@ export function ExpPage() {
               getList("up");
             }}
           >
-            <Text style={styles.buttonTextSmall}>다음</Text>
+            <Text style={styles.buttonTextSmall}>{t("User.next")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

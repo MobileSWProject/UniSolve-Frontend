@@ -5,7 +5,12 @@ import { mainColor } from "../../constants/Colors";
 import List from "../tabs/List/List";
 import _axios from "../../api";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 export default function ModalList({ visible, setVisible, type }) {
+  const { t } = useTranslation();
+
   const [list, setList] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
@@ -51,7 +56,7 @@ export default function ModalList({ visible, setVisible, type }) {
   return (
     <>
       <Text style={[styles.timeDate, { color: mainColor, marginTop: 4 }]}>
-        {type === "notification" ? "알림" : type === "history" ? "히스토리" : "이용 제한 내역"}
+        {type === "notification" ? t("Function.notification") : type === "history" ? t("Function.history") : t("Function.sanction")}
       </Text>
       <FlatList
         style={{ width: "100%" }}
@@ -77,7 +82,7 @@ export default function ModalList({ visible, setVisible, type }) {
         style={[styles.buttonSmall, { backgroundColor: mainColor }]}
         onPress={() => setVisible(false)}
       >
-        <Text style={styles.buttonTextSmall}>확인</Text>
+        <Text style={styles.buttonTextSmall}>{t("Function.confirm")}</Text>
       </TouchableOpacity>
     </>
   );

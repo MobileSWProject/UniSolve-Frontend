@@ -2,7 +2,11 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { mainColor } from "../../constants/Colors";
 import { styles } from "../../styles/form/FormStyle";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 export default function InputProcess({ visible, setVisible, type, onPress, content, cancel, disabled }) {
+  const { t } = useTranslation();
   return (
     <View style={{ flexDirection: "row" }}>
       <TouchableOpacity
@@ -10,7 +14,7 @@ export default function InputProcess({ visible, setVisible, type, onPress, conte
         style={[styles.buttonSmall, { backgroundColor: cancel ? "gray" : mainColor }]}
         onPress={() => { setVisible(false); }}
       >
-        <Text style={styles.buttonTextSmall}>취소</Text>
+        <Text style={styles.buttonTextSmall}>{t("Function.cancel")}</Text>
       </TouchableOpacity>
       <TouchableOpacity
         disabled={disabled ? disabled : false}

@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Image, Platform, Text, TouchableOpacity, View } from "react-native";
+import { Platform, Text, TouchableOpacity, View } from "react-native";
 import styles from "../../styles/form/PostCreateStyle";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { _fetchFormData, formFetch } from "../../api";
@@ -12,7 +12,12 @@ import ModalView from "../../components/modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 export default function PostCreate() {
+  const { t } = useTranslation();
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
@@ -79,7 +84,7 @@ export default function PostCreate() {
   // 이미지 및 폼 데이터 전송
   const handleSubmit = async () => {
     if (title.trim() === "" || content.trim() === "") {
-      snackBar("❌ 빈칸으로 등록할 수 없습니다.");
+      snackBar(`${t("Stage.failed")}${t("Function.empty")}`);
       return;
     }
     const data = new FormData();
@@ -99,7 +104,7 @@ export default function PostCreate() {
       }
     }
 
-    snackBar("〽️ 등록하고 있습니다..");
+    snackBar(`${t("Stage.process")}${t("Function.registering")}`);
     setSubmitLoading(true);
     try {
       const response = await formFetch("/posts", data);
@@ -143,7 +148,7 @@ export default function PostCreate() {
             }}
           >
             <Text style={styles.submitButtonText}>
-              {isPrivate ? "비공개" : "공개"}
+              {isPrivate ? t("Function.private") : t("Function.public")}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -152,23 +157,23 @@ export default function PostCreate() {
             onPress={handleSubmit}
             disabled={submitLoading}
           >
-            <Text style={styles.submitButtonText}>등록</Text>
+            <Text style={styles.submitButtonText}>{t("Function.regist")}</Text>
           </TouchableOpacity>
         </View>
         <View>
           <Input
-            title="제목"
+            title={t("Function.title")}
             content={title}
             onChangeText={setTitle}
             maxLength={32}
           />
           <Input
-            title="내용"
+            title={t("Function.content")}
             content={content}
             onChangeText={setContent}
             textArea={true}
           />
-          <Text style={styles.textTo}>첨부</Text>
+          <Text style={styles.textTo}>{t("Function.attachment")}</Text>
           <View style={{ flexDirection: "row", marginTop: 5 }}>
             <TouchableOpacity
               style={styles.submitButton}

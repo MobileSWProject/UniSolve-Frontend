@@ -9,8 +9,13 @@ import ModalView from "../components/modal/ModalView";
 import SnackBar from "../components/Snackbar";
 import _axios from "../api";
 
+import { useTranslation } from 'react-i18next';
+import "../i18n";
+
 export default function Home() {
   const router = useRouter();
+  const { t } = useTranslation();
+
   const [certification, setCertification] = useState(false);
   const [sending, setSending] = useState(false);
   const [checkID, setCheckID] = useState(false);
@@ -49,14 +54,14 @@ export default function Home() {
         if (isTokenExpired) await AsyncStorage.removeItem("token");
         else {
           setCertification(true);
-          snackBar("✅ 로그인 정보가 존재합니다!\n메인으로 이동하고 있습니다...");
+          snackBar(`${t("Stage.success")}${t("User.already")}`);
           setTimeout(() => {
             router.replace("/home");
           }, 1500);
         }
       } catch (error) {
         setCertification(false);
-        snackBar("⚠️ 로그인이 필요합니다!");
+        snackBar(`${t("Stage.warning")}${t("User.login_please")}`);
         Animated.sequence([
           Animated.timing(logoPosition, {
             toValue: -25,
@@ -79,7 +84,7 @@ export default function Home() {
       const response = await _axios.post("/accounts/existuser", value);
       return !response.data.isNotExist;
     } catch {
-      snackBar("❌ 문제가 발생했습니다!");
+      snackBar(`${t("Stage.failed")}${t("User.error")}`);
       return false;
     }
   };
@@ -101,18 +106,18 @@ export default function Home() {
         }),
       ]).start();
       if (checkID) {
-        snackBar("〽️ 로그인 중입니다...");
+        snackBar(`${t("Stage.process")}${t("User.login_process")}`);
         const response = await _axios.post("/auth/login", JSON.stringify({ user_id: id, password: pw }));
         const token = response.data.token;
         if (token) {
           await AsyncStorage.setItem("token", token);
-          snackBar("✅ 로그인 되었습니다!\n메인으로 이동하고 있습니다...");
+          snackBar(`${t("Stage.success")}${t("User.login_success")}`);
           setLoginCheck(true);
           setTimeout(() => {
             router.replace("/(app)/(tabs)/home");
           }, 1000);
         } else {
-          snackBar("❌ 로그인 정보가 올바르지 않습니다!");
+          snackBar(`${t("Stage.failed")}${t("User.failed")}`);
         }
         setSending(false);
       } else {
@@ -133,7 +138,7 @@ export default function Home() {
             }),
           ]).start();
         } else {
-          snackBar("❌ 존재하지 않은 계정입니다.");
+          snackBar(`${t("Stage.failed")}${t("User.account_notfound")}`);
         }
       }
     } catch {
@@ -203,7 +208,7 @@ export default function Home() {
       >
         <TextInput
           style={styles.input}
-          placeholder="아이디를 입력하세요."
+          placeholder={t("User.id_please")}
           placeholderTextColor="#fff"
           value={id}
           onChangeText={(text) => { inputID(text); }}
@@ -223,7 +228,7 @@ export default function Home() {
         >
           <TextInput
             style={styles.input}
-            placeholder="비밀번호를 입력하세요."
+            placeholder={t("User.password_please")}
             placeholderTextColor="#fff"
             value={pw}
             onChangeText={setPW}
@@ -242,7 +247,7 @@ export default function Home() {
             setModalVisible(true);
           }}
         >
-          <Text style={styles.text}>계정을 잊으셨나요?</Text>
+          <Text style={styles.text}>{t("User.account_forget")}</Text>
         </TouchableOpacity>
       </Animated.View>
       <Animated.View style={{ opacity: inputOpacity, marginTop: 15 }}>
@@ -253,7 +258,7 @@ export default function Home() {
           }}
         >
           <Text style={[styles.text, { fontWeight: "bold" }]}>
-            계정이 없다면 계정을 만들어봐요!
+            {t("User.account_regist")}
           </Text>
         </TouchableOpacity>
       </Animated.View>
