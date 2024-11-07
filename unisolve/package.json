@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@gorhom/bottom-sheet": "^4.0.0",
+    "@gorhom/bottom-sheet": "^5.0.5",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "axios": "^1.7.7",
     "base-64": "^1.0.0",
