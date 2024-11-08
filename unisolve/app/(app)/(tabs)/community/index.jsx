@@ -1,12 +1,18 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState, useRef, useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   ActivityIndicator,
   FlatList,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   View,
+  TouchableOpacity,
+  RefreshControl,
+  Platform,
 } from "react-native";
 import _axios from "../../../../api";
 import List from "../../../../components/tabs/List/List";
@@ -16,11 +22,16 @@ import Icons from "@expo/vector-icons/MaterialIcons";
 import { mainColor } from "../../../../constants/Colors";
 import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
 import { debounce } from "lodash";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
+import BottomView from "../../../../components/modal/BottomView";
 
 export default function Community() {
+  const sheetRef = useRef(null);
+
   const [communitys, setCommunitys] = useState([]);
   const [page, setPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(1); // 총 페이지 수 관리
+  const [isRemain, setIsRemain] = useState(true); // 총 페이지 수 관리
   const [searchText, setSearchText] = useState("");
   const [process, setProcess] = useState(false); // 데이터 요청 중 여부
   const [lastTimestamp, setLastTimestamp] = useState(null);
@@ -30,13 +41,11 @@ export default function Community() {
 
   const flatListRef = useRef(null); // FlatList의 ref 생성
 
-  // 초기 데이터 로드 및 상태 초기화
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     resetState();
-  //     getList(1, null, null); // 첫 페이지 데이터 가져오기
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      sheetRef.current?.collapse();
+    }, [sheetRef])
+  );
 
   // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
@@ -58,7 +67,7 @@ export default function Community() {
     // isForce true인 경우 강제 새로고침
     // 단, isForce true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
     if (isForce === false) {
-      if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
+      if (process || !hasMore) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
     }
     setProcess(true);
     setIsSearching(false);
@@ -72,7 +81,7 @@ export default function Community() {
       );
 
       const newData = response.data.data || [];
-      setTotalPage(response.data.total_pages); // 총 페이지 수 설정
+      setIsRemain(response.data.is_remain); // 총 페이지 수 설정
 
       if (newData.length === 0) {
         setHasMore(false); // 더 이상 데이터가 없을 때 hasMore를 false로 설정
@@ -120,7 +129,7 @@ export default function Community() {
   const appendNextData = async () => {
     const nextPage = page + 1;
 
-    if (process || !hasMore || nextPage > totalPage) return; // 중복 요청, 데이터 없음, 페이지 초과 방지
+    if (process || !hasMore || !isRemain) return; // 중복 요청, 데이터 없음, 페이지 초과 방지
 
     setPage(nextPage); // 페이지 증가
     await getList(nextPage, lastTimestamp, lastPostId); // 다음 페이지 데이터 요청
@@ -133,6 +142,7 @@ export default function Community() {
 
   // 키워드 변경시
   useEffect(() => {
+    sheetRef.current?.collapse();
     setIsSearching(true);
     debouncedSearch();
 
@@ -226,62 +236,105 @@ export default function Community() {
   }, [canRefresh, isRefreshing]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: mainColor }}>
-      {/* 검색창 */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="검색어"
-          value={searchText}
-          onChangeText={handleChangeText}
-          placeholderTextColor={"white"}
-        />
-      </View>
-      <View style={{ zIndex: 10 }}>
-        <AnimatedIcons
-          name="refresh"
-          size={28}
-          color="white"
-          style={{
-            position: "absolute",
-            alignSelf: "center",
-            // top: -10,
-            ...springs,
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: mainColor }}>
+        {/* 검색창 */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="검색어"
+            value={searchText}
+            onChangeText={handleChangeText}
+            placeholderTextColor={"white"}
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            sheetRef.current?.expand();
           }}
-        />
-      </View>
-
-      {/* 커뮤니티 리스트 */}
-      <AnimatedView style={{ ...springs2, flex: 1 }}>
-        <FlatList
-          ref={flatListRef}
-          style={{ backgroundColor: mainColor }}
-          data={communitys}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item, index }) => (
-            <List
-              item={item}
-              index={index}
-              count={communitys.length}
-              type="community"
+        >
+          <Text style={{ left: 10 }}>
+            <Ionicons
+              name="create"
+              size={30}
+              color="white"
             />
-          )}
-          contentContainerStyle={{ paddingTop: 20 }}
-          onEndReached={appendNextData}
-          onEndReachedThreshold={0.1} // 적절한 임계값 설정
-          onScroll={handleScroll}
-          onScrollBeginDrag={handleScrollStartDrag}
-          onScrollEndDrag={handleScrollEndDrag}
-          ListFooterComponent={
-            process || isSearching ? (
-              <SkeletonList />
+          </Text>
+        </TouchableOpacity>
+        <View style={{ zIndex: 10 }}>
+          <AnimatedIcons
+            name="refresh"
+            size={28}
+            color="white"
+            style={{
+              position: "absolute",
+              alignSelf: "center",
+              // top: -10,
+              ...springs,
+            }}
+          />
+        </View>
+
+        {/* 커뮤니티 리스트 */}
+        <AnimatedView style={{ ...springs2, flex: 1 }}>
+          <>
+            {communitys.length === 0 ? (
+              <>
+                {process || isSearching ? (
+                  <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
+                    <SkeletonList length={20} />
+                  </ScrollView>
+                ) : (
+                  <View>
+                    <Text style={{ color: "white" }}>찾는 결과 없음 ㅋ.</Text>
+                  </View>
+                )}
+              </>
             ) : (
-              <View style={{ marginBottom: 100 }} />
-            )
-          }
-        />
-      </AnimatedView>
-    </SafeAreaView>
+              <FlatList
+                ref={flatListRef}
+                style={{ backgroundColor: mainColor }}
+                data={communitys}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item, index }) => (
+                  <List
+                    item={item}
+                    index={index}
+                    count={communitys.length}
+                    type="community"
+                  />
+                )}
+                contentContainerStyle={{ paddingTop: 20 }}
+                onEndReached={appendNextData}
+                onEndReachedThreshold={0.1} // 적절한 임계값 설정
+                onScroll={handleScroll}
+                onScrollBeginDrag={handleScrollStartDrag}
+                onScrollEndDrag={handleScrollEndDrag}
+                ListFooterComponent={
+                  process || isSearching ? (
+                    <SkeletonList />
+                  ) : (
+                    <View style={{ marginBottom: 100 }} />
+                  )
+                }
+                refreshControl={
+                  Platform.OS === "android" ? (
+                    <RefreshControl
+                      refreshing={isRefreshing}
+                      onRefresh={() => {
+                        getList(1, null, null, true);
+                      }}
+                    />
+                  ) : null
+                }
+              />
+            )}
+          </>
+        </AnimatedView>
+        <BottomView sheetRef={sheetRef} />
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 

@@ -6,21 +6,25 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Modal,
   SafeAreaView,
   StatusBar,
 } from "react-native";
 import { mainColor } from "../../../../constants/Colors";
-import { Exp, Notification } from "../../../../components/tabs/home/index";
+import ModalView from "../../../../components/modal/ModalView";
 import _axios from "../../../../api";
+
+import { useTranslation } from 'react-i18next';
+import "../../../../i18n";
 
 export default function Home() {
   const router = useRouter();
+  const { t } = useTranslation();
+  
   const [currentDate, setCurrentDate] = useState(convertDate());
   const [currentTime, setCurrentTime] = useState(convertTime());
-  const [modalVisibleNotification, setModalVisibleNotification] =
-    useState(false);
-  const [modalVisibleRanking, setModalVisibleRanking] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,26 +38,17 @@ export default function Home() {
 
   function convertDate() {
     const date = new Date();
-    const week = {
-      0: "일",
-      1: "월",
-      2: "화",
-      3: "수",
-      4: "목",
-      5: "금",
-      6: "토",
-    };
-    return `${Number(date.getMonth() + 1)}월 ${date
+    return `${Number(date.getMonth() + 1)}${t("DateTime.month")} ${date
       .getDate()
       .toString()
-      .padStart(2, "0")}일 ${week[date.getDay()]}요일`;
+      .padStart(2, "0")}${t("DateTime.day")} ${t(`DateTime.week_${date.getDay().toString()}`)}`;
   }
   function convertTime() {
     const date = new Date();
-    return `${date.getHours().toString().padStart(2, "0")}시 ${date
+    return `${date.getHours().toString().padStart(2, "0")}${t("DateTime.hour")} ${date
       .getMinutes()
       .toString()
-      .padStart(2, "0")}분 ${date.getSeconds().toString().padStart(2, "0")}초`;
+      .padStart(2, "0")}${t("DateTime.minute")} ${date.getSeconds().toString().padStart(2, "0")}${t("DateTime.second")}`;
   }
 
   return (
@@ -72,58 +67,13 @@ export default function Home() {
         />
       </TouchableOpacity>
 
-      <Text style={styles.timeDate}>로고를 클릭하여 문제를 해결하세요!</Text>
+      <Text style={styles.timeDate}>{t("Function.main")}</Text>
 
-      {/* 알림 */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisibleNotification}
-        onRequestClose={() => setModalVisibleNotification(false)}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={[styles.timeDate, { color: mainColor, marginTop: 4 }]}>
-              알림
-            </Text>
-            <Notification />
-            <TouchableOpacity
-              disabled={false}
-              style={[
-                styles.buttonSmall,
-                { backgroundColor: false ? "gray" : mainColor },
-              ]}
-              onPress={() => setModalVisibleNotification(false)}
-            >
-              <Text style={styles.buttonTextSmall}>확인</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* 랭킹 */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisibleRanking}
-        onRequestClose={() => setModalVisibleRanking(false)}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Exp />
-            <TouchableOpacity
-              disabled={false}
-              style={[
-                styles.buttonSmall,
-                { backgroundColor: false ? "gray" : mainColor },
-              ]}
-              onPress={() => setModalVisibleRanking(false)}
-            >
-              <Text style={styles.buttonTextSmall}>확인</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <ModalView
+        type={modalType}
+        visible={modalVisible}
+        setVisible={setModalVisible}
+      />
 
       <Image
         source={require("../../../../assets/logotypo.png")}
@@ -135,7 +85,8 @@ export default function Home() {
       <TouchableOpacity
         style={styles.alarmLink}
         onPress={() => {
-          setModalVisibleNotification(true);
+          setModalType("notification");
+          setModalVisible(true);
         }}
       >
         <Image

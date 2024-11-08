@@ -4,15 +4,16 @@ export default function MeLayout() {
   return (
     <Stack
       initialRouteName="index"
-      screenOptions={{ headerShown: false }}>
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen
         name="index"
         options={{ title: "Me" }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="history"
         options={{ title: "히스토리" }}
-      />
+      /> */}
     </Stack>
   );
 }

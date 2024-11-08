@@ -11,6 +11,9 @@ import SyntaxHighlighter from "react-native-syntax-highlighter";
 import { mainColor } from "../../constants/Colors";
 import formatAuthor from "../../utils/formatAuthor";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 const CommentSection = ({
   ban,
   comment,
@@ -31,6 +34,7 @@ const CommentSection = ({
   editComment,
 }) => {
   const isReplying = selectedComment === comment.comment_id;
+  const { t } = useTranslation();
 
   return (
     <View
@@ -98,7 +102,7 @@ const CommentSection = ({
       </Text>
       {editing ? (
         <TextInput
-          placeholder="댓글을 입력하세요..."
+          placeholder={t("Function.empty_please")}
           placeholderTextColor={"black"}
           value={editComment}
           onChangeText={(text) => setEditComment(text)}
@@ -171,7 +175,7 @@ const CommentSection = ({
           onPress={() => handleReply(comment)}
         >
           <Text style={{ color: "#FFFFFF", fontSize: 12, fontWeight: "bold" }}>
-            답글 달기
+            {t("Function.reply")}
           </Text>
         </TouchableOpacity>
       )}
@@ -191,7 +195,7 @@ const CommentSection = ({
               paddingHorizontal: 10,
               backgroundColor: ban ? "#ccc" : "#fff",
             }}
-            placeholder={ban ? "운영정책 위반으로 이용제한이 적용되어 대댓글을 작성할 수 없습니다." : "대댓글을 입력하세요."}
+            placeholder={ban ? t("Function.forbidden") : t("Function.empty_please")}
             placeholderTextColor={"black"}
             value={replyComment}
             onChangeText={(text) => setReplyComment(text)}
@@ -209,7 +213,7 @@ const CommentSection = ({
             onPress={() => handleAddComment(true)}
             disabled={ban}
           >
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>댓글 작성</Text>
+            <Text style={{ color: "#fff", fontWeight: "bold" }}>{t("Function.regist")}</Text>
           </TouchableOpacity>
         </View>
       )}

@@ -3,9 +3,14 @@ import { Text, View, StyleSheet } from 'react-native';
 import { mainColor } from "../constants/Colors";
 import { useRouter } from "expo-router";
 
+import { useTranslation } from 'react-i18next';
+import "../i18n";
+
 export default function NotFoundScreen() {
   const router = useRouter();
   const [time, setTime] = useState(3);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,8 +24,8 @@ export default function NotFoundScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>404</Text>
-      <Text style={styles.subtitle}>잘못 오신 거 같은데...?</Text>
-      <Text style={styles.subsubtitle}>{time}초 후에 자동으로 이동합니다.</Text>
+      <Text style={styles.subtitle}>{t("Function.notpage")}</Text>
+      <Text style={styles.subsubtitle}>{`${time}${t("Function.notpagego")}`}</Text>
     </View>
   );
 }

@@ -6,11 +6,11 @@ import { animated, useSpring } from "react-spring";
 const boxColor = "#c0c0c0";
 const contentColor = "#d4d4d4";
 
-export default function SkeletonList() {
+export default function SkeletonList({ length = 10 }) {
   return (
     <>
       <View style={styles.container}>
-        {Array.from({ length: 20 }, (_, i) => i).map((i) => (
+        {Array.from({ length: length }, (_, i) => i).map((i) => (
           <Item
             key={i}
             index={i}

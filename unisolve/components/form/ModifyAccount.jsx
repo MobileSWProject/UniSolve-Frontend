@@ -5,7 +5,11 @@ import Input from "./Input";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 export default function Modify({ visible, setVisible, userData }) {
+  const { t } = useTranslation(); 
   const [user, setUser] = useState(userData);
 
   const [editing, setEditing] = useState(false);
@@ -33,16 +37,16 @@ export default function Modify({ visible, setVisible, userData }) {
 
   const CheckProcess = async (value) => {
     try {
-      snackBar("〽️ 잠시만 기다려주세요...");
+      snackBar(`${t("Stage.process")}${t("Function.waiting")}`);
       const response = await _axios.post("/accounts/existuser", value);
-      snackBar("✅ 확인되었습니다!");
+      snackBar(`${t("Stage.success")}${t("User.confirm_success")}`);
       const result = response.data.isNotExist || false;
-      if (!result) snackBar("❌ 잘못 입력했거나 이미 사용 중입니다.");
+      if (!result) snackBar(`${t("Stage.failed")}${t("User.confirm_failed")}`);
       if (value.user_id) setReIDCheck(result);
       else if (value.email) return result;
       else if (value.nickname) setNicknameCheck(result);
     } catch {
-      snackBar("❌ 문제가 발생했습니다!");
+      snackBar(`${t("Stage.failed")}${t("User.error")}`);
       if (type) return false;
       if (value.email) return false;
       if (value.nickname) setNicknameCheck(false);
@@ -51,22 +55,22 @@ export default function Modify({ visible, setVisible, userData }) {
 
   const EditProcess = async () => {
     if (editing || password.length <= 0 || !emailChecks || (newPassword.length > 0 && newPassword !== subPassword) || nickname.length <= 0) {
-      snackBar("❌ 일부 정보가 누락되었거나 확인되지 않은 항목이 있습니다.");
+      snackBar(`${t("Stage.failed")}${t("Function.empty_content")}`);
       return;
     }
     try {
       setEditing(true);
-      snackBar("〽️ 정보를 수정하고 있습니다...");
+      snackBar(`${t("Stage.process")}${t("Function.edit_account_process")}`);
       const response = await _axios.put("/accounts", {
         current_password: password,
         email: email,
         new_password: newPassword,
         user_nickname: nickname,
       })
-      if (response.data.updated === true) snackBar("✅ 계정 정보를 수정했습니다!");
-      else snackBar("❌ 계정 정보를 수정하지 못했습니다.");
+      if (response.data.updated === true) snackBar(`${t("Stage.success")}${t("Function.edit_account_success")}`);
+      else snackBar(`${t("Stage.failed")}${t("Function.edit_account_failed")}`);
     } catch {
-      snackBar("❌ 문제가 발생했습니다!");
+      snackBar(`${t("Stage.failed")}${t("User.error")}`);
     } finally {
       setTimeout(async () => {
         setVisible(false);
@@ -86,16 +90,16 @@ export default function Modify({ visible, setVisible, userData }) {
       if (emailProcess) return;
       setEmailProcess(true);
       const response = await CheckProcess({ email: email });
-      snackBar("〽️ 인증 번호를 발송하고 있습니다...");
+      snackBar(`${t("Stage.process")}${t("User.email_number_process")}`);
       if (response) {
         const responseTo = await _axios.post("/auth/send-code", { email: email });
         setEmailCheck(responseTo.data.isSent || false);
-        snackBar("✅ 인증 번호를 발송했습니다!");
+        snackBar(`${t("Stage.success")}${t("User.email_number_success")}`);
       }
       setEmailProcess(false);
     } catch {
       setEmailCheck(false);
-      snackBar("❌ 인증 번호를 발송하지 못했습니다.");
+      snackBar(`${t("Stage.failed")}${t("User.email_number_failed")}`);
       setEmailProcess(false);
     }
   };
@@ -103,14 +107,14 @@ export default function Modify({ visible, setVisible, userData }) {
   const CheckProcessEmailTo = async () => {
     try {
       if (emailProcessTo) return;
-      snackBar("〽️ 인증 번호를 확인하고 있습니다...");
+      snackBar(`${t("Stage.process")}${t("User.email_number_check")}`);
       setEmailProcessTo(true);
       const response = await _axios.post("/auth/verify-code", { email: email, code: emailConfirm });
-      snackBar("✅ 인증 번호가 확인되었습니다!");
+      snackBar(`${t("Stage.success")}${t("User.email_number_check_success")}`);
       setEmailChecks(response.data.isVerified || false);
       setEmailProcessTo(false);
     } catch {
-      snackBar("❌ 인증 번호가 잘못 입력되었습니다.");
+      snackBar(`${t("Stage.failed")}${t("User.email_number_check_failed")}`);
       setEmailChecks(false);
       setEmailProcessTo(false);
     }
@@ -126,7 +130,7 @@ export default function Modify({ visible, setVisible, userData }) {
     );
     if (type === true) return regEx && newPassword === subPassword;
     else if (type === false) return regEx;
-    return !regEx ? "규칙이 잘못됨" : newPassword === subPassword ? "일치함" : "일치하지 않음";
+    return !regEx ? t("User.regular_check_failed") : newPassword === subPassword ? t("User.password_confirm_success") : t("User.password_confirm_failed");
   };
 
   const inputPW = (text) => {
@@ -155,11 +159,11 @@ export default function Modify({ visible, setVisible, userData }) {
         onDismiss={() => setSnackbarVisible(false)}
       />
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
-        계정 정보 수정
+        {t("User.edit")}
       </Text>
       <Input
-        title="이메일"
-        subTitle={emailCheck && emailChecks ? "인증 완료" : "인증 필요"}
+        title={t("User.email")}
+        subTitle={emailCheck && emailChecks ? t("User.email_confirm_success") : t("User.email_confirm_failed")}
         subTitleConfirm={emailCheck && emailChecks}
         content={email}
         onChangeText={(text) => inputEmail(text)}
@@ -170,8 +174,8 @@ export default function Modify({ visible, setVisible, userData }) {
       {
         !(user.email === email) && emailCheck ?
           <Input
-            title="인증번호"
-            subTitle={emailCheck && emailChecks ? "인증 완료" : "인증 필요"}
+            title={t("User.email_number")}
+            subTitle={emailCheck && emailChecks ? t("User.email_confirm_success") : t("User.email_confirm_failed")}
             subTitleConfirm={emailCheck && emailChecks}
             content={emailConfirm}
             maxLength={8}
@@ -183,8 +187,8 @@ export default function Modify({ visible, setVisible, userData }) {
           : null
       }
       <Input
-        title="비밀번호"
-        placeholder="변경할 비밀번호를 입력하세요."
+        title={t("User.passowrd")}
+        placeholder={t("User.password_modify_please")}
         subTitle={confirmPW()}
         subTitleConfirm={confirmPW(true)}
         content={newPassword}
@@ -194,8 +198,8 @@ export default function Modify({ visible, setVisible, userData }) {
       />
       {confirmPW(false) ?
         <Input
-          title="비밀번호 확인"
-          placeholder="변경할 비밀번호를 다시 한번 입력하세요."
+          title={t("User.password_confirm")}
+          placeholder={t("User.password_modify_confirm_please")}
           subTitle={confirmPW()}
           subTitleConfirm={confirmPW(true)}
           content={subPassword}
@@ -205,8 +209,8 @@ export default function Modify({ visible, setVisible, userData }) {
         />
         : null}
       <Input
-        title="닉네임"
-        subTitle={nicknameCheck ? "확인 완료" : "중복 확인 필요"}
+        title={t("User.nickname")}
+        subTitle={nicknameCheck ? t("User.confirm_please_success") : t("User.confirm_please")}
         subTitleConfirm={nicknameCheck}
         content={nickname}
         onChangeText={(text) => inputNickname(text)}
@@ -215,7 +219,7 @@ export default function Modify({ visible, setVisible, userData }) {
         disabled={editing}
       />
       <Input
-        title="현재 비밀번호"
+        title={t("User.current_password")}
         content={password}
         onChangeText={(text) => setPassword(text)}
         secure={true}
@@ -225,7 +229,7 @@ export default function Modify({ visible, setVisible, userData }) {
         visible={visible}
         setVisible={setVisible}
         onPress={() => { EditProcess(); }}
-        content="수정하기"
+        content={t("User.edit_go")}
         cancel={editing}
         disabled={editing}
       />

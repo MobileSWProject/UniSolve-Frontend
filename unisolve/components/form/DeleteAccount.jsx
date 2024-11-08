@@ -7,8 +7,12 @@ import Input from "./Input";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 export default function Delete({ visible, setVisible }) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [deleting, setDeleting] = useState(false);
   const [password, setPassword] = useState("");
@@ -24,14 +28,14 @@ export default function Delete({ visible, setVisible }) {
   const DeletedProcess = async () => {
     try {
       if (deleting || !password) {
-        snackBar("❌ 일부 정보가 누락되었거나 확인되지 않은 항목이 있습니다.");
+        snackBar(`${t("Stage.failed")}${t("Function.empty_content")}`);
         return;
       }  
       setDeleting(true);
-      snackBar("〽️ 계정 탈퇴 처리 중입니다...");
+      snackBar(`${t("Stage.process")}${t("User.delete_process")}`);
       const response = await _axios.delete("/accounts", { data: { password } })
       if (response.data.deleted === true) {
-        snackBar("✅ 회원 계정 탈퇴 처리가 완료되었습니다!");
+        snackBar(`${t("Stage.success")}${t("User.delete_success")}`);
         setTimeout(async () => {
           setVisible(false);
           await AsyncStorage.clear();
@@ -40,7 +44,7 @@ export default function Delete({ visible, setVisible }) {
         }, 2000);
       }
     } catch {
-      snackBar("❌ 회원 계정 탈퇴에 실패하였습니다.");
+      snackBar(`${t("Stage.failed")}${t("User.delete_failed")}`);
       setTimeout(async () => {
         setDeleting(false);
         setVisible(false);
@@ -56,13 +60,13 @@ export default function Delete({ visible, setVisible }) {
         onDismiss={() => setSnackbarVisible(false)}
       />
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
-        회원 계정 탈퇴
+        {t("User.delete")}
       </Text>
       <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>
-        정말로 해당 계정을 탈퇴 처리하시겠습니까?{"\n"}이 작업은 되돌릴 수 없습니다.
+        {t("User.delete_notice")}
       </Text>
       <Input
-        title="현재 비밀번호"
+        title={t("User.current_password")}
         content={password}
         onChangeText={(text) => setPassword(text)}
         secure={true}
@@ -72,7 +76,7 @@ export default function Delete({ visible, setVisible }) {
         setVisible={setVisible}
         onPress={() => { DeletedProcess(); }}
         type="delete"
-        content="탈퇴하기"
+        content={t("User.delete_go")}
         cancel={deleting}
         disabled={deleting}
       />

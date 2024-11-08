@@ -6,19 +6,16 @@ import { useRouter } from "expo-router";
 import formatAuthor from "../../../utils/formatAuthor";
 import _axios from "../../../api";
 
+import { useTranslation } from 'react-i18next';
+import "../../../i18n";
+
 export default function PostListItem({ item, index, count, type }) {
-  const typeConvert = {
-    0: "시스템 알림",
-    1: "새로운 질문",
-    2: "새로운 답변",
-    3: "새로운 댓글",
-    4: "새로운 대댓글",
-  };
+  const { t } = useTranslation();
   const router = useRouter();
 
   const updateNotification = async (id) => {
     try {
-      const response = await _axios.put(`/notifications/${id}`, {
+      await _axios.put(`/notifications/${id}`, {
         is_read: true,
       });
     } catch (error) {}
@@ -58,9 +55,9 @@ export default function PostListItem({ item, index, count, type }) {
                 item.author_nickname || `${item.questioner}_temp_nickname`
               )}`
             : type === "history"
-            ? `#${item.id} | ${item.private ? "비공개" : "공개"}`
+            ? `#${item.id} | ${item.private ? t("Function.private") : t("Function.public")}`
             : type === "notification"
-            ? typeConvert[item.type]
+            ? t(`Function.notification_${item.type}`)
             : null}
         </Text>
         <Text>

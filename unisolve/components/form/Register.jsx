@@ -7,7 +7,11 @@ import Input from "./Input";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
 
+import { useTranslation } from 'react-i18next';
+import "../../i18n";
+
 export default function Register({ visible, setVisible }) {
+  const { t } = useTranslation();
   const [effect, setEffect] = useState(false);
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
@@ -40,18 +44,18 @@ export default function Register({ visible, setVisible }) {
 
   const CheckProcess = async (value, type) => {
     try {
-      snackBar("〽️ 잠시만 기다려주세요...");
+      snackBar(`${t("Stage.process")}${t("Function.waiting")}`);
       const response = await _axios.post("/accounts/existuser", value);
       const result = response.data.isNotExist || false;
       if (type) return result === false ? true : false;
       else {
-        if (!result) snackBar("❌ 잘못 입력했거나 이미 사용 중입니다.");
+        if (!result) snackBar(`${t("Stage.failed")}${t("User.confirm_failed")}`);
         if (value.user_id) setReIDCheck(result);
         else if (value.email) return result;
         else if (value.nickname) setReNicknameCheck(result);
       }
     } catch {
-      snackBar("❌ 문제가 발생했습니다!");
+      snackBar(`${t("Stage.failed")}${t("User.error")}`);
       if (type) return false;
       if (value.user_id) setReIDCheck(false);
       if (value.email) return false;
@@ -70,31 +74,31 @@ export default function Register({ visible, setVisible }) {
       setReEmailProcess(true);
       const response = await CheckProcess({ email: reEmail });
       if (response) {
-        snackBar("〽️ 인증번호를 발송하고 있습니다...");
+        snackBar(`${t("Stage.process")}${t("User.email_number_process")}`);
         const responseTo = await _axios.post("/auth/send-code", {
           email: reEmail,
         });
         setReEmailCheck(responseTo.data.isSent || false);
         setReEmailProcess(false);
-        snackBar("✅ 인증번호를 발송했습니다!");
+        snackBar(`${t("Stage.success")}${t("User.email_number_success")}`);
       }
     } catch {
       setReEmailCheck(false);
       setReEmailProcess(false);
-      snackBar("❌ 인증번호를 발송하지 못했습니다.");
+      snackBar(`${t("Stage.failed")}${t("User.email_number_failed")}`);
     }
   };
 
   const CheckProcessEmailTo = async () => {
     try {
-      snackBar("〽️ 인증번호를 확인하고 있습니다...");
+      snackBar(`${t("Stage.process")}${t("User.email_number_check")}`);
       const response = await _axios.post("/auth/verify-code", {
         email: reEmail,
         code: reEmailTo,
       });
       setReEmailCheckTo(response.data.isVerified || false);
     } catch {
-      snackBar("❌ 인증번호가 잘못 입력되었습니다.");
+      snackBar(`${t("Stage.failed")}${t("User.email_number_check_failed")}`);
       setReEmailCheckTo(false);
     }
   };
@@ -107,13 +111,13 @@ export default function Register({ visible, setVisible }) {
   const confirmID = (type) => {
     const regEx = /^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{4,}$/.test(reID);
     if (type === true) return regEx;
-    return !regEx ? "규칙이 잘못됨" : reIDCheck ? "확인 완료" : "중복 확인 필요" };
+    return !regEx ? t("User.regular_check_failed") : reIDCheck ? t("User.confirm_please_success") : t("User.confirm_please") };
 
   const confirmPW = (type) => {
     const regEx = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W])[a-zA-Z0-9\W]{8,}$/.test(rePw);
     if (type === true) return regEx && rePw === rePwTo;
     else if (type === false) return regEx;
-    return !regEx ? "규칙이 잘못됨" : rePw === rePwTo ? "일치함" : "일치하지 않음";
+    return !regEx ? t("User.regular_check_failed") : rePw === rePwTo ? t("User.password_confirm_success") : t("User.password_confirm_failed");
   };
 
   const confirmEmail = () => {
@@ -152,11 +156,11 @@ export default function Register({ visible, setVisible }) {
         rePw !== rePwTo ||
         reNickname.length <= 0
       ) {
-        snackBar("❌ 정보가 누락되었거나 확인되지 않은 항목이 있습니다.");
+        snackBar(`${t("Stage.failed")}${t("User.empty_content")}`);
         return;
       }
       setReProcess(true);
-      snackBar("〽️ 회원 가입 처리 중입니다...");
+      snackBar(`${t("Stage.process")}${t("User.regist_process")}`);
       const response = await _axios.post("/auth/register", {
         user_id: reID,
         username: reName,
@@ -166,14 +170,14 @@ export default function Register({ visible, setVisible }) {
         school: reSchool,
       });
       if (response.data.status === "success") {
-        snackBar("✅ 회원 가입이 완료되었습니다!\n로그인이 필요합니다.");
+        snackBar(`${t("Stage.success")}${t("User.regist_success")}`);
         setTimeout(() => {
           setVisible(false);
           setReProcess(false);
         }, 2000);
       }
     } catch {
-      snackBar("❌ 회원 가입에 실패했습니다.\n잠시 후 다시 시도해 주세요.");
+      snackBar(`${t("Stage.failed")}${t("User.regist_failed")}`);
       setReProcess(false);
     }
   };
@@ -196,10 +200,10 @@ export default function Register({ visible, setVisible }) {
         onDismiss={() => setSnackbarVisible(false)}
       />
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
-        회원가입
+        {t("User.regist")}
       </Text>
       <Input
-        title="아이디"
+        title={t("User.regist")}
         subTitle={confirmID()}
         subTitleConfirm={reIDCheck}
         content={reID}
@@ -208,13 +212,13 @@ export default function Register({ visible, setVisible }) {
         buttonOnPress={() => { if (confirmID(true)) CheckProcess({ user_id: reID }); }}
       />
       <Input 
-        title="이름"
+        title={t("User.name")}
         content={reName}
         onChangeText={setReName}
       />
       <Input
-        title="이메일"
-        subTitle={reEmailCheck && reEmailCheckTo ? "인증 완료" : "인증 필요"}
+        title={t("User.email")}
+        subTitle={reEmailCheck && reEmailCheckTo ? t("User.email_confirm_success") : t("User.email_confirm_failed")}
         subTitleConfirm={reEmailCheck && reEmailCheckTo}
         content={reEmail}
         onChangeText={(text) => inputEmail(text)}
@@ -224,8 +228,8 @@ export default function Register({ visible, setVisible }) {
       {
         reEmailCheck ?
         <Input
-          title="인증번호"
-          subTitle={reEmailCheck && reEmailCheckTo ? "인증 완료" : "인증 필요"}
+          title={t("User.email_number")}
+          subTitle={reEmailCheck && reEmailCheckTo ? t("User.email_confirm_success") : t("User.email_confirm_failed")}
           subTitleConfirm={reEmailCheck && reEmailCheckTo}
           content={reEmailTo}
           disabled={reEmailCheckTo}
@@ -237,7 +241,7 @@ export default function Register({ visible, setVisible }) {
         null
       }
       <Input
-        title="비밀번호"
+        title={t("User.password")}
         subTitle={confirmPW()}
         subTitleConfirm={confirmPW(true)}
         content={rePw}
@@ -247,8 +251,8 @@ export default function Register({ visible, setVisible }) {
       {
         confirmPW(false) ?
         <Input
-          title="비밀번호 확인"
-          placeholder="비밀번호를 다시 한번 입력하세요."
+          title={t("User.password_confirm")}
+          placeholder={t("User.password_confirm_please")}
           subTitle={confirmPW()}
           subTitleConfirm={confirmPW(true)}
           content={rePwTo}
@@ -258,8 +262,8 @@ export default function Register({ visible, setVisible }) {
         null
       }
       <Input
-        title="닉네임"
-        subTitle={reNicknameCheck ? "확인 완료" : "중복 확인 필요"}
+        title={t("User.nickname")}
+        subTitle={reNicknameCheck ? t("User.confirm_please_success") : t("User.confirm_please")}
         subTitleConfirm={reNicknameCheck}
         content={reNickname}
         onChangeText={(text) => inputReNickname(text)}
@@ -267,8 +271,8 @@ export default function Register({ visible, setVisible }) {
         buttonOnPress={() => CheckProcess({ nickname: reNickname })}
       />
       <Input
-        title="소속"
-        placeholder="본인의 소속을 입력 후 선택하세요."
+        title={t("User.school")}
+        placeholder={t("User.school_confirm")}
         content={reSchool}
         onChangeText={(text) => setReSchool(text)}
       />

@@ -7,7 +7,6 @@ import {
 } from "expo-router";
 import {
   Image,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -28,7 +27,11 @@ import { mainColor } from "../../../../constants/Colors";
 import { Snackbar, Provider as PaperProvider } from "react-native-paper";
 import CommentSection from "../../../../components/post/CommentSection";
 
+import { useTranslation } from 'react-i18next';
+import "../../../../i18n";
+
 const Post = () => {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const [data, setData] = useState(null);
 
@@ -161,7 +164,7 @@ const Post = () => {
         }));
       }
       setSnackbarVisible(true);
-      setSnackbarMessage("댓글이 수정되었습니다!");
+      setSnackbarMessage(t("Function.edit"));
     } catch (error) {
       // "something error 😭"
       console.log("Something Error 😭");
@@ -182,13 +185,13 @@ const Post = () => {
       setCommentID(null);
       if (response.data.status === "success") {
         setReportReason("");
-        setSnackbarMessage("신고가 접수되었습니다!");
+        setSnackbarMessage(t("Function.report_success"));
         setSnackbarVisible(true);
       }
     } catch (error) {
       setProcess(false);
       setModalVisible(false);
-      setSnackbarMessage("신고가 접수되지 않았습니다!");
+      setSnackbarMessage(t("Function.report_failed"));
       setSnackbarVisible(true);
     }
   };
@@ -237,7 +240,7 @@ const Post = () => {
           commentsCount: updatedPost.data.comments_count,
         }));
       }
-      setSnackbarMessage("게시글이 수정되었습니다!");
+      setSnackbarMessage(t("Function.edit"));
       setSnackbarVisible(true);
       setProcess(false);
     } catch (error) {
@@ -309,7 +312,7 @@ const Post = () => {
             style={styles.privateStatusIcon}
           />
           <Text style={styles.privateStatusText}>
-            {data.private ? "비공개" : "공개"}
+            {data.private ? t("Function.private") : t("Function.public")}
           </Text>
         </View>
         <Text style={styles.userInfo}>
@@ -325,7 +328,7 @@ const Post = () => {
           style={styles.chatButtonTouchArea}
           hitSlop={4}
         >
-          <Text style={styles.chatButtonText}>비공개 채팅</Text>
+          <Text style={styles.chatButtonText}>{t("Function.chat")}</Text>
         </TouchableOpacity>
       </View>
 
@@ -333,7 +336,7 @@ const Post = () => {
       <View style={styles.commentInputContainer}>
         <TextInput
           style={[styles.commentInput, {backgroundColor: ban ? "#ccc" : "#fff"}]}
-          placeholder={ban ? "운영정책 위반으로 이용제한이 적용되어 댓글을 작성할 수 없습니다." : "댓글을 입력하세요."}
+          placeholder={ban ? t("Function.forbidden") : t("Function.input_content")}
           placeholderTextColor={"black"}
           value={newComment}
           onChangeText={(text) => setNewComment(text)}
@@ -345,13 +348,13 @@ const Post = () => {
           onPress={() => handleAddComment(false)}
           disabled={ban}
         >
-          <Text style={styles.commentButtonText}>댓글 작성</Text>
+          <Text style={styles.commentButtonText}>{t("Function.regist")}</Text>
         </TouchableOpacity>
       </View>
 
       {/* 댓글 렌더링 */}
       <View style={styles.commentContainer}>
-        <Text style={styles.commentTitle}>댓글 {data.commentsCount}개</Text>
+        <Text style={styles.commentTitle}>{t("Function.comment")} {data.commentsCount}{t("Function.count")}</Text>
         {data.comments.map((comment, index) => (
           <CommentSection
             ban={ban}
@@ -396,14 +399,14 @@ const Post = () => {
                 <>
                   <TextInput
                     style={styles.commentInput}
-                    placeholder="제목"
+                    placeholder={t("Function.title")}
                     value={editTitle}
                     onChangeText={(text) => setEditTitle(text)}
                     multiline={true}
                   />
                   <TextInput
                     style={styles.commentInput}
-                    placeholder="내용"
+                    placeholder={t("Function.content")}
                     value={editContent}
                     onChangeText={(text) => setEditContent(text)}
                     multiline={true}
@@ -412,7 +415,7 @@ const Post = () => {
               ) : (
                 <TextInput
                   style={styles.commentInput}
-                  placeholder="신고 내용을 입력하세요..."
+                  placeholder={t("Function.input_content")}
                   value={reportReason}
                   onChangeText={(text) => setReportReason(text)}
                   multiline={true}
@@ -431,7 +434,7 @@ const Post = () => {
                   setEditContent("");
                 }}
               >
-                <Text style={styles.buttonTextSmall}>취소</Text>
+                <Text style={styles.buttonTextSmall}>{t("Function.cancel")}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 disabled={false}
@@ -444,7 +447,7 @@ const Post = () => {
                 }}
               >
                 <Text style={styles.buttonTextSmall}>
-                  {editPost ? "수정하기" : "신고하기"}
+                  {editPost ? t("Function.btn_edit") : t("Function.btn_report")}
                 </Text>
               </TouchableOpacity>
             </View>
