@@ -3,14 +3,19 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { mainColor } from "../../../../constants/Colors";
 import { ProgressBar } from "react-native-paper";
-import { getExpToLevel, getPercent, getLevel } from "../../../../components/tabs/me/index";
+// import { getExpToLevel, getPercent, getLevel } from "../../../../components/tabs/me/index";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModalView from "../../../../components/modal/ModalView";
 import SnackBar from "../../../../components/Snackbar";
 import _axios from "../../../../api";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import "../../../../i18n";
+import {
+  getExpToLevel,
+  getLevel,
+  getPercent,
+} from "../../../../utils/expUtils";
 
 export default function MePage() {
   const router = useRouter();
@@ -67,7 +72,7 @@ export default function MePage() {
     require(`../../../../assets/icons/lv7.png`),
     require(`../../../../assets/icons/lv8.png`),
     require(`../../../../assets/icons/lv9.png`),
-  ]
+  ];
 
   return (
     <View style={styles.container}>
@@ -89,13 +94,32 @@ export default function MePage() {
           <Text style={styles.phoneNumber}>
             {user.school || t("User.school")}
           </Text>
-          <Text style={[styles.phoneNumber, { marginBottom: 15, fontSize: 18, fontWeight: "bold", color: "#fff" }]}>
-            {getExpToLevel(getLevel(exp))}
+          <Text
+            style={[
+              styles.phoneNumber,
+              {
+                marginBottom: 15,
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#fff",
+              },
+            ]}
+          >
+            {getExpToLevel(t, getLevel(exp))}
           </Text>
           <View style={styles.experienceContainer}>
-            {getPercent(exp) < 100 ?
-              <Text style={[styles.experienceText, { color: getPercent(exp) <= 33 ? mainColor : "#000" }]}>{getPercent(exp)}%</Text> :
-              <></>}
+            {getPercent(exp) < 100 ? (
+              <Text
+                style={[
+                  styles.experienceText,
+                  { color: getPercent(exp) <= 33 ? mainColor : "#000" },
+                ]}
+              >
+                {getPercent(exp)}%
+              </Text>
+            ) : (
+              <></>
+            )}
             <ProgressBar
               styleAttr="Horizontal"
               indeterminate={false}
@@ -107,7 +131,9 @@ export default function MePage() {
         </View>
       </View>
 
-      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>{t("Menu.account")}</Text>
+      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>
+        {t("Menu.account")}
+      </Text>
       <TouchableOpacity
         onPress={() => {
           setModalType("modify");
@@ -120,7 +146,8 @@ export default function MePage() {
         onPress={() => {
           setModalType("sanction");
           setModalVisible(true);
-        }}>
+        }}
+      >
         <Text style={styles.buttonText}>{t("User.sanction")}</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -131,42 +158,57 @@ export default function MePage() {
       >
         <Text style={styles.buttonText}>{t("Function.history")}</Text>
       </TouchableOpacity>
-      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>{t("Menu.settings")}</Text>
-      <TouchableOpacity onPress={() => { }}>
-        <Text style={styles.buttonText}>{true ? t("Menu.darkmode") : t("Menu.lightmode")}</Text>
+      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>
+        {t("Menu.settings")}
+      </Text>
+      <TouchableOpacity onPress={() => {}}>
+        <Text style={styles.buttonText}>
+          {true ? t("Menu.darkmode") : t("Menu.lightmode")}
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
           if (i18n.language === "ko") {
             i18n.changeLanguage("en");
-            snackBar(`${t("Stage.success")} ${t("Menu.en")}${t("Function.convert")}`);
+            snackBar(
+              `${t("Stage.success")} ${t("Menu.en")}${t("Function.convert")}`
+            );
           } else {
-            i18n.changeLanguage("ko")
-            snackBar(`${t("Stage.success")} ${t("Menu.ko")}${t("Function.convert")}`);
+            i18n.changeLanguage("ko");
+            snackBar(
+              `${t("Stage.success")} ${t("Menu.ko")}${t("Function.convert")}`
+            );
           }
-        }}>
-        <Text style={styles.buttonText}>{`${t("Menu.lang")}(${t(i18n.language === "ko" ? "Menu.ko" : "Menu.en")})`}</Text>
+        }}
+      >
+        <Text style={styles.buttonText}>{`${t("Menu.lang")}(${t(
+          i18n.language === "ko" ? "Menu.ko" : "Menu.en"
+        )})`}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
+      <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.notification")}</Text>
       </TouchableOpacity>
-      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>{t("Menu.use")}</Text>
-      <TouchableOpacity onPress={() => { }}>
+      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>
+        {t("Menu.use")}
+      </Text>
+      <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.version")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
+      <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.support")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
+      <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.notice")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
+      <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.operation")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { }}>
+      <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.privacy")}</Text>
       </TouchableOpacity>
-      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>기타</Text>
+      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>
+        기타
+      </Text>
       <TouchableOpacity
         onPress={() => {
           setModalType("delete");
@@ -175,10 +217,12 @@ export default function MePage() {
       >
         <Text style={styles.buttonText}>{t("User.delete")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={async () => {
-        await AsyncStorage.removeItem("token");
-        router.replace("/");
-      }}>
+      <TouchableOpacity
+        onPress={async () => {
+          await AsyncStorage.removeItem("token");
+          router.replace("/");
+        }}
+      >
         <Text style={styles.buttonText}>{t("User.logout")}</Text>
       </TouchableOpacity>
       {modalVisible ? (
