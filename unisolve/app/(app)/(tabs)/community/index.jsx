@@ -14,46 +14,61 @@ import useScrollRefresh from "../../../../hooks/useScrollRefresh";
 import { animated, useSpring } from "react-spring";
 import Icons from "@expo/vector-icons/MaterialIcons";
 import { mainColor } from "../../../../constants/Colors";
+import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
+import { debounce } from "lodash";
 
 export default function Community() {
   const [communitys, setCommunitys] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1); // 총 페이지 수 관리
   const [searchText, setSearchText] = useState("");
-  const [filteredCommunitys, setFilteredCommunitys] = useState([]);
   const [process, setProcess] = useState(false); // 데이터 요청 중 여부
   const [lastTimestamp, setLastTimestamp] = useState(null);
   const [lastPostId, setLastPostId] = useState(null);
   const [hasMore, setHasMore] = useState(true); // 더 가져올 데이터가 있는지 여부
+  const [isSearching, setIsSearching] = useState(false);
+
+  const flatListRef = useRef(null); // FlatList의 ref 생성
 
   // 초기 데이터 로드 및 상태 초기화
-  useFocusEffect(
-    useCallback(() => {
-      resetState();
-      getList(1, null, null); // 첫 페이지 데이터 가져오기
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     resetState();
+  //     getList(1, null, null); // 첫 페이지 데이터 가져오기
+  //   }, [])
+  // );
 
-  const resetState = () => {
-    setPage(1);
-    setTotalPage(1); // 초기화할 때 총 페이지 수도 초기화
-    setCommunitys([]);
-    setFilteredCommunitys([]);
-    setLastTimestamp(null);
-    setLastPostId(null);
-    setHasMore(true); // 데이터가 더 있다고 초기화
-  };
+  // 초기 데이터 로드 및 상태 초기화
+  useEffect(() => {
+    // resetState();
+    getList(1, null, null); // 첫 페이지 데이터 가져오기
+  }, []);
+
+  // const resetState = () => {
+  //   setPage(1);
+  //   setTotalPage(1); // 초기화할 때 총 페이지 수도 초기화
+  //   setCommunitys([]);
+  //   setLastTimestamp(null);
+  //   setLastPostId(null);
+  //   setHasMore(true); // 데이터가 더 있다고 초기화
+  // };
 
   // 서버에서 데이터 가져오기
-  const getList = async (tempPage, timestamp, postId) => {
-    if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
+  const getList = async (tempPage, timestamp, postId, isForce = false) => {
+    // isForce true인 경우 강제 새로고침
+    // 단, isForce true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
+    if (isForce === false) {
+      if (process || !hasMore || tempPage > totalPage) return; // 중복 요청, 페이지 초과, 더 이상 데이터가 없을 경우 중단
+    }
     setProcess(true);
+    setIsSearching(false);
 
     try {
+      // console.log(searchText);
       const response = await _axios.get(
         `/posts?page=${tempPage}&last_timestamp=${
           timestamp || ""
-        }&last_post_id=${postId || ""}`
+        }&last_post_id=${postId || ""}&search=${searchText}`
       );
 
       const newData = response.data.data || [];
@@ -66,16 +81,9 @@ export default function Community() {
       // 첫 페이지라면 데이터 초기화
       if (tempPage === 1) {
         setCommunitys(newData);
-        setFilteredCommunitys(newData);
       } else {
         // 중복 데이터 없이 추가
         setCommunitys((prev) => [
-          ...prev,
-          ...newData.filter(
-            (item) => !prev.some((prevItem) => prevItem.id === item.id)
-          ),
-        ]);
-        setFilteredCommunitys((prev) => [
           ...prev,
           ...newData.filter(
             (item) => !prev.some((prevItem) => prevItem.id === item.id)
@@ -88,8 +96,18 @@ export default function Community() {
       if (lastItem) {
         setLastTimestamp(lastItem.timestamp);
         setLastPostId(lastItem.id);
+        setHasMore(true);
       } else {
         setHasMore(false); // 새로운 데이터가 없으면 더 이상 요청하지 않음
+      }
+
+      // isForce: 위로 스크롤로 인한 새로고침 이거나 검색으로 인한 새로고침이면
+      if (isForce) {
+        setPage(1);
+        // 스크롤을 가장 위로 올리기
+        if (flatListRef.current) {
+          flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+        }
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -108,18 +126,37 @@ export default function Community() {
     await getList(nextPage, lastTimestamp, lastPostId); // 다음 페이지 데이터 요청
   };
 
+  // 0.5초 debounce
+  const debouncedSearch = debounce(() => {
+    getList(1, null, null, true);
+  }, 500);
+
+  // 키워드 변경시
+  useEffect(() => {
+    setIsSearching(true);
+    debouncedSearch();
+
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [searchText]);
+
+  // 검색 키워드 입력 중일 때 로딩 표시
+  useEffect(() => {
+    if (isSearching) {
+      setCommunitys([]);
+    }
+  }, [isSearching]);
+
   // 검색 기능
-  const handleSearch = (text) => {
-    setSearchText(text);
-    const filtered = communitys.filter((item) =>
-      item.title.toLowerCase().includes(text.toLowerCase())
-    );
-    setFilteredCommunitys(filtered);
+  const handleChangeText = (text) => {
+    setSearchText(text.trim());
   };
 
   const getRefreshData = async () => {
-    await getList(1, null, null); // 첫 페이지 데이터 가져오기
-    setPage(1);
+    // 명시적으로 기다리게 하기 => 새로고침 되도록 느끼도록
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    await getList(1, null, null, true); // 첫 페이지 데이터 가져오기
   };
 
   // 새로고침
@@ -196,7 +233,7 @@ export default function Community() {
           style={styles.searchInput}
           placeholder="검색어"
           value={searchText}
-          onChangeText={handleSearch}
+          onChangeText={handleChangeText}
           placeholderTextColor={"white"}
         />
       </View>
@@ -217,14 +254,15 @@ export default function Community() {
       {/* 커뮤니티 리스트 */}
       <AnimatedView style={{ ...springs2, flex: 1 }}>
         <FlatList
+          ref={flatListRef}
           style={{ backgroundColor: mainColor }}
-          data={filteredCommunitys}
+          data={communitys}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item, index }) => (
             <List
               item={item}
               index={index}
-              count={filteredCommunitys.length}
+              count={communitys.length}
               type="community"
             />
           )}
@@ -235,11 +273,8 @@ export default function Community() {
           onScrollBeginDrag={handleScrollStartDrag}
           onScrollEndDrag={handleScrollEndDrag}
           ListFooterComponent={
-            process ? (
-              <ActivityIndicator
-                size="large"
-                color="#0000ff"
-              />
+            process || isSearching ? (
+              <SkeletonList />
             ) : (
               <View style={{ marginBottom: 100 }} />
             )
