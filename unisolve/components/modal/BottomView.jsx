@@ -36,7 +36,13 @@ export default function BottomView({
           color="black"
         />
       </TouchableOpacity>
-      <BottomSheetView style={{ flex: 1, marginTop: 35, marginBottom: 75 }}>
+      <BottomSheetView
+        style={{
+          flex: 1,
+          marginTop: 35,
+          marginBottom: 75,
+        }}
+      >
         {mode === "create" ? (
           <PostCreate snackBar={snackBar} />
         ) : mode === "post" ? (

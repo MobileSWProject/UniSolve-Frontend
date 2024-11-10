@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import ChatMessage from "./ChatMessage";
 import { io } from "socket.io-client";
 import _axios from "../../api";
@@ -8,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import "../../i18n";
 import useUserId from "../../hooks/useUserId";
 import Input from "../../components/form/Input";
+import { animated } from "react-spring";
 
 export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const { t } = useTranslation();
@@ -21,7 +29,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
 
   const scrollToBottom = () => {
     if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({ animated: true });
+      flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
     }
   };
 
@@ -30,7 +38,8 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       const response = await _axios.get(`/chat/messages?post_id=${post}`);
       if (response.data && response.data.data) {
         setBan(response.data.ban || false);
-        setChatData(response.data.data);
+        setChatData(response.data.data.reverse());
+        scrollToBottom();
       }
     } catch (error) {
       console.error("Failed to load existing messages:", error);
@@ -71,14 +80,14 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
         setChatData((prevData) => {
           const updatedData = [...prevData];
           if (updatedData.length > 0) {
-            updatedData[updatedData.length - 1] = {
-              ...updatedData[updatedData.length - 1],
+            updatedData[0] = {
+              ...updatedData[0],
               sent_at: checkDate(data.sent_at) || "",
             };
           }
-          if (!(updatedData[updatedData.length - 1].content === data.content)) { 
+          if (!(updatedData[0].content === data.content)) {
             const isMe = data.sender === userId;
-            updatedData.push({ ...data, is_me: isMe });
+            updatedData.unshift({ ...data, is_me: isMe });
           }
           return updatedData;
         });
@@ -117,7 +126,8 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   async function msgSend() {
     if (!message || message.length <= 0) return;
     setMessage("");
-    chatData.push({
+    scrollToBottom();
+    chatData.unshift({
       content: message,
       is_me: true,
       sent_at: t("Function.sending"),
@@ -144,18 +154,24 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.container}
-        onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
+        // onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
+        inverted
       />
       <View style={styles.inputContainer}>
-        <Input
+        <TextInput
+          style={styles.textInput}
           placeholder={
             ban ? t("Function.forbidden") : t("Function.input_content")
           }
-          content={message}
+          value={message}
           onChangeText={(text) => setMessage(text)}
-          buttonText={t("Function.send")}
-          buttonOnPress={() => msgSend(true)}
         />
+        <TouchableOpacity
+          onPress={() => msgSend(true)}
+          style={styles.sendButton}
+        >
+          <Text style={{ fontWeight: 600 }}>{t("Function.send")}</Text>
+        </TouchableOpacity>
       </View>
     </>
   );
@@ -163,27 +179,35 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingBottom: 40,
+    paddingHorizontal: 20,
+    paddingVertical: 60,
   },
   inputContainer: {
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     flexDirection: "row",
     bottom: 0,
     position: "absolute",
+    width: "100%",
+    gap: 10,
+    backgroundColor: "white",
   },
   textInput: {
     flex: 1,
     height: 40,
-    backgroundColor: "#ccc",
+    // backgroundColor: "#ccc",
+    borderColor: "black",
+    borderBottomWidth: 1,
     paddingHorizontal: 10,
   },
   sendButton: {
-    backgroundColor: "skyblue",
+    width: 80,
+    // backgroundColor: "skyblue",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 15,
+    borderColor: "black",
+    borderWidth: 1,
+    borderRadius: 6,
+    // paddingHorizontal: 15,
   },
 });
