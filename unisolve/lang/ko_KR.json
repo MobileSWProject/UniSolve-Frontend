@@ -160,6 +160,7 @@
         "sent": "전송됨",
         "edit": "내용이 수정되었습니다.",
         "registering": "등록하고 있습니다..",
+        "register_success": "등록되었습니다!",
         "report_success": "신고가 접수되었습니다.",
         "report_failed": "신고 접수에 실패했습니다.",
         "public": "공개",

@@ -357,6 +357,7 @@ export default function Community() {
         mode={mode}
         setMode={setMode}
         post={postID}
+        setPost={setPostID}
         snackBar={snackBar}
       />
     </GestureHandlerRootView>

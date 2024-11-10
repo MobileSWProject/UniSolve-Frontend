@@ -11,12 +11,13 @@ export default function BottomView({
   mode,
   setMode,
   post,
+  setPost,
   snackBar,
 }) {
   return (
     <BottomSheet
       ref={sheetRef}
-      snapPoints={["1%", "25%", "90%"]}
+      snapPoints={["1%", "35%", "95%"]}
       index={-1}
       enablePanDownToClose={true}
       animateOnMount={false}
@@ -44,7 +45,11 @@ export default function BottomView({
         }}
       >
         {mode === "create" ? (
-          <PostCreate snackBar={snackBar} />
+          <PostCreate
+            setMode={setMode}
+            setPost={setPost}
+            snackBar={snackBar}
+          />
         ) : mode === "post" ? (
           <Post
             sheetRef={sheetRef}

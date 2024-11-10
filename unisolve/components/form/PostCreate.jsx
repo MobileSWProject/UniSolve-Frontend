@@ -6,7 +6,6 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { _fetchFormData, formFetch } from "../../api";
 import Input from "./Input";
 import * as ImagePicker from "expo-image-picker";
-import SnackBar from "../Snackbar";
 import { mainColor } from "../../constants/Colors";
 import ModalView from "../../components/modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -15,7 +14,7 @@ import Fontisto from "@expo/vector-icons/Fontisto";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
-export default function PostCreate() {
+export default function PostCreate({setMode, setPost, snackBar}) {
   const { t } = useTranslation();
 
   const [title, setTitle] = useState("");
@@ -25,16 +24,8 @@ export default function PostCreate() {
 
   const [image, setImage] = useState(null);
 
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
-
-  const snackBar = (message) => {
-    setSnackbarMessage(message);
-    setSnackbarVisible(true);
-  };
 
   const router = useRouter();
 
@@ -109,8 +100,9 @@ export default function PostCreate() {
     try {
       const response = await formFetch("/posts", data);
       const postId = response.postId;
+      snackBar(`${t("Stage.success")}${t("Function.register_success")}`);
       setSubmitLoading(false);
-      setTimeout(() => router.push(`/post/${postId}`));
+      setTimeout(() => {setPost(postId); setMode("post")});
     } catch (error) {
       console.log("Error during submission:", error);
       if (
@@ -125,11 +117,6 @@ export default function PostCreate() {
 
   return (
     <>
-      <SnackBar
-        visible={snackbarVisible}
-        message={snackbarMessage}
-        onDismiss={() => setSnackbarVisible(false)}
-      />
       <KeyboardAwareScrollView style={styles.container}>
         <View style={styles.submitContainer}>
           <TouchableOpacity
