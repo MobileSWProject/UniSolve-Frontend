@@ -1,12 +1,18 @@
 import { View, TouchableOpacity } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
 import PostCreate from "../form/PostCreate";
 import Post from "../post/Post";
 import Chat from "../post/Chat";
 import Feather from "@expo/vector-icons/Feather";
 
-export default function BottomView({ sheetRef, mode, setMode, post, snackBar}) {
+export default function BottomView({
+  sheetRef,
+  mode,
+  setMode,
+  post,
+  snackBar,
+}) {
   return (
     <BottomSheet
       ref={sheetRef}
@@ -30,14 +36,25 @@ export default function BottomView({ sheetRef, mode, setMode, post, snackBar}) {
           color="black"
         />
       </TouchableOpacity>
-      <BottomSheetScrollView style={{ flex: 1, marginTop: 35, marginBottom: 75 }}>
-        {
-          mode === "create" ? <PostCreate snackBar = {snackBar} /> :
-          mode === "post" ? <Post sheetRef = {sheetRef} setMode = {setMode} post = {post} snackBar = {snackBar}/> :
-          mode === "chat" ? <Chat sheetRef = {sheetRef} setMode = {setMode} post = {post} snackBar = {snackBar}/> :
-          null
-        }
-      </BottomSheetScrollView>
+      <BottomSheetView style={{ flex: 1, marginTop: 35, marginBottom: 75 }}>
+        {mode === "create" ? (
+          <PostCreate snackBar={snackBar} />
+        ) : mode === "post" ? (
+          <Post
+            sheetRef={sheetRef}
+            setMode={setMode}
+            post={post}
+            snackBar={snackBar}
+          />
+        ) : mode === "chat" ? (
+          <Chat
+            sheetRef={sheetRef}
+            setMode={setMode}
+            post={post}
+            snackBar={snackBar}
+          />
+        ) : null}
+      </BottomSheetView>
     </BottomSheet>
   );
 }
