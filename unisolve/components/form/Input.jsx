@@ -13,8 +13,8 @@ export default function Input({ title, subTitle, subTitleConfirm, placeholder, c
     else return t("Function.input_nofinal");
   }
   return (
-    <>
-      <Text style={styles.textTo}>
+    <View style={{width:"93%"}}>
+      <Text style={[styles.textTo, !title ? {marginLeft : 0} : null]}>
         {title}
         {
           subTitle ?
@@ -26,7 +26,7 @@ export default function Input({ title, subTitle, subTitleConfirm, placeholder, c
       </Text>
       <View style={styles.view}>
         <TextInput
-          style={[styles.inputTo, textArea ? { height: 350 } : null]}
+          style={[styles.inputTo, title && textArea ? { height: 350 } : null]}
           placeholder={placeholder ? placeholder : `${title}${lastConvert(title)} ${t("Function.input")}`}
           value={content}
           onChangeText={onChangeText}
@@ -49,6 +49,6 @@ export default function Input({ title, subTitle, subTitleConfirm, placeholder, c
           null
         }
       </View>
-    </>
+    </View>
   );
 }

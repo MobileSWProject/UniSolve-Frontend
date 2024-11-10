@@ -1,9 +1,12 @@
-import { TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import PostCreate from "../form/PostCreate";
+import Post from "../post/Post";
+import Chat from "../post/Chat";
 import Feather from "@expo/vector-icons/Feather";
 
-export default function BottomView({ sheetRef }) {
+export default function BottomView({ sheetRef, mode, setMode, post, snackBar}) {
   return (
     <BottomSheet
       ref={sheetRef}
@@ -16,6 +19,8 @@ export default function BottomView({ sheetRef }) {
       <TouchableOpacity
         style={{ position: "absolute", zIndex: 999, left: 10 }}
         onPress={() => {
+          if (mode === "chat") return setMode("post");
+          setMode("");
           sheetRef.current?.collapse();
         }}
       >
@@ -25,7 +30,14 @@ export default function BottomView({ sheetRef }) {
           color="black"
         />
       </TouchableOpacity>
-      <PostCreate />
+      <BottomSheetScrollView style={{ flex: 1, marginTop: 35, marginBottom: 75 }}>
+        {
+          mode === "create" ? <PostCreate snackBar = {snackBar} /> :
+          mode === "post" ? <Post sheetRef = {sheetRef} setMode = {setMode} post = {post} snackBar = {snackBar}/> :
+          mode === "chat" ? <Chat sheetRef = {sheetRef} setMode = {setMode} post = {post} snackBar = {snackBar}/> :
+          null
+        }
+      </BottomSheetScrollView>
     </BottomSheet>
   );
 }

@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator, Animated, TextInput, TouchableOpacity } 
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { styles } from "../styles/IndexStyle";
+import { accountCheck } from "../utils/accountCheck";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import decodeJWT from "../utils/decodeJWT";
 import ModalView from "../components/modal/ModalView";
@@ -79,16 +80,6 @@ export default function Home() {
     checkCertification();
   }, [logoPosition, inputOpacity]);
 
-  const CheckProcess = async (value) => {
-    try {
-      const response = await _axios.post("/accounts/existuser", value);
-      return !response.data.isNotExist;
-    } catch {
-      snackBar(`${t("Stage.failed")}${t("User.error")}`);
-      return false;
-    }
-  };
-
   const handleSend = async () => {
     try {
       if (sending || id.length < 1) return;
@@ -117,11 +108,11 @@ export default function Home() {
             router.replace("/(app)/(tabs)/home");
           }, 1000);
         } else {
-          snackBar(`${t("Stage.failed")}${t("User.failed")}`);
+          snackBar(`${t("Stage.failed")}${t("User.login_failed")}`);
         }
         setSending(false);
       } else {
-        const response = await CheckProcess({ user_id: id });
+        const response = await accountCheck({ user_id: id }, snackBar, true);
         setCheckID(response);
         setSending(false);
         if (response) {

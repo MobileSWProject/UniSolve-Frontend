@@ -16,7 +16,7 @@ export default function NotFoundScreen() {
     const interval = setInterval(() => {
       setTime(time => time - 1);
     }, 1000);
-    if (time < 0) router.replace("/");
+    if (time <= 0) router.replace("/");
     return () => clearInterval(interval);
   }, [time]);
 

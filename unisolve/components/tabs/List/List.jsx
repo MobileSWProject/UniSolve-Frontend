@@ -9,7 +9,7 @@ import _axios from "../../../api";
 import { useTranslation } from 'react-i18next';
 import "../../../i18n";
 
-export default function PostListItem({ item, index, count, type }) {
+export default function PostListItem({ item, index, count, type, bottomView, setVisible }) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -31,8 +31,16 @@ export default function PostListItem({ item, index, count, type }) {
           : null,
       ]}
       onPress={async () => {
+        if (setVisible) setVisible(false);
         if (type === "notification") await updateNotification(item.not_id);
-        router.push(`post/${item.id}`);
+        if (type === "community") {
+          bottomView.sheetRef.current?.collapse();
+          bottomView.setMode("post");
+          bottomView.setPostID(item.id);
+          bottomView.sheetRef.current?.expand();
+        } else {
+          router.push(`community?post=${item.id}`);
+        }
       }}
     >
       <View style={styles.header}>

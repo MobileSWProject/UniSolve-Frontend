@@ -1,10 +1,9 @@
 import { useFocusEffect } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter  } from "expo-router";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
-  ActivityIndicator,
   FlatList,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,11 +22,16 @@ import { mainColor } from "../../../../constants/Colors";
 import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
 import { debounce } from "lodash";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import SnackBar from "../../../../components/Snackbar";
 
 import BottomView from "../../../../components/modal/BottomView";
 
 export default function Community() {
+  const { post } = useLocalSearchParams();
   const sheetRef = useRef(null);
+
+  const [mode, setMode] = useState("");
+  const [postID, setPostID] = useState("");
 
   const [communitys, setCommunitys] = useState([]);
   const [page, setPage] = useState(1);
@@ -41,17 +45,26 @@ export default function Community() {
 
   const flatListRef = useRef(null); // FlatList의 ref 생성
 
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const router = useRouter();
   useFocusEffect(
     useCallback(() => {
-      sheetRef.current?.collapse();
-    }, [sheetRef])
+      if (!post) sheetRef.current?.collapse();
+    }, [post])
   );
 
   // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
-    // resetState();
-    getList(1, null, null); // 첫 페이지 데이터 가져오기
-  }, []);
+    getList(1, null, null);
+    if (post && post > 0) {
+      setMode("post");
+      setPostID(post);
+      sheetRef.current?.expand();
+    } else {
+      sheetRef.current?.collapse();
+    }
+  }, [post]);
 
   // const resetState = () => {
   //   setPage(1);
@@ -61,6 +74,11 @@ export default function Community() {
   //   setLastPostId(null);
   //   setHasMore(true); // 데이터가 더 있다고 초기화
   // };
+
+  const snackBar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarVisible(true);
+  };
 
   // 서버에서 데이터 가져오기
   const getList = async (tempPage, timestamp, postId, isForce = false) => {
@@ -236,104 +254,111 @@ export default function Community() {
   }, [canRefresh, isRefreshing]);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: mainColor }}>
-        {/* 검색창 */}
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="검색어"
-            value={searchText}
-            onChangeText={handleChangeText}
-            placeholderTextColor={"white"}
-          />
-        </View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            sheetRef.current?.expand();
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor }}>
+      <SnackBar
+        visible={snackbarVisible}
+        message={snackbarMessage}
+        onDismiss={() => setSnackbarVisible(false)}
+      />
+      {/* 검색창 */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="검색어"
+          value={searchText}
+          onChangeText={handleChangeText}
+          placeholderTextColor={"white"}
+        />
+      </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          setMode("create");
+          sheetRef.current?.expand();
+        }}
+      >
+        <Text style={{ left: 10 }}>
+          <Ionicons name="create" size={30} color="white" />
+        </Text>
+      </TouchableOpacity>
+      <View style={{ zIndex: 10 }}>
+        <AnimatedIcons
+          name="refresh"
+          size={28}
+          color="white"
+          style={{
+            position: "absolute",
+            alignSelf: "center",
+            // top: -10,
+            ...springs,
           }}
-        >
-          <Text style={{ left: 10 }}>
-            <Ionicons
-              name="create"
-              size={30}
-              color="white"
-            />
-          </Text>
-        </TouchableOpacity>
-        <View style={{ zIndex: 10 }}>
-          <AnimatedIcons
-            name="refresh"
-            size={28}
-            color="white"
-            style={{
-              position: "absolute",
-              alignSelf: "center",
-              // top: -10,
-              ...springs,
-            }}
-          />
-        </View>
+        />
+      </View>
 
-        {/* 커뮤니티 리스트 */}
-        <AnimatedView style={{ ...springs2, flex: 1 }}>
-          <>
-            {communitys.length === 0 ? (
-              <>
-                {process || isSearching ? (
-                  <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
-                    <SkeletonList length={20} />
-                  </ScrollView>
+      {/* 커뮤니티 리스트 */}
+      <AnimatedView style={{ ...springs2, flex: 1 }}>
+        <>
+          {communitys.length === 0 ? (
+            <>
+              {process || isSearching ? (
+                <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
+                  <SkeletonList length={20} />
+                </ScrollView>
+              ) : (
+                <View>
+                  <Text style={{ color: "white" }}>찾는 결과 없음 ㅋ.</Text>
+                </View>
+              )}
+            </>
+          ) : (
+            <FlatList
+              ref={flatListRef}
+              style={{ backgroundColor: mainColor }}
+              data={communitys}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item, index }) => (
+                <List
+                  item={item}
+                  index={index}
+                  count={communitys.length}
+                  type="community"
+                  bottomView={{ setMode, setPostID, sheetRef }}
+                />
+              )}
+              contentContainerStyle={{ paddingTop: 20 }}
+              onEndReached={appendNextData}
+              onEndReachedThreshold={0.1} // 적절한 임계값 설정
+              onScroll={handleScroll}
+              onScrollBeginDrag={handleScrollStartDrag}
+              onScrollEndDrag={handleScrollEndDrag}
+              ListFooterComponent={
+                process || isSearching ? (
+                  <SkeletonList />
                 ) : (
-                  <View>
-                    <Text style={{ color: "white" }}>찾는 결과 없음 ㅋ.</Text>
-                  </View>
-                )}
-              </>
-            ) : (
-              <FlatList
-                ref={flatListRef}
-                style={{ backgroundColor: mainColor }}
-                data={communitys}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item, index }) => (
-                  <List
-                    item={item}
-                    index={index}
-                    count={communitys.length}
-                    type="community"
+                  <View style={{ marginBottom: 100 }} />
+                )
+              }
+              refreshControl={
+                Platform.OS === "android" ? (
+                  <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={() => {
+                      getList(1, null, null, true);
+                    }}
                   />
-                )}
-                contentContainerStyle={{ paddingTop: 20 }}
-                onEndReached={appendNextData}
-                onEndReachedThreshold={0.1} // 적절한 임계값 설정
-                onScroll={handleScroll}
-                onScrollBeginDrag={handleScrollStartDrag}
-                onScrollEndDrag={handleScrollEndDrag}
-                ListFooterComponent={
-                  process || isSearching ? (
-                    <SkeletonList />
-                  ) : (
-                    <View style={{ marginBottom: 100 }} />
-                  )
-                }
-                refreshControl={
-                  Platform.OS === "android" ? (
-                    <RefreshControl
-                      refreshing={isRefreshing}
-                      onRefresh={() => {
-                        getList(1, null, null, true);
-                      }}
-                    />
-                  ) : null
-                }
-              />
-            )}
-          </>
-        </AnimatedView>
-        <BottomView sheetRef={sheetRef} />
-      </SafeAreaView>
+                ) : null
+              }
+            />
+          )}
+        </>
+      </AnimatedView>
+      <BottomView
+        sheetRef={sheetRef}
+        mode={mode}
+        setMode={setMode}
+        post={postID}
+        snackBar={snackBar}
+      />
     </GestureHandlerRootView>
   );
 }

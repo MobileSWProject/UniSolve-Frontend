@@ -17,22 +17,6 @@ export default function AppLayout() {
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen
-        name="post/[id]/index"
-        options={({ route }) => ({
-          title: `${t("Function.quest")} #${route.params.id}`,
-          headerBackTitle: t("Function.previous"),
-          headerShown: true,
-        })}
-      />
-      <Stack.Screen
-        name="post/[id]/chat"
-        options={({ route }) => ({
-          title: `${t("Function.chat")} (${t("Function.quest")} #${route.params.id})`,
-          animation: "slide_from_bottom",
-          headerShown: true,
-        })}
-      />
     </Stack>
   );
 }

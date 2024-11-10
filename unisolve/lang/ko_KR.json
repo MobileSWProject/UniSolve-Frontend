@@ -154,7 +154,6 @@
         "notpage": "잘못 오신 거 같은데...?",
         "notpagego": "초 후에 자동으로 이동합니다.",
         "empty": "내용이 비어 있습니다.",
-        "empty_please": "내용을 입력하세요.",
         "empty_content": "일부 정보가 누락되었거나 확인되지 않은 항목이 있습니다.",
         "sending": "전송 중...",
         "editing": "내용을 수정하고 있습니다.",
@@ -184,6 +183,7 @@
         "next": "다음",
         "delete": "삭제",
         "input": "입력하세요.",
+        "image": "이미지",
         "chat": "대화",
         "input_final": "을",
         "input_nofinal": "를"

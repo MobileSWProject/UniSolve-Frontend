@@ -5,6 +5,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    marginTop: 15,
   },
   image: {
     width: "100%",
@@ -14,11 +15,19 @@ const styles = StyleSheet.create({
     maxHeight: 400,
     alignSelf: "center",
     borderRadius: 20,
-    marginBottom: 20,
+    marginTop: 20,
   },
   contentContainer: {
     paddingHorizontal: 30,
     paddingVertical: 20,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 5,
+    minHeight: 30,
   },
   title: {
     fontSize: 20,
@@ -37,44 +46,26 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   userInfo: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#666",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   content: {
     fontSize: 16,
-    marginBottom: 20,
-  },
-  chatButtonContainer: {
-    height: 50,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-  },
-  chatButtonTouchArea: {
-    backgroundColor: mainColor,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    height: "100%",
-    borderRadius: 12,
-  },
-  chatButtonText: {
-    color: "white",
-    fontWeight: "900",
-    fontSize: 22,
+    marginBottom: 10,
+    color: "#666",
   },
 
   // 댓글 관련 스타일
   commentContainer: {
     backgroundColor: "#f8f8f8",
-    paddingTop: 20,
+    paddingTop: 30,
     paddingBottom: 60,
     paddingHorizontal: 24,
   },
   commentTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
   },
   commentItem: {
     marginBottom: 20,
@@ -103,7 +94,6 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: "#f8f8f8",
     alignItems: "center",
-    marginBottom: 10,
   },
   commentInput: {
     flex: 1,

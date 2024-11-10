@@ -3,7 +3,8 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { mainColor } from "../../../../constants/Colors";
 import { ProgressBar } from "react-native-paper";
-// import { getExpToLevel, getPercent, getLevel } from "../../../../components/tabs/me/index";
+import { getExpToLevel, getLevel, getPercent,} from "../../../../utils/expUtils";
+import LevelImage from "../../../../components/tabs/me/LevelImage"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ModalView from "../../../../components/modal/ModalView";
 import SnackBar from "../../../../components/Snackbar";
@@ -11,11 +12,6 @@ import _axios from "../../../../api";
 
 import { useTranslation } from "react-i18next";
 import "../../../../i18n";
-import {
-  getExpToLevel,
-  getLevel,
-  getPercent,
-} from "../../../../utils/expUtils";
 
 export default function MePage() {
   const router = useRouter();
@@ -61,19 +57,6 @@ export default function MePage() {
     }
   }
 
-  const images = [
-    require(`../../../../assets/icons/lv0.png`),
-    require(`../../../../assets/icons/lv1.png`),
-    require(`../../../../assets/icons/lv2.png`),
-    require(`../../../../assets/icons/lv3.png`),
-    require(`../../../../assets/icons/lv4.png`),
-    require(`../../../../assets/icons/lv5.png`),
-    require(`../../../../assets/icons/lv6.png`),
-    require(`../../../../assets/icons/lv7.png`),
-    require(`../../../../assets/icons/lv8.png`),
-    require(`../../../../assets/icons/lv9.png`),
-  ];
-
   return (
     <View style={styles.container}>
       <SnackBar
@@ -83,10 +66,7 @@ export default function MePage() {
       />
       {/* 프로필 이미지 */}
       <View style={styles.profileContainer}>
-        <Image
-          source={images[getLevel(exp)]}
-          style={styles.profileImage}
-        />
+        <LevelImage exp={exp} size={120} />
         <View>
           <Text style={styles.nickname}>
             {user.username} | {user.user_nickname}
@@ -206,9 +186,7 @@ export default function MePage() {
       <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.privacy")}</Text>
       </TouchableOpacity>
-      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>
-        기타
-      </Text>
+      <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>{t("Menu.etc")}</Text>
       <TouchableOpacity
         onPress={() => {
           setModalType("delete");

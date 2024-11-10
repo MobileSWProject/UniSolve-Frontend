@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Text } from "react-native";
+import { accountCheck } from "../../utils/accountCheck";
 import SnackBar from "../Snackbar";
 import Input from "./Input";
 import InputProcess from "./InputProcess";
@@ -33,24 +34,6 @@ export default function Modify({ visible, setVisible, userData }) {
   const snackBar = (message) => {
     setSnackbarMessage(message);
     setSnackbarVisible(true);
-  };
-
-  const CheckProcess = async (value) => {
-    try {
-      snackBar(`${t("Stage.process")}${t("Function.waiting")}`);
-      const response = await _axios.post("/accounts/existuser", value);
-      snackBar(`${t("Stage.success")}${t("User.confirm_success")}`);
-      const result = response.data.isNotExist || false;
-      if (!result) snackBar(`${t("Stage.failed")}${t("User.confirm_failed")}`);
-      if (value.user_id) setReIDCheck(result);
-      else if (value.email) return result;
-      else if (value.nickname) setNicknameCheck(result);
-    } catch {
-      snackBar(`${t("Stage.failed")}${t("User.error")}`);
-      if (type) return false;
-      if (value.email) return false;
-      if (value.nickname) setNicknameCheck(false);
-    }
   };
 
   const EditProcess = async () => {
@@ -89,7 +72,7 @@ export default function Modify({ visible, setVisible, userData }) {
     try {
       if (emailProcess) return;
       setEmailProcess(true);
-      const response = await CheckProcess({ email: email });
+      const response = await accountCheck({ email: email }, snackBar);
       snackBar(`${t("Stage.process")}${t("User.email_number_process")}`);
       if (response) {
         const responseTo = await _axios.post("/auth/send-code", { email: email });
@@ -187,7 +170,7 @@ export default function Modify({ visible, setVisible, userData }) {
           : null
       }
       <Input
-        title={t("User.passowrd")}
+        title={t("User.password")}
         placeholder={t("User.password_modify_please")}
         subTitle={confirmPW()}
         subTitleConfirm={confirmPW(true)}
@@ -215,7 +198,7 @@ export default function Modify({ visible, setVisible, userData }) {
         content={nickname}
         onChangeText={(text) => inputNickname(text)}
         buttonDisabled={nicknameCheck || nickname.length <= 0}
-        buttonOnPress={() => CheckProcess({ nickname: nickname })}
+        buttonOnPress={async () => setNicknameCheck(await accountCheck({ nickname: nickname }, snackBar))}
         disabled={editing}
       />
       <Input

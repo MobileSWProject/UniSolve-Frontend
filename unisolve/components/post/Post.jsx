@@ -1,10 +1,11 @@
-import { Ionicons } from "@expo/vector-icons";
+import Entypo from "@expo/vector-icons/Entypo";
 import {
   useFocusEffect,
   useLocalSearchParams,
   usePathname,
   useRouter,
 } from "expo-router";
+import Input from "../../components/form/Input";
 import {
   Image,
   Text,
@@ -13,26 +14,25 @@ import {
   TextInput,
   Modal,
 } from "react-native";
-import styles from "../../../../styles/post/PostStyles";
+import styles from "../../styles/post/PostStyles";
 import { useCallback, useState, useEffect } from "react";
-import _axios from "../../../../api";
+import _axios from "../../api";
+import LevelImage from "../../components/tabs/me/LevelImage";
 import {
   ReplyCommentIdProvider,
   useReplyCommentId,
-} from "../../../../components/post/ReplyCommentIdContext";
+} from "../../components/post/ReplyCommentIdContext";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import useUserId from "../../../../hooks/useUserId"; // 커스텀 훅 불러오기
-import formatAuthor from "../../../../utils/formatAuthor";
-import { mainColor } from "../../../../constants/Colors";
-import { Snackbar, Provider as PaperProvider } from "react-native-paper";
-import CommentSection from "../../../../components/post/CommentSection";
+import useUserId from "../../hooks/useUserId"; // 커스텀 훅 불러오기
+import formatAuthor from "../../utils/formatAuthor";
+import { mainColor } from "../../constants/Colors";
+import CommentSection from "../../components/post/CommentSection";
 
-import { useTranslation } from 'react-i18next';
-import "../../../../i18n";
+import { useTranslation } from "react-i18next";
+import "../../i18n";
 
-const Post = () => {
+const Post = ({ sheetRef, setMode, post, snackBar }) => {
   const { t } = useTranslation();
-  const { id } = useLocalSearchParams();
   const [data, setData] = useState(null);
 
   const [ban, setBan] = useState(false);
@@ -42,8 +42,6 @@ const Post = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [commentID, setCommentID] = useState(null);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [process, setProcess] = useState(false);
 
   const [editTitle, setEditTitle] = useState("");
@@ -70,7 +68,7 @@ const Post = () => {
     useCallback(() => {
       const getData = async () => {
         _axios
-          .get(`/posts/${id}`)
+          .get(`/posts/${post}`)
           .then((response) => {
             setBan(response.data.ban);
             setData({
@@ -95,7 +93,7 @@ const Post = () => {
       };
 
       getData();
-    }, [id])
+    }, [post])
   );
 
   // 댓글 또는 대댓글 추가 로직
@@ -108,21 +106,19 @@ const Post = () => {
 
     try {
       let data = JSON.stringify({
-        post_id: id,
+        post_id: post,
         content: commentContent,
         parent_id: isReply ? selectedComment : null,
       });
       const response = await _axios.post("/comments", data);
 
       // 댓글 추가 후 댓글 목록만 다시 불러옴
-      const updatedPost = await _axios.get(`/posts/${id}`);
+      const updatedPost = await _axios.get(`/posts/${post}`);
       setData((prev) => ({
         ...prev,
         comments: updatedPost.data.comments,
         commentsCount: updatedPost.data.comments_count,
       }));
-    } catch (error) {
-      console.log(error);
     } finally {
       setNewComment("");
       setReplyComment("");
@@ -135,16 +131,13 @@ const Post = () => {
       const response = await _axios.delete(`/comments/${targetCommentId}`);
 
       // 댓글 삭제 후 댓글 목록만 다시 불러옴
-      const updatedPost = await _axios.get(`/posts/${id}`);
+      const updatedPost = await _axios.get(`/posts/${post}`);
       setData((prev) => ({
         ...prev,
         comments: updatedPost.data.comments,
         commentsCount: updatedPost.data.comments_count,
       }));
-    } catch (error) {
-      // "something error 😭"
-      console.log("Something Error 😭");
-    }
+    } catch { }
   };
 
   const handleUpdateComment = async (targetCommentId) => {
@@ -156,19 +149,15 @@ const Post = () => {
         setEditComment("");
         setEditing(false);
         // 댓글 수정 후 댓글 목록만 다시 불러옴
-        const updatedPost = await _axios.get(`/posts/${id}`);
+        const updatedPost = await _axios.get(`/posts/${post}`);
         setData((prev) => ({
           ...prev,
           comments: updatedPost.data.comments,
           commentsCount: updatedPost.data.comments_count,
         }));
       }
-      setSnackbarVisible(true);
-      setSnackbarMessage(t("Function.edit"));
-    } catch (error) {
-      // "something error 😭"
-      console.log("Something Error 😭");
-    }
+      snackBar(t("Function.edit"));
+    } catch { }
   };
 
   const handleReport = async () => {
@@ -176,7 +165,7 @@ const Post = () => {
     try {
       setProcess(true);
       const response = await _axios.post(`/reports`, {
-        post_id: id,
+        post_id: post,
         comment_id: commentID || null,
         reason: reportReason,
       });
@@ -185,14 +174,12 @@ const Post = () => {
       setCommentID(null);
       if (response.data.status === "success") {
         setReportReason("");
-        setSnackbarMessage(t("Function.report_success"));
-        setSnackbarVisible(true);
+        snackBar(t("Function.report_success"));
       }
     } catch (error) {
       setProcess(false);
       setModalVisible(false);
-      setSnackbarMessage(t("Function.report_failed"));
-      setSnackbarVisible(true);
+      snackBar(t("Function.report_failed"));
     }
   };
 
@@ -203,17 +190,14 @@ const Post = () => {
 
   const handleRemovePost = async () => {
     try {
-      const response = await _axios.delete(`/posts/${id}`);
+      const response = await _axios.delete(`/posts/${post}`);
 
       if (router.canGoBack()) {
         router.back();
       } else {
         router.replace("/community");
       }
-    } catch (error) {
-      // "something error 😭"
-      console.log("Something Error 😭");
-    }
+    } catch { }
   };
 
   const handleUpdatePost = async () => {
@@ -224,13 +208,13 @@ const Post = () => {
       setEditContent("");
       setEditing(false);
       setProcess(true);
-      const response = await _axios.put(`/posts/${id}`, {
+      const response = await _axios.put(`/posts/${post}`, {
         title: editTitle,
         content: editContent,
       });
       if (response.data.status === "success") {
         // 게시글 수정 후 다시 불러오기
-        const updatedPost = await _axios.get(`/posts/${id}`);
+        const updatedPost = await _axios.get(`/posts/${post}`);
         setData((prev) => ({
           ...prev,
           title: updatedPost.data.title,
@@ -240,12 +224,10 @@ const Post = () => {
           commentsCount: updatedPost.data.comments_count,
         }));
       }
-      setSnackbarMessage(t("Function.edit"));
-      setSnackbarVisible(true);
+      snackBar(t("Function.edit"));
       setProcess(false);
     } catch (error) {
       setProcess(false);
-      console.log("Something Error 😭");
     }
   };
 
@@ -256,105 +238,89 @@ const Post = () => {
   return (
     <KeyboardAwareScrollView style={styles.container}>
       <View style={styles.contentContainer}>
-        {data.image && (
-          <Image
-            source={{ uri: data.image }}
-            style={styles.image}
-          />
-        )}
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: 10,
-            minHeight: 30,
           }}
         >
-          <Text style={styles.title}>{data.title}</Text>
-          {formatAuthor(data.authorId) === formatAuthor(userId) ? (
-            <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row" }}>
+            <LevelImage exp={2} size={36} />
+            <View style={{ flexDirection: "column" }}>
+              <Text style={styles.userInfo}>{formatAuthor(data.nickname)}</Text>
+              <Text style={styles.userInfo}>{data.timestamp}</Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            {formatAuthor(data.authorId) === formatAuthor(userId) ? (
+              <>
+                <TouchableOpacity
+                  onPress={() => { setMode("chat"); }}
+                  hitSlop={4}
+                >
+                  <Entypo name="chat" size={30} color={mainColor} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  hitSlop={8}
+                  onPress={() => {
+                    setEditPost(true);
+                    setEditTitle(data.title);
+                    setEditContent(data.content);
+                    setModalVisible(true);
+                  }}
+                >
+                  <Text style={{ fontSize: 24 }}>✏️</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  hitSlop={8}
+                  onPress={() => handleRemovePost()}
+                >
+                  <Text style={{ fontSize: 24 }}>❌</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
               <TouchableOpacity
                 hitSlop={8}
                 onPress={() => {
-                  setEditPost(true);
-                  setEditTitle(data.title);
-                  setEditContent(data.content);
+                  setEditPost(false);
                   setModalVisible(true);
                 }}
               >
-                <Text style={{ fontSize: 12 }}>✏️</Text>
+                <Text style={{ fontSize: 24 }}>🚨</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                hitSlop={8}
-                onPress={() => handleRemovePost()}
-              >
-                <Text style={{ fontSize: 12 }}>❌</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity
-              hitSlop={8}
-              onPress={() => {
-                setEditPost(false);
-                setModalVisible(true);
-              }}
-            >
-              <Text style={{ fontSize: 12 }}>🚨</Text>
-            </TouchableOpacity>
-          )}
+            )}
+          </View>
         </View>
-        <View style={styles.privateStatusContainer}>
-          <Ionicons
-            name={data.private ? "lock-closed" : "earth-sharp"}
-            size={16}
-            color="#666"
-            style={styles.privateStatusIcon}
-          />
-          <Text style={styles.privateStatusText}>
-            {data.private ? t("Function.private") : t("Function.public")}
-          </Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>{data.title}</Text>
         </View>
-        <Text style={styles.userInfo}>
-          {formatAuthor(data.nickname)} • {data.timestamp}
-        </Text>
         <Text style={styles.content}>{data.content}</Text>
-      </View>
-
-      {/* 비공개 채팅 버튼 */}
-      <View style={styles.chatButtonContainer}>
-        <TouchableOpacity
-          onPress={() => router.push(`${pathname}/chat`)}
-          style={styles.chatButtonTouchArea}
-          hitSlop={4}
-        >
-          <Text style={styles.chatButtonText}>{t("Function.chat")}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 게시글 댓글 입력 필드 */}
-      <View style={styles.commentInputContainer}>
-        <TextInput
-          style={[styles.commentInput, {backgroundColor: ban ? "#ccc" : "#fff"}]}
-          placeholder={ban ? t("Function.forbidden") : t("Function.input_content")}
-          placeholderTextColor={"black"}
-          value={newComment}
-          onChangeText={(text) => setNewComment(text)}
-          multiline={true}
-          disabled={ban}
-        />
-        <TouchableOpacity
-          style={[styles.commentButton, {backgroundColor: ban ? "#ccc" : mainColor}]}
-          onPress={() => handleAddComment(false)}
-          disabled={ban}
-        >
-          <Text style={styles.commentButtonText}>{t("Function.regist")}</Text>
-        </TouchableOpacity>
+        {data.image && (
+          <Image source={{ uri: data.image }} style={styles.image} />
+        )}
       </View>
 
       {/* 댓글 렌더링 */}
       <View style={styles.commentContainer}>
-        <Text style={styles.commentTitle}>{t("Function.comment")} {data.commentsCount}{t("Function.count")}</Text>
+        <Text style={styles.commentTitle}>
+          {t("Function.comment")} {data.commentsCount}
+          {t("Function.count")}
+        </Text>
+        <View style={styles.commentInputContainer}>
+          <Input
+            placeholder={
+              ban ? t("Function.forbidden") : t("Function.input_content")
+            }
+            content={newComment}
+            onChangeText={(text) => setNewComment(text)}
+            buttonDisabled={ban}
+            buttonText={t("Function.regist")}
+            buttonOnPress={() => handleAddComment(false)}
+            disabled={ban}
+            textArea={true}
+          />
+        </View>
         {data.comments.map((comment, index) => (
           <CommentSection
             ban={ban}
@@ -434,7 +400,9 @@ const Post = () => {
                   setEditContent("");
                 }}
               >
-                <Text style={styles.buttonTextSmall}>{t("Function.cancel")}</Text>
+                <Text style={styles.buttonTextSmall}>
+                  {t("Function.cancel")}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 disabled={false}
@@ -454,31 +422,14 @@ const Post = () => {
           </View>
         </Modal>
       </View>
-      {snackbarVisible ? (
-        <View style={styles.snackbarContainer}>
-          <Snackbar
-            style={styles.snackbar}
-            visible={snackbarVisible}
-            onDismiss={() => {
-              setSnackbarVisible(false);
-              setSnackbarMessage("");
-            }}
-            duration={2000}
-          >
-            {snackbarMessage}
-          </Snackbar>
-        </View>
-      ) : (
-        <></>
-      )}
     </KeyboardAwareScrollView>
   );
 };
 
-export default function PostWithReplyCommentIdProvider() {
+export default function PostWithReplyCommentIdProvider({ sheetRef, setMode, post, snackBar }) {
   return (
     <ReplyCommentIdProvider>
-      <Post />
+      <Post sheetRef = {sheetRef} setMode = {setMode} post={post} snackBar={snackBar} />
     </ReplyCommentIdProvider>
   );
 }

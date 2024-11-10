@@ -1,29 +1,23 @@
 import { useState, useEffect, useRef } from "react";
-import { useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
-import ChatMessage from "../../../../components/post/ChatMessage";
+import { View, Text, FlatList, StyleSheet } from "react-native";
+import ChatMessage from "./ChatMessage";
 import { io } from "socket.io-client";
-import _axios from "../../../../api";
+import _axios from "../../api";
 import { useTranslation } from "react-i18next";
-import "../../../../i18n";
-import useUserId from "../../../../hooks/useUserId";
+import "../../i18n";
+import useUserId from "../../hooks/useUserId";
+import Input from "../../components/form/Input";
 
-export default function CommunityChat() {
+export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const { t } = useTranslation();
-  const { id } = useLocalSearchParams();
   const { userId, loading } = useUserId();
   const [chatData, setChatData] = useState([]);
   const [message, setMessage] = useState("");
   const socket = useRef(null);
   const flatListRef = useRef(null); // FlatList 참조 생성
+
+  const [ban, setBan] = useState(false);
 
   const scrollToBottom = () => {
     if (flatListRef.current) {
@@ -33,8 +27,9 @@ export default function CommunityChat() {
 
   const loadExistingMessages = async () => {
     try {
-      const response = await _axios.get(`/chat/messages?post_id=${id}`);
+      const response = await _axios.get(`/chat/messages?post_id=${post}`);
       if (response.data && response.data.data) {
+        setBan(response.data.ban || false);
         setChatData(response.data.data);
       }
     } catch (error) {
@@ -42,17 +37,48 @@ export default function CommunityChat() {
     }
   };
 
+  function checkDate(sentDt) {
+    if (!sentDt || isNaN(new Date(sentDt))) return sentDt;
+    sentDt = new Date(sentDt);
+    const nowDt = new Date();
+    let resultDate = "";
+    function pad(text) {
+      return String(text).padStart(2, "0");
+    }
+    if (nowDt.getFullYear() !== sentDt.getFullYear()) {
+      resultDate += `${sentDt.getFullYear()}`;
+    }
+    if (nowDt.getDate() !== sentDt.getDate()) {
+      resultDate += `${resultDate.length ? "-" : ""}${pad(
+        Number(sentDt.getMonth()) + 1
+      )}-${pad(sentDt.getDate())}`;
+    }
+    resultDate += `${resultDate.length ? " " : ""}${pad(
+      sentDt.getHours()
+    )}:${pad(sentDt.getMinutes())}`;
+    return resultDate;
+  }
+
   useEffect(() => {
     const initializeSocket = async () => {
       if (loading) return;
       socket.current = io(process.env.EXPO_PUBLIC_SERVER_BASE_URL);
       const token = await AsyncStorage.getItem("token");
 
-      socket.current.emit("join", { room: id, token });
+      socket.current.emit("join", { room: post, token });
 
       socket.current.on("receive_message", (data) => {
-        const isMe = data.sender === userId;
-        setChatData((prevData) => [...prevData, { ...data, is_me: isMe }]);
+        console.log(data);
+        setChatData((prevData) => {
+          const updatedData = [...prevData];
+          if (updatedData.length > 0) {
+            updatedData[updatedData.length - 1] = {
+              ...updatedData[updatedData.length - 1],
+              sent_at: checkDate(data.sent_at) || "",
+            };
+          }
+          return updatedData;
+        });
       });
 
       socket.current.on("error", (data) => {
@@ -65,11 +91,11 @@ export default function CommunityChat() {
 
     return () => {
       if (socket.current) {
-        socket.current.emit("leave", { room: id });
+        socket.current.emit("leave", { room: post });
         socket.current.disconnect();
       }
     };
-  }, [id, userId, loading]);
+  }, [post, userId, loading]);
 
   // chatData가 변경될 때마다 스크롤을 아래로 이동
   useEffect(() => {
@@ -81,16 +107,22 @@ export default function CommunityChat() {
       me={item.is_me}
       sender={item.sender || "NULL"}
       content={item.content}
-      sent_at={item.sent_at}
+      sent_at={checkDate(item.sent_at) || ""}
     />
   );
 
   async function msgSend() {
     if (!message || message.length <= 0) return;
     setMessage("");
+    chatData.push({
+      content: message,
+      is_me: true,
+      sent_at: t("Function.sending"),
+    });
+
     const token = await AsyncStorage.getItem("token");
 
-    socket.current.emit("send_message", { room: id, message, token });
+    socket.current.emit("send_message", { room: post, message, token });
   }
 
   if (loading) {
@@ -112,17 +144,15 @@ export default function CommunityChat() {
         onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
       />
       <View style={styles.inputContainer}>
-        <TextInput
-          value={message}
-          onChangeText={setMessage}
-          style={styles.textInput}
+        <Input
+          placeholder={
+            ban ? t("Function.forbidden") : t("Function.input_content")
+          }
+          content={message}
+          onChangeText={(text) => setMessage(text)}
+          buttonText={t("Function.send")}
+          buttonOnPress={() => msgSend(true)}
         />
-        <TouchableOpacity
-          style={styles.sendButton}
-          onPress={msgSend}
-        >
-          <Text>{t("Function.send")}</Text>
-        </TouchableOpacity>
       </View>
     </>
   );
@@ -138,6 +168,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 10,
     flexDirection: "row",
+    bottom: 0,
+    position: "absolute",
   },
   textInput: {
     flex: 1,

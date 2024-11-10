@@ -10,8 +10,9 @@ import Markdown from "react-native-markdown-display";
 import SyntaxHighlighter from "react-native-syntax-highlighter";
 import { mainColor } from "../../constants/Colors";
 import formatAuthor from "../../utils/formatAuthor";
+import Input from "../../components/form/Input";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import "../../i18n";
 
 const CommentSection = ({
@@ -102,7 +103,7 @@ const CommentSection = ({
       </Text>
       {editing ? (
         <TextInput
-          placeholder={t("Function.empty_please")}
+          placeholder={t("Function.input_content")}
           placeholderTextColor={"black"}
           value={editComment}
           onChangeText={(text) => setEditComment(text)}
@@ -185,36 +186,18 @@ const CommentSection = ({
         <View
           style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}
         >
-          <TextInput
-            style={{
-              flex: 1,
-              height: 40,
-              borderWidth: 1,
-              borderColor: "#ddd",
-              borderRadius: 5,
-              paddingHorizontal: 10,
-              backgroundColor: ban ? "#ccc" : "#fff",
-            }}
-            placeholder={ban ? t("Function.forbidden") : t("Function.empty_please")}
-            placeholderTextColor={"black"}
-            value={replyComment}
+          <Input
+            placeholder={
+              ban ? t("Function.forbidden") : t("Function.input_content")
+            }
+            content={replyComment}
             onChangeText={(text) => setReplyComment(text)}
-            multiline={true}
+            buttonDisabled={ban}
+            buttonText={t("Function.regist")}
+            buttonOnPress={() => handleAddComment(true)}
             disabled={ban}
+            textArea={true}
           />
-          <TouchableOpacity
-            style={{
-              marginLeft: 10,
-              backgroundColor: ban ? "#ccc" : mainColor,
-              paddingVertical: 10,
-              paddingHorizontal: 15,
-              borderRadius: 5,
-            }}
-            onPress={() => handleAddComment(true)}
-            disabled={ban}
-          >
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>{t("Function.regist")}</Text>
-          </TouchableOpacity>
         </View>
       )}
 

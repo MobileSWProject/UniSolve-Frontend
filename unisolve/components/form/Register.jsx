@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { styles } from "../../styles/form/FormStyle"
 import { styles as FlatStyles } from "../../styles/tabs/List/ListStyles";
+import { accountCheck } from "../../utils/accountCheck";
 import SnackBar from "../Snackbar";
 import Input from "./Input";
 import InputProcess from "./InputProcess";
@@ -42,27 +43,6 @@ export default function Register({ visible, setVisible }) {
     }
   });
 
-  const CheckProcess = async (value, type) => {
-    try {
-      snackBar(`${t("Stage.process")}${t("Function.waiting")}`);
-      const response = await _axios.post("/accounts/existuser", value);
-      const result = response.data.isNotExist || false;
-      if (type) return result === false ? true : false;
-      else {
-        if (!result) snackBar(`${t("Stage.failed")}${t("User.confirm_failed")}`);
-        if (value.user_id) setReIDCheck(result);
-        else if (value.email) return result;
-        else if (value.nickname) setReNicknameCheck(result);
-      }
-    } catch {
-      snackBar(`${t("Stage.failed")}${t("User.error")}`);
-      if (type) return false;
-      if (value.user_id) setReIDCheck(false);
-      if (value.email) return false;
-      if (value.nickname) setReNicknameCheck(false);
-    }
-  };
-
   const snackBar = (message) => {
     setSnackbarMessage(message);
     setSnackbarVisible(true);
@@ -72,7 +52,7 @@ export default function Register({ visible, setVisible }) {
     try {
       if (reEmailProcess) return;
       setReEmailProcess(true);
-      const response = await CheckProcess({ email: reEmail });
+      const response = await accountCheck({ email: reEmail }, snackBar);
       if (response) {
         snackBar(`${t("Stage.process")}${t("User.email_number_process")}`);
         const responseTo = await _axios.post("/auth/send-code", {
@@ -209,7 +189,7 @@ export default function Register({ visible, setVisible }) {
         content={reID}
         onChangeText={(text) => inputReID(text)}
         buttonDisabled={reIDCheck || !confirmID(true)}
-        buttonOnPress={() => { if (confirmID(true)) CheckProcess({ user_id: reID }); }}
+        buttonOnPress={async () => { if (confirmID(true)) { setReIDCheck(await accountCheck({ user_id: reID }, snackBar)); } }}
       />
       <Input 
         title={t("User.name")}
@@ -268,7 +248,7 @@ export default function Register({ visible, setVisible }) {
         content={reNickname}
         onChangeText={(text) => inputReNickname(text)}
         buttonDisabled={reNicknameCheck || reNickname.length <= 0}
-        buttonOnPress={() => CheckProcess({ nickname: reNickname })}
+        buttonOnPress={async () => setReNicknameCheck(await accountCheck({ nickname: reNickname }, snackBar))}
       />
       <Input
         title={t("User.school")}

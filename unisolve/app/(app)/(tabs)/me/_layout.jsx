@@ -10,10 +10,6 @@ export default function MeLayout() {
         name="index"
         options={{ title: "Me" }}
       />
-      {/* <Stack.Screen
-        name="history"
-        options={{ title: "히스토리" }}
-      /> */}
     </Stack>
   );
 }

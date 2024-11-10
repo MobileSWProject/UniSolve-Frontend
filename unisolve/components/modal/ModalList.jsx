@@ -68,6 +68,7 @@ export default function ModalList({ visible, setVisible, type }) {
             index={index}
             count={list.length}
             type={type}
+            setVisible={setVisible}
           />
         )}
         contentContainerStyle={{ paddingTop: 20 }}
