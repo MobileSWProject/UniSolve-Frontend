@@ -6,7 +6,7 @@ import { animated, useSpring } from "react-spring";
 const boxColor = "#c0c0c0";
 const contentColor = "#d4d4d4";
 
-export default function SkeletonList({ length = 10 }) {
+export default function SkeletonList({ length = 8 }) {
   return (
     <>
       <View style={styles.container}>
