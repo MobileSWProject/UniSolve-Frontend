@@ -1,5 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { View, Text, ActivityIndicator, Animated, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Animated,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { styles } from "../styles/IndexStyle";
@@ -10,7 +17,7 @@ import ModalView from "../components/modal/ModalView";
 import SnackBar from "../components/Snackbar";
 import _axios from "../api";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import "../i18n";
 
 export default function Home() {
@@ -98,7 +105,10 @@ export default function Home() {
       ]).start();
       if (checkID) {
         snackBar(`${t("Stage.process")}${t("User.login_process")}`);
-        const response = await _axios.post("/auth/login", JSON.stringify({ user_id: id, password: pw }));
+        const response = await _axios.post(
+          "/auth/login",
+          JSON.stringify({ user_id: id, password: pw })
+        );
         const token = response.data.token;
         if (token) {
           await AsyncStorage.setItem("token", token);
@@ -112,7 +122,7 @@ export default function Home() {
         }
         setSending(false);
       } else {
-        const response = await accountCheck({ user_id: id }, snackBar, true);
+        const response = await accountCheck({ user_id: id }, snackBar, t, true);
         setCheckID(response);
         setSending(false);
         if (response) {
@@ -189,7 +199,14 @@ export default function Home() {
         source={require("../assets/logo.png")}
         style={[styles.logo, { transform: [{ translateY: logoPosition }] }]}
       />
-      {certification ? <ActivityIndicator size="large" color="white" /> : <></>}
+      {certification ? (
+        <ActivityIndicator
+          size="large"
+          color="white"
+        />
+      ) : (
+        <></>
+      )}
       <Animated.View
         style={{
           opacity: inputOpacity,
@@ -202,7 +219,9 @@ export default function Home() {
           placeholder={t("User.id_please")}
           placeholderTextColor="#fff"
           value={id}
-          onChangeText={(text) => { inputID(text); }}
+          onChangeText={(text) => {
+            inputID(text);
+          }}
           onSubmitEditing={handleSend}
           disabled={loginCheck}
         />
@@ -262,8 +281,15 @@ export default function Home() {
             alignItems: "center",
           }}
         >
-          <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <MaterialCommunityIcons name="send" size={24} color="white" />
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={handleSend}
+          >
+            <MaterialCommunityIcons
+              name="send"
+              size={24}
+              color="white"
+            />
           </TouchableOpacity>
         </Animated.View>
       ) : (

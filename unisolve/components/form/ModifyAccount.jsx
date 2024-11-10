@@ -6,11 +6,11 @@ import Input from "./Input";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import "../../i18n";
 
 export default function Modify({ visible, setVisible, userData }) {
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
   const [user, setUser] = useState(userData);
 
   const [editing, setEditing] = useState(false);
@@ -37,7 +37,13 @@ export default function Modify({ visible, setVisible, userData }) {
   };
 
   const EditProcess = async () => {
-    if (editing || password.length <= 0 || !emailChecks || (newPassword.length > 0 && newPassword !== subPassword) || nickname.length <= 0) {
+    if (
+      editing ||
+      password.length <= 0 ||
+      !emailChecks ||
+      (newPassword.length > 0 && newPassword !== subPassword) ||
+      nickname.length <= 0
+    ) {
       snackBar(`${t("Stage.failed")}${t("Function.empty_content")}`);
       return;
     }
@@ -49,8 +55,9 @@ export default function Modify({ visible, setVisible, userData }) {
         email: email,
         new_password: newPassword,
         user_nickname: nickname,
-      })
-      if (response.data.updated === true) snackBar(`${t("Stage.success")}${t("Function.edit_account_success")}`);
+      });
+      if (response.data.updated === true)
+        snackBar(`${t("Stage.success")}${t("Function.edit_account_success")}`);
       else snackBar(`${t("Stage.failed")}${t("Function.edit_account_failed")}`);
     } catch {
       snackBar(`${t("Stage.failed")}${t("User.error")}`);
@@ -72,10 +79,12 @@ export default function Modify({ visible, setVisible, userData }) {
     try {
       if (emailProcess) return;
       setEmailProcess(true);
-      const response = await accountCheck({ email: email }, snackBar);
+      const response = await accountCheck({ email: email }, snackBar, t);
       snackBar(`${t("Stage.process")}${t("User.email_number_process")}`);
       if (response) {
-        const responseTo = await _axios.post("/auth/send-code", { email: email });
+        const responseTo = await _axios.post("/auth/send-code", {
+          email: email,
+        });
         setEmailCheck(responseTo.data.isSent || false);
         snackBar(`${t("Stage.success")}${t("User.email_number_success")}`);
       }
@@ -92,7 +101,10 @@ export default function Modify({ visible, setVisible, userData }) {
       if (emailProcessTo) return;
       snackBar(`${t("Stage.process")}${t("User.email_number_check")}`);
       setEmailProcessTo(true);
-      const response = await _axios.post("/auth/verify-code", { email: email, code: emailConfirm });
+      const response = await _axios.post("/auth/verify-code", {
+        email: email,
+        code: emailConfirm,
+      });
       snackBar(`${t("Stage.success")}${t("User.email_number_check_success")}`);
       setEmailChecks(response.data.isVerified || false);
       setEmailProcessTo(false);
@@ -113,7 +125,11 @@ export default function Modify({ visible, setVisible, userData }) {
     );
     if (type === true) return regEx && newPassword === subPassword;
     else if (type === false) return regEx;
-    return !regEx ? t("User.regular_check_failed") : newPassword === subPassword ? t("User.password_confirm_success") : t("User.password_confirm_failed");
+    return !regEx
+      ? t("User.regular_check_failed")
+      : newPassword === subPassword
+      ? t("User.password_confirm_success")
+      : t("User.password_confirm_failed");
   };
 
   const inputPW = (text) => {
@@ -126,8 +142,7 @@ export default function Modify({ visible, setVisible, userData }) {
     if (user.email === text) {
       setEmailCheck(true);
       setEmailChecks(true);
-    }
-    else {
+    } else {
       setEmailCheck(false);
       setEmailChecks(false);
     }
@@ -146,29 +161,39 @@ export default function Modify({ visible, setVisible, userData }) {
       </Text>
       <Input
         title={t("User.email")}
-        subTitle={emailCheck && emailChecks ? t("User.email_confirm_success") : t("User.email_confirm_failed")}
+        subTitle={
+          emailCheck && emailChecks
+            ? t("User.email_confirm_success")
+            : t("User.email_confirm_failed")
+        }
         subTitleConfirm={emailCheck && emailChecks}
         content={email}
         onChangeText={(text) => inputEmail(text)}
         buttonDisabled={emailCheck || !confirmEmail(true) || emailProcess}
-        buttonOnPress={() => { if (confirmEmail(true)) CheckProcessEmail(); }}
+        buttonOnPress={() => {
+          if (confirmEmail(true)) CheckProcessEmail();
+        }}
         disabled={editing}
       />
-      {
-        !(user.email === email) && emailCheck ?
-          <Input
-            title={t("User.email_number")}
-            subTitle={emailCheck && emailChecks ? t("User.email_confirm_success") : t("User.email_confirm_failed")}
-            subTitleConfirm={emailCheck && emailChecks}
-            content={emailConfirm}
-            maxLength={8}
-            disabled={emailChecks || editing}
-            onChangeText={(text) => setEmailConfirm(text.replace(/[^0-9]/g, ""))}
-            buttonDisabled={emailChecks || !confirmEmail(true)}
-            buttonOnPress={() => { CheckProcessEmailTo(); }}
-          />
-          : null
-      }
+      {!(user.email === email) && emailCheck ? (
+        <Input
+          title={t("User.email_number")}
+          subTitle={
+            emailCheck && emailChecks
+              ? t("User.email_confirm_success")
+              : t("User.email_confirm_failed")
+          }
+          subTitleConfirm={emailCheck && emailChecks}
+          content={emailConfirm}
+          maxLength={8}
+          disabled={emailChecks || editing}
+          onChangeText={(text) => setEmailConfirm(text.replace(/[^0-9]/g, ""))}
+          buttonDisabled={emailChecks || !confirmEmail(true)}
+          buttonOnPress={() => {
+            CheckProcessEmailTo();
+          }}
+        />
+      ) : null}
       <Input
         title={t("User.password")}
         placeholder={t("User.password_modify_please")}
@@ -179,7 +204,7 @@ export default function Modify({ visible, setVisible, userData }) {
         secure={true}
         disabled={editing}
       />
-      {confirmPW(false) ?
+      {confirmPW(false) ? (
         <Input
           title={t("User.password_confirm")}
           placeholder={t("User.password_modify_confirm_please")}
@@ -190,15 +215,23 @@ export default function Modify({ visible, setVisible, userData }) {
           secure={true}
           disabled={editing}
         />
-        : null}
+      ) : null}
       <Input
         title={t("User.nickname")}
-        subTitle={nicknameCheck ? t("User.confirm_please_success") : t("User.confirm_please")}
+        subTitle={
+          nicknameCheck
+            ? t("User.confirm_please_success")
+            : t("User.confirm_please")
+        }
         subTitleConfirm={nicknameCheck}
         content={nickname}
         onChangeText={(text) => inputNickname(text)}
         buttonDisabled={nicknameCheck || nickname.length <= 0}
-        buttonOnPress={async () => setNicknameCheck(await accountCheck({ nickname: nickname }, snackBar))}
+        buttonOnPress={async () =>
+          setNicknameCheck(
+            await accountCheck({ nickname: nickname }, snackBar, t)
+          )
+        }
         disabled={editing}
       />
       <Input
@@ -211,7 +244,9 @@ export default function Modify({ visible, setVisible, userData }) {
       <InputProcess
         visible={visible}
         setVisible={setVisible}
-        onPress={() => { EditProcess(); }}
+        onPress={() => {
+          EditProcess();
+        }}
         content={t("User.edit_go")}
         cancel={editing}
         disabled={editing}

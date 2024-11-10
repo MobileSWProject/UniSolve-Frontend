@@ -1,10 +1,8 @@
 import _axios from "../api";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import "../i18n";
 
-const { t } = useTranslation();
-
-export const accountCheck = async (value, snackBar, type) => {
+export const accountCheck = async (value, snackBar, t, type) => {
   try {
     snackBar(`${t("Stage.process")}${t("Function.waiting")}`);
     const response = await _axios.post("/accounts/existuser", value);
