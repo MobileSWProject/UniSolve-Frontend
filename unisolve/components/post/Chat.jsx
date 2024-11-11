@@ -101,9 +101,10 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
     loadExistingMessages();
     initializeSocket();
 
-    return () => {
+    return async () => {
       if (socket.current) {
-        socket.current.emit("leave", { room: post });
+        const token = await AsyncStorage.getItem("token");
+        socket.current.emit("leave", { room: post, token });
         socket.current.disconnect();
       }
     };
