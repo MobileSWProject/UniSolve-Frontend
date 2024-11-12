@@ -31,7 +31,7 @@ import CommentSection from "../../components/post/CommentSection";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-const Post = ({ sheetRef, setMode, post, snackBar }) => {
+const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
 
@@ -191,13 +191,14 @@ const Post = ({ sheetRef, setMode, post, snackBar }) => {
   const handleRemovePost = async () => {
     try {
       const response = await _axios.delete(`/posts/${post}`);
-
-      if (router.canGoBack()) {
-        router.back();
+      if (response) {
+        sheetRef.current?.collapse();
+        snackBar(t("Function.delete_success"));
+        getList(1, null, null);
       } else {
-        router.replace("/community");
+        snackBar(t("Function.delete_failed"));
       }
-    } catch { }
+    } catch { snackBar(t("Function.delete_failed")); }
   };
 
   const handleUpdatePost = async () => {
@@ -426,10 +427,10 @@ const Post = ({ sheetRef, setMode, post, snackBar }) => {
   );
 };
 
-export default function PostWithReplyCommentIdProvider({ sheetRef, setMode, post, snackBar }) {
+export default function PostWithReplyCommentIdProvider({ sheetRef, setMode, post, snackBar, getList }) {
   return (
     <ReplyCommentIdProvider>
-      <Post sheetRef = {sheetRef} setMode = {setMode} post={post} snackBar={snackBar} />
+      <Post sheetRef = {sheetRef} setMode = {setMode} post={post} snackBar={snackBar} getList={getList}/>
     </ReplyCommentIdProvider>
   );
 }

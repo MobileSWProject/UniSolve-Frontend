@@ -161,6 +161,8 @@
         "edit": "Content has been edited.",
         "registering": "Registering...",
         "register_success": "Registered!",
+        "delete_success": "Deleted.",
+        "delete_failed": "Not Delete",
         "report_success": "Report submitted successfully.",
         "report_failed": "Failed to submit the report.",
         "public": "Public",

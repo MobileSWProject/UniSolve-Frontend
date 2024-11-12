@@ -1,5 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { useLocalSearchParams, useRouter  } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
@@ -23,12 +23,24 @@ import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
 import { debounce } from "lodash";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SnackBar from "../../../../components/Snackbar";
+import DropDownPicker from 'react-native-dropdown-picker';
 
 import BottomView from "../../../../components/modal/BottomView";
 
 export default function Community() {
   const { post } = useLocalSearchParams();
   const sheetRef = useRef(null);
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState({label: '본관 1층', value: '1'});
+  const [items, setItems] = useState([
+    { label: '본관 1층', value: '1' },
+    { label: '본관 2층', value: '2' },
+    { label: '본관 3층', value: '3' },
+    { label: '본관 4층', value: '4' },
+    { label: '별관 지하 1층', value: '5' },
+ ]);
+  const [category, setCategory] = useState("");
 
   const [mode, setMode] = useState("");
   const [postID, setPostID] = useState("");
@@ -93,9 +105,7 @@ export default function Community() {
     try {
       // console.log(searchText);
       const response = await _axios.get(
-        `/posts?page=${tempPage}&last_timestamp=${
-          timestamp || ""
-        }&last_post_id=${postId || ""}&search=${searchText}`
+        `/posts?page=${tempPage}&last_timestamp=${timestamp || ""}&last_post_id=${postId || ""}&search=${searchText}&category=${category}`
       );
 
       const newData = response.data.data || [];
@@ -269,18 +279,29 @@ export default function Community() {
           onChangeText={handleChangeText}
           placeholderTextColor={"white"}
         />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            setMode("create");
+            sheetRef.current?.expand();
+          }}
+        >
+          <Text style={{ left: 10 }}>
+            <Ionicons name="create" size={30} color="white" />
+          </Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          setMode("create");
-          sheetRef.current?.expand();
-        }}
-      >
-        <Text style={{ left: 10 }}>
-          <Ionicons name="create" size={30} color="white" />
-        </Text>
-      </TouchableOpacity>
+      <DropDownPicker
+          open={open}
+          value={value}
+          items={items}
+          placeholder="카테고리"
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setItems}
+          maxHeight={200}
+          onChangeValue={(value) => {setCategory(value)}}
+        />
       <View style={{ zIndex: 10 }}>
         <AnimatedIcons
           name="refresh"
@@ -359,6 +380,7 @@ export default function Community() {
         post={postID}
         setPost={setPostID}
         snackBar={snackBar}
+        getList={getList}
       />
     </GestureHandlerRootView>
   );
@@ -368,6 +390,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 20,
     alignItems: "flex-end",
+    flexDirection: "row",
   },
   searchInput: {
     height: 40,

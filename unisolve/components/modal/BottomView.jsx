@@ -13,6 +13,7 @@ export default function BottomView({
   post,
   setPost,
   snackBar,
+  getList,
 }) {
   return (
     <BottomSheet
@@ -37,7 +38,7 @@ export default function BottomView({
           color="black"
         />
       </TouchableOpacity>
-      <BottomSheetView
+      <BottomSheetScrollView
         style={{
           flex: 1,
           marginTop: 35,
@@ -56,6 +57,7 @@ export default function BottomView({
             setMode={setMode}
             post={post}
             snackBar={snackBar}
+            getList={getList}
           />
         ) : mode === "chat" ? (
           <Chat
@@ -65,7 +67,7 @@ export default function BottomView({
             snackBar={snackBar}
           />
         ) : null}
-      </BottomSheetView>
+      </BottomSheetScrollView>
     </BottomSheet>
   );
 }
