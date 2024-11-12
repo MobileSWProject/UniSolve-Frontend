@@ -23,6 +23,7 @@ export default function BottomView({
       enablePanDownToClose={true}
       animateOnMount={false}
       enableDynamicSizing={false}
+      enableContentPanningGesture={false}
     >
       <TouchableOpacity
         style={{ position: "absolute", zIndex: 999, left: 10 }}
