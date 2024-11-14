@@ -21,11 +21,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 20,
   },
+  categoryContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 5,
+    minHeight: 30,
+  },
+  category: {
+    fontSize: 15,
+    color: "#AAA",
+  },
   titleContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 10,
     marginBottom: 5,
     minHeight: 30,
   },

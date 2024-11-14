@@ -99,7 +99,7 @@ export default function Community() {
     timestamp,
     postId,
     isForce = false,
-    category = null
+    tempCategory = null
   ) => {
     // isForce true인 경우 강제 새로고침
     // 단, isForce true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
@@ -108,14 +108,13 @@ export default function Community() {
     }
     setProcess(true);
     setIsSearching(false);
-
     try {
       const response = await _axios.get(
         `/posts?page=${tempPage}&last_timestamp=${
           timestamp || ""
         }&last_post_id=${
           postId || ""
-        }&search=${searchText}&category=${category}`
+        }&search=${searchText}&category_filter=${tempCategory || category}`
       );
 
       const newData = response.data.data || [];
@@ -343,7 +342,7 @@ export default function Community() {
                   }}
                   onPress={() => {
                     setCategory(item.value);
-                    getList(1, null, null, false, item.value);
+                    getList(1, null, null, true, item.value);
                   }}
                 >
                   <Text style={{ color: "#fff" }}>{item.label}</Text>

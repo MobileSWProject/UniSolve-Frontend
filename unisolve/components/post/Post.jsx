@@ -1,4 +1,5 @@
 import Entypo from "@expo/vector-icons/Entypo";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {
   useFocusEffect,
   useLocalSearchParams,
@@ -70,21 +71,22 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
         _axios
           .get(`/posts/${post}`)
           .then((response) => {
-            setBan(response.data.ban);
+            setBan(response.data.data.ban);
             setData({
-              id: response.data.id,
-              private: Boolean(response.data.is_private),
-              authorId: formatAuthor(response.data.author_id),
+              id: response.data.data.id,
+              private: Boolean(response.data.data.is_private),
+              authorId: formatAuthor(response.data.data.author_id),
               nickname: formatAuthor(
-                response.data.author_nickname ||
-                  `${response.data.author_id}_temp_nickname`
+                response.data.data.author_nickname ||
+                  `${response.data.data.author_id}_temp_nickname`
               ),
-              title: response.data.title,
-              content: response.data.description,
-              timestamp: response.data.timestamp,
-              image: response.data.image,
-              comments: response.data.comments,
-              commentsCount: response.data.comments_count,
+              category: response.data.data.category,
+              title: response.data.data.title,
+              content: response.data.data.description,
+              timestamp: response.data.data.timestamp,
+              image: response.data.data.image,
+              comments: response.data.data.comments,
+              commentsCount: response.data.data.comments_count,
             });
           })
           .catch((error) => {
@@ -116,8 +118,8 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       const updatedPost = await _axios.get(`/posts/${post}`);
       setData((prev) => ({
         ...prev,
-        comments: updatedPost.data.comments,
-        commentsCount: updatedPost.data.comments_count,
+        comments: updatedPost.data.data.comments,
+        commentsCount: updatedPost.data.data.comments_count,
       }));
     } finally {
       setNewComment("");
@@ -134,8 +136,8 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       const updatedPost = await _axios.get(`/posts/${post}`);
       setData((prev) => ({
         ...prev,
-        comments: updatedPost.data.comments,
-        commentsCount: updatedPost.data.comments_count,
+        comments: updatedPost.data.data.comments,
+        commentsCount: updatedPost.data.data.comments_count,
       }));
     } catch { }
   };
@@ -145,15 +147,15 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       const response = await _axios.put(`/comments/${targetCommentId}`, {
         content: editComment,
       });
-      if (response.data.status === "success") {
+      if (response.data.data.status === "success") {
         setEditComment("");
         setEditing(false);
         // 댓글 수정 후 댓글 목록만 다시 불러옴
         const updatedPost = await _axios.get(`/posts/${post}`);
         setData((prev) => ({
           ...prev,
-          comments: updatedPost.data.comments,
-          commentsCount: updatedPost.data.comments_count,
+          comments: updatedPost.data.data.comments,
+          commentsCount: updatedPost.data.data.comments_count,
         }));
       }
       snackBar(t("Function.edit"));
@@ -172,7 +174,7 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       setProcess(false);
       setModalVisible(false);
       setCommentID(null);
-      if (response.data.status === "success") {
+      if (response.data.data.status === "success") {
         setReportReason("");
         snackBar(t("Function.report_success"));
       }
@@ -213,16 +215,16 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
         title: editTitle,
         content: editContent,
       });
-      if (response.data.status === "success") {
+      if (response.data.data.status === "success") {
         // 게시글 수정 후 다시 불러오기
         const updatedPost = await _axios.get(`/posts/${post}`);
         setData((prev) => ({
           ...prev,
-          title: updatedPost.data.title,
-          content: updatedPost.data.description,
-          timestamp: updatedPost.data.timestamp,
-          comments: updatedPost.data.comments,
-          commentsCount: updatedPost.data.comments_count,
+          title: updatedPost.data.data.title,
+          content: updatedPost.data.data.description,
+          timestamp: updatedPost.data.data.timestamp,
+          comments: updatedPost.data.data.comments,
+          commentsCount: updatedPost.data.data.comments_count,
         }));
       }
       snackBar(t("Function.edit"));
@@ -292,6 +294,12 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
               </TouchableOpacity>
             )}
           </View>
+        </View>
+        <View style={styles.categoryContainer}>
+          <Text style={styles.category}>
+            <MaterialIcons name="category" size={15} color="#AAA" />
+            {data.category}
+          </Text>
         </View>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{data.title}</Text>
