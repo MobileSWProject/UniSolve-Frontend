@@ -23,7 +23,6 @@ import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
 import { debounce } from "lodash";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SnackBar from "../../../../components/Snackbar";
-import DropDownPicker from "react-native-dropdown-picker";
 
 import BottomView from "../../../../components/modal/BottomView";
 
@@ -31,7 +30,6 @@ export default function Community() {
   const { post } = useLocalSearchParams();
   const sheetRef = useRef(null);
 
-  const [value, setValue] = useState("");
   const [items, setItems] = useState([]);
   const [category, setCategory] = useState("");
 
@@ -61,7 +59,6 @@ export default function Community() {
 
   // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
-    getCategory();
     if (post && post > 0) {
       setMode("post");
       setPostID(post);
@@ -69,6 +66,7 @@ export default function Community() {
     } else {
       sheetRef.current?.collapse();
     }
+    getCategory();
   }, [post]);
 
   // const resetState = () => {
@@ -185,12 +183,17 @@ export default function Community() {
   // 검색 키워드 입력 중일 때 로딩 표시
   useEffect(() => {
     if (isSearching) {
+      if (!category) return;
       setCommunitys([]);
     }
   }, [isSearching]);
 
   // 검색 기능
   const handleChangeText = (text) => {
+    if (!category) {
+      setSearchText("");
+      return;
+    }
     setSearchText(text.trim());
   };
 
@@ -300,7 +303,8 @@ export default function Community() {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            setCategory("")
+            setSearchText("");
+            setCategory("");
           }}
         >
           <Text style={{ left: 10 }}>
