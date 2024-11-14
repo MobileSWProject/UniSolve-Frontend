@@ -127,69 +127,13 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
 
   return (
     <>
-      <KeyboardAwareScrollView style={styles.container}>
-        <View style={styles.submitContainer}>
-          {/* 공개 비공개 토글 버튼 */}
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              {
-                flex: 1,
-                left: 15,
-                marginRight: 15,
-                backgroundColor: isPrivate ? "#000" : mainColor,
-              },
-            ]}
-            hitSlop={4}
-            onPress={() => {
-              setIsPrivate(!isPrivate);
-            }}
-          >
-            <Text style={styles.submitButtonText}>
-              {isPrivate ? t("Function.private") : t("Function.public")}
-            </Text>
-          </TouchableOpacity>
-          {/* 등록 버튼 */}
-          <TouchableOpacity
-            style={styles.submitButton}
-            hitSlop={4}
-            onPress={handleSubmit}
-            disabled={submitLoading}
-          >
-            <Text style={styles.submitButtonText}>{t("Function.regist")}</Text>
-          </TouchableOpacity>
-        </View>
-        <View>
-          {/* 카테고리 */}
-          <DropDownPicker
-            open={open}
-            value={value}
-            items={items}
-            placeholder={t("Function.category")}
-            setOpen={setOpen}
-            setValue={setValue}
-            setItems={setItems}
-            maxHeight={200}
-            onChangeValue={(value) => {
-              setCategory(value);
-            }}
-          />
-          {/* 제목 */}
-          <Input
-            title={t("Function.title")}
-            content={title}
-            onChangeText={setTitle}
-            maxLength={32}
-          />
-          {/* 내용 */}
-          <Input
-            title={t("Function.content")}
-            content={content}
-            onChangeText={setContent}
-            textArea={true}
-          />
-          <Text style={styles.textTo}>{t("Function.attachment")}</Text>
-          <View style={{ flexDirection: "row", marginTop: 5 }}>
+      <KeyboardAwareScrollView
+        style={styles.container}
+        contentContainerStyle={{}}
+      >
+        {/* [카메라, 사진, 사진보기 그룹] */}
+        <View style={{ marginTop: 5 }}>
+          <View style={{ width: "93%", flexDirection: "row" }}>
             {/* 카메라 버튼 */}
             <TouchableOpacity
               style={styles.submitButton}
@@ -216,25 +160,96 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
                 />
               </Text>
             </TouchableOpacity>
-            {/* 사진 확인 버튼 */}
-            {image && (
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={() => {
-                  setModalType("image");
-                  setModalVisible(true);
-                }}
-              >
-                <Text style={styles.submitButtonText}>
-                  <Fontisto
-                    name="preview"
-                    size={24}
-                    color="white"
-                  />
-                </Text>
-              </TouchableOpacity>
-            )}
           </View>
+          {/* 사진 확인 버튼 */}
+          {image && (
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={() => {
+                setModalType("image");
+                setModalVisible(true);
+              }}
+            >
+              <Text style={styles.submitButtonText}>
+                <Fontisto
+                  name="preview"
+                  size={24}
+                  color="white"
+                />
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={{ alignItems: "center" }}>
+          {/* 제목 */}
+          <Input
+            title={t("Function.title")}
+            content={title}
+            onChangeText={setTitle}
+            maxLength={32}
+          />
+          <View style={{ marginTop: 30 }} />
+          {/* 카테고리 */}
+          <View style={{ width: "93%" }}>
+            <DropDownPicker
+              style={{ borderWidth: 1.4 }}
+              open={open}
+              value={value}
+              items={items}
+              placeholder={t("Function.category")}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setItems}
+              maxHeight={200}
+              onChangeValue={(value) => {
+                setCategory(value);
+              }}
+            />
+          </View>
+
+          {/* 내용 */}
+          <Input
+            title={t("Function.content")}
+            content={content}
+            onChangeText={setContent}
+            textArea={true}
+          />
+          <View style={{ marginTop: 30 }} />
+          <View style={styles.submitContainer}>
+            {/* 공개 비공개 토글 버튼 */}
+            <TouchableOpacity
+              style={[
+                styles.submitButton,
+                {
+                  flex: 1,
+                  left: 15,
+                  marginRight: 15,
+                  backgroundColor: isPrivate ? "#000" : mainColor,
+                },
+              ]}
+              hitSlop={4}
+              onPress={() => {
+                setIsPrivate(!isPrivate);
+              }}
+            >
+              <Text style={styles.submitButtonText}>
+                {isPrivate ? t("Function.private") : t("Function.public")}
+              </Text>
+            </TouchableOpacity>
+            {/* 등록 버튼 */}
+            <TouchableOpacity
+              style={styles.submitButton}
+              hitSlop={4}
+              onPress={handleSubmit}
+              disabled={submitLoading}
+            >
+              <Text style={styles.submitButtonText}>
+                {t("Function.regist")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           {modalVisible ? (
             <ModalView
               type={modalType}

@@ -4,11 +4,13 @@ import { styles as FormStyle } from "./FormStyle";
 
 const styles = StyleSheet.create({
   container: {
-    left: 10,
+    // left: 10,
     top: 10,
-    padding: 35,
+    // padding: 35,
+    paddingHorizontal: 20,
   },
   submitContainer: {
+    width: "93%",
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
@@ -57,8 +59,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   textTo: {
-    ...FormStyle.textTo
-  }
+    ...FormStyle.textTo,
+  },
 });
 
 export default styles;
