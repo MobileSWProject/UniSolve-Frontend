@@ -1,7 +1,11 @@
 import { useCallback, useState } from "react";
 import { Tabs } from "expo-router";
 import { TabBarIcon } from "../../../components/navigation/TabBarIcon";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 import { useFocusEffect } from "@react-navigation/native";
 import { View, Dimensions, TouchableOpacity } from "react-native";
 import { mainColor } from "../../../constants/Colors";
@@ -23,7 +27,10 @@ function AnimatedIcon({ name, color, focused }) {
 
   return (
     <Animated.View style={animatedStyle}>
-      <TabBarIcon name={name} color={color} />
+      <TabBarIcon
+        name={name}
+        color={color}
+      />
     </Animated.View>
   );
 }
@@ -38,7 +45,9 @@ function TabUnderline({ index }) {
     }, [index, tabWidth])
   );
 
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ translateX: translateX.value }] }));
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
   return (
     <Animated.View
@@ -64,7 +73,7 @@ export default function TabsLayout() {
   return (
     <View style={{ flex: 1 }}>
       <Tabs
-        initialRouteName="home/index"
+        initialRouteName="home"
         screenOptions={{
           tabBarActiveTintColor: mainColor,
           tabBarInactiveTintColor: "#222",
