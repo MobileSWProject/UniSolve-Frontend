@@ -28,6 +28,7 @@ import useUserId from "../../hooks/useUserId"; // 커스텀 훅 불러오기
 import formatAuthor from "../../utils/formatAuthor";
 import { mainColor } from "../../constants/Colors";
 import CommentSection from "../../components/post/CommentSection";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { useTranslation } from "react-i18next";
 import "../../i18n";
@@ -55,6 +56,8 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
 
+  const [isPrivate, setIsPrivate] = useState(false);
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -80,6 +83,7 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
                 response.data.data.author_nickname ||
                   `${response.data.data.author_id}_temp_nickname`
               ),
+              private: response.data.data.is_private,
               category: response.data.data.category,
               title: response.data.data.title,
               content: response.data.data.description,
@@ -174,7 +178,7 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       setProcess(false);
       setModalVisible(false);
       setCommentID(null);
-      if (response.data.data.status === "success") {
+      if (response.data.status === "success") {
         setReportReason("");
         snackBar(t("Function.report_success"));
       }
@@ -211,15 +215,18 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       setEditContent("");
       setEditing(false);
       setProcess(true);
+      setIsPrivate(false);
       const response = await _axios.put(`/posts/${post}`, {
         title: editTitle,
         content: editContent,
+        toggle_privacy: isPrivate,
       });
-      if (response.data.data.status === "success") {
+      if (response.data.status === "success") {
         // 게시글 수정 후 다시 불러오기
         const updatedPost = await _axios.get(`/posts/${post}`);
         setData((prev) => ({
           ...prev,
+          private: updatedPost.data.data.is_private,
           title: updatedPost.data.data.title,
           content: updatedPost.data.data.description,
           timestamp: updatedPost.data.data.timestamp,
@@ -296,9 +303,13 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
           </View>
         </View>
         <View style={styles.categoryContainer}>
-          <Text style={styles.category}>
+        <Text style={styles.category}>
             <MaterialIcons name="category" size={15} color="#AAA" />
             {data.category}
+          </Text>
+          <Text style={styles.category}>
+            <MaterialIcons name={data.private ? "lock" : "lock-open"} size={15} color="#AAA" />
+            {data.private ? t("Function.private") : t("Function.public")}
           </Text>
         </View>
         <View style={styles.titleContainer}>
@@ -386,6 +397,28 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
                     onChangeText={(text) => setEditContent(text)}
                     multiline={true}
                   />
+                  {data.private ? 
+                    <View style={styles.submitContainer}>
+                    <TouchableOpacity
+                      style={{
+                        height: 30,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                      hitSlop={4}
+                      onPress={() => {
+                        setIsPrivate(!isPrivate);
+                      }}
+                    >
+                      <MaterialCommunityIcons
+                        name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"}
+                        size={24}
+                        color="black"
+                      />
+                      <Text style={{}}>{`${t("Function.public")}로 전환하기(전환 후 비공개로 변경 불가)`}</Text>
+                    </TouchableOpacity>
+                  </View> : null}
                 </>
               ) : (
                 <TextInput

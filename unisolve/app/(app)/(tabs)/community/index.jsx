@@ -37,6 +37,8 @@ export default function Community() {
   const [mode, setMode] = useState("");
   const [postID, setPostID] = useState("");
 
+  const [ban, setBan] = useState(true);
+
   const [communitys, setCommunitys] = useState([]);
   const [page, setPage] = useState(1);
   const [isRemain, setIsRemain] = useState(true); // 총 페이지 수 관리
@@ -116,6 +118,8 @@ export default function Community() {
           postId || ""
         }&search=${searchText}&category_filter=${tempCategory || category}`
       );
+      setBan(response.data.ban);
+
 
       const newData = response.data.data || [];
       setIsRemain(response.data.is_remain); // 총 페이지 수 설정
@@ -277,6 +281,18 @@ export default function Community() {
     }
   }, [canRefresh, isRefreshing]);
 
+  const postCreate = async () => {
+    try {
+      setMode("create");
+      sheetRef.current?.expand();
+      const response = await _axios.get("/posts/check_ban_status")
+      if (response.data.ban) {
+        sheetRef.current?.collapse();
+        setBan(response.data.ban);
+      }
+    } catch { }
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor }}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -296,16 +312,14 @@ export default function Community() {
           />
           <TouchableOpacity
             style={styles.button}
-            onPress={() => {
-              setMode("create");
-              sheetRef.current?.expand();
-            }}
+            disabled={ban}
+            onPress={() => {postCreate();}}
           >
             <Text style={{ left: 10 }}>
               <Ionicons
                 name="create"
                 size={30}
-                color="white"
+                color={ban ? "#AAA" : "white"}
               />
             </Text>
           </TouchableOpacity>
@@ -425,6 +439,7 @@ export default function Community() {
         </AnimatedView>
         <BottomView
           sheetRef={sheetRef}
+          ban={ban}
           mode={mode}
           setMode={setMode}
           post={postID}
