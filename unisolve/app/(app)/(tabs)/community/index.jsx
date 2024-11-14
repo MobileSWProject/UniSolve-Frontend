@@ -23,7 +23,7 @@ import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
 import { debounce } from "lodash";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SnackBar from "../../../../components/Snackbar";
-import DropDownPicker from 'react-native-dropdown-picker';
+import DropDownPicker from "react-native-dropdown-picker";
 
 import BottomView from "../../../../components/modal/BottomView";
 
@@ -108,7 +108,11 @@ export default function Community() {
 
     try {
       const response = await _axios.get(
-        `/posts?page=${tempPage}&last_timestamp=${timestamp || ""}&last_post_id=${postId || ""}&search=${searchText}&category=${category}`
+        `/posts?page=${tempPage}&last_timestamp=${
+          timestamp || ""
+        }&last_post_id=${
+          postId || ""
+        }&search=${searchText}&category=${category}`
       );
 
       const newData = response.data.data || [];
@@ -290,7 +294,11 @@ export default function Community() {
           }}
         >
           <Text style={{ left: 10 }}>
-            <Ionicons name="create" size={30} color="white" />
+            <Ionicons
+              name="create"
+              size={30}
+              color="white"
+            />
           </Text>
         </TouchableOpacity>
       </View>
@@ -351,7 +359,7 @@ export default function Community() {
               )}
               contentContainerStyle={{ paddingTop: 20 }}
               onEndReached={appendNextData}
-              onEndReachedThreshold={0.1} // 적절한 임계값 설정
+              onEndReachedThreshold={0.5} // 적절한 임계값 설정
               onScroll={handleScroll}
               onScrollBeginDrag={handleScrollStartDrag}
               onScrollEndDrag={handleScrollEndDrag}
@@ -359,7 +367,7 @@ export default function Community() {
                 process || isSearching ? (
                   <SkeletonList />
                 ) : (
-                  <View style={{ marginBottom: 100 }} />
+                  <View style={{ marginBottom: isRemain ? 500 : 100 }} />
                 )
               }
               refreshControl={

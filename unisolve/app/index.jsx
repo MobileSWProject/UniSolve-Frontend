@@ -54,13 +54,14 @@ export default function Home() {
       try {
         const token = await AsyncStorage.getItem("token");
         if (!token) throw new Error("No token found");
-
         const decodedToken = decodeJWT(token);
         const currentTime = Math.floor(Date.now() / 1000);
         const isTokenExpired = decodedToken.exp < currentTime;
 
-        if (isTokenExpired) await AsyncStorage.removeItem("token");
-        else {
+        if (isTokenExpired) {
+          await AsyncStorage.removeItem("token");
+          throw new Error("Token is expired");
+        } else {
           setCertification(true);
           snackBar(`${t("Stage.success")}${t("User.already")}`);
           setTimeout(() => {
@@ -85,7 +86,7 @@ export default function Home() {
       }
     };
     checkCertification();
-  }, [logoPosition, inputOpacity]);
+  }, []);
 
   const handleSend = async () => {
     try {
