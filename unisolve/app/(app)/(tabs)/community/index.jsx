@@ -32,14 +32,8 @@ export default function Community() {
   const sheetRef = useRef(null);
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState({label: '본관 1층', value: '1'});
-  const [items, setItems] = useState([
-    { label: '본관 1층', value: '1' },
-    { label: '본관 2층', value: '2' },
-    { label: '본관 3층', value: '3' },
-    { label: '본관 4층', value: '4' },
-    { label: '별관 지하 1층', value: '5' },
- ]);
+  const [value, setValue] = useState();
+  const [items, setItems] = useState([]);
   const [category, setCategory] = useState("");
 
   const [mode, setMode] = useState("");
@@ -69,6 +63,7 @@ export default function Community() {
   // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
     getList(1, null, null);
+    getCategory();
     if (post && post > 0) {
       setMode("post");
       setPostID(post);
@@ -92,6 +87,15 @@ export default function Community() {
     setSnackbarVisible(true);
   };
 
+  const getCategory = async () => {
+    try {
+      const response = await _axios.post("posts/category");
+      setItems(response.data.data);
+    } catch {
+      setItems([]);
+    }
+  }
+
   // 서버에서 데이터 가져오기
   const getList = async (tempPage, timestamp, postId, isForce = false) => {
     // isForce true인 경우 강제 새로고침
@@ -103,7 +107,6 @@ export default function Community() {
     setIsSearching(false);
 
     try {
-      // console.log(searchText);
       const response = await _axios.get(
         `/posts?page=${tempPage}&last_timestamp=${timestamp || ""}&last_post_id=${postId || ""}&search=${searchText}&category=${category}`
       );
@@ -300,7 +303,7 @@ export default function Community() {
           setValue={setValue}
           setItems={setItems}
           maxHeight={200}
-          onChangeValue={(value) => {setCategory(value)}}
+          onChangeValue={(value) => {setCategory(value); getList(1, null, null);}}
         />
       <View style={{ zIndex: 10 }}>
         <AnimatedIcons
@@ -381,6 +384,7 @@ export default function Community() {
         setPost={setPostID}
         snackBar={snackBar}
         getList={getList}
+        categorys={items}
       />
     </GestureHandlerRootView>
   );

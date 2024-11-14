@@ -10,17 +10,23 @@ import { mainColor } from "../../constants/Colors";
 import ModalView from "../../components/modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
+import DropDownPicker from 'react-native-dropdown-picker';
 
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
-export default function PostCreate({setMode, setPost, snackBar}) {
+export default function PostCreate({setMode, setPost, snackBar, categorys}) {
   const { t } = useTranslation();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState();
+  const [items, setItems] = useState(categorys);
+  const [category, setCategory] = useState("");
 
   const [image, setImage] = useState(null);
 
@@ -82,6 +88,7 @@ export default function PostCreate({setMode, setPost, snackBar}) {
     data.append("title", title);
     data.append("content", content);
     data.append("is_private", Number(isPrivate));
+    data.append("category", value);
 
     if (image) {
       if (Platform.OS === "web") {
@@ -148,6 +155,17 @@ export default function PostCreate({setMode, setPost, snackBar}) {
           </TouchableOpacity>
         </View>
         <View>
+        <DropDownPicker
+          open={open}
+          value={value}
+          items={items}
+          placeholder={t("Function.category")}
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setItems}
+          maxHeight={200}
+          onChangeValue={(value) => {setCategory(value);}}
+        />
           <Input
             title={t("Function.title")}
             content={title}

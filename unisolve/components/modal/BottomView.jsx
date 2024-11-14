@@ -14,6 +14,7 @@ export default function BottomView({
   setPost,
   snackBar,
   getList,
+  categorys,
 }) {
   return (
     <BottomSheet
@@ -51,6 +52,7 @@ export default function BottomView({
             setMode={setMode}
             setPost={setPost}
             snackBar={snackBar}
+            categorys={categorys}
           />
         ) : mode === "post" ? (
           <Post

@@ -87,7 +87,7 @@ export default function PostListItem({ item, index, count, type, bottomView, set
           {item.description ? item.description.replace(/\n/g, " ") : ""}
         </Text>
         <View style={styles.header}>
-          {type === "history" ? (
+          {type === "history" || type === "community" ? (
             <Entypo
               name="new-message"
               size={16}

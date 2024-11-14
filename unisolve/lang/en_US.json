@@ -181,6 +181,7 @@
         "send": "Send",
         "reply": "Reply",
         "count": "Count",
+        "category": "Category",
         "title": "Title",
         "content": "Content",
         "attachment": "Attachment",
