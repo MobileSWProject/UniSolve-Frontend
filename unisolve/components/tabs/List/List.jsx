@@ -32,8 +32,9 @@ export default function PostListItem({ item, index, count, type, bottomView, set
       ]}
       onPress={async () => {
         if (setVisible) setVisible(false);
-        if (type === "notification") await updateNotification(item.not_id);
-        if (type === "community") {
+        if (type === "sanction") null
+        else if (type === "notification") await updateNotification(item.not_id);
+        else if (type === "community") {
           bottomView.sheetRef.current?.collapse();
           bottomView.setMode("post");
           bottomView.setPostID(item.id);
@@ -66,7 +67,10 @@ export default function PostListItem({ item, index, count, type, bottomView, set
             ? `#${item.id} | ${item.private ? t("Function.private") : t("Function.public")}`
             : type === "notification"
             ? t(`Function.notification_${item.type}`)
-            : null}
+            : type === "sanction"
+            ? `${t(`User.sanction_${item.type}`)}\n${t("User.sanction_start")}: ${item.created_at}\n${t("User.sanction_end")}: ${item.end_at}\n${t("User.sanction_content")}: ${item.content || t("User.sanction_empty")}`
+            : null
+          }
         </Text>
         <Text>
           {type === "notification" ? item.timebefore : item.timestamp}
@@ -83,7 +87,7 @@ export default function PostListItem({ item, index, count, type, bottomView, set
           {item.description ? item.description.replace(/\n/g, " ") : ""}
         </Text>
         <View style={styles.header}>
-          {type !== "notification" ? (
+          {type === "history" ? (
             <Entypo
               name="new-message"
               size={16}
