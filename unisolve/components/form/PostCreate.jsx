@@ -10,12 +10,13 @@ import { mainColor } from "../../constants/Colors";
 import ModalView from "../../components/modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
-import DropDownPicker from 'react-native-dropdown-picker';
+import DropDownPicker from "react-native-dropdown-picker";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-export default function PostCreate({setMode, setPost, snackBar, categorys}) {
+export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
   const { t } = useTranslation();
 
   const [title, setTitle] = useState("");
@@ -109,7 +110,10 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
       const postId = response.postId;
       snackBar(`${t("Stage.success")}${t("Function.register_success")}`);
       setSubmitLoading(false);
-      setTimeout(() => {setPost(postId); setMode("post")});
+      setTimeout(() => {
+        setPost(postId);
+        setMode("post");
+      });
     } catch (error) {
       console.log("Error during submission:", error);
       if (
@@ -124,98 +128,143 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
 
   return (
     <>
-      <KeyboardAwareScrollView style={styles.container}>
-        <View style={styles.submitContainer}>
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              {
-                flex: 1,
-                left: 15,
-                marginRight: 15,
-                backgroundColor: isPrivate ? "#000" : mainColor,
-              },
-            ]}
-            hitSlop={4}
-            onPress={() => {
-              setIsPrivate(!isPrivate);
-            }}
-          >
-            <Text style={styles.submitButtonText}>
-              {isPrivate ? t("Function.private") : t("Function.public")}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.submitButton}
-            hitSlop={4}
-            onPress={handleSubmit}
-            disabled={submitLoading}
-          >
-            <Text style={styles.submitButtonText}>{t("Function.regist")}</Text>
-          </TouchableOpacity>
-        </View>
-        <View>
-        <DropDownPicker
-          open={open}
-          value={value}
-          items={items}
-          placeholder={t("Function.category")}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-          maxHeight={200}
-          onChangeValue={(value) => {setCategory(value);}}
-        />
-          <Input
-            title={t("Function.title")}
-            content={title}
-            onChangeText={setTitle}
-            maxLength={32}
-          />
-          <Input
-            title={t("Function.content")}
-            content={content}
-            onChangeText={setContent}
-            textArea={true}
-          />
-          <Text style={styles.textTo}>{t("Function.attachment")}</Text>
-          <View style={{ flexDirection: "row", marginTop: 5 }}>
+      <KeyboardAwareScrollView
+        style={styles.container}
+        contentContainerStyle={{}}
+      >
+        {/* [카메라, 사진, 사진보기 그룹] */}
+        <View style={{ marginTop: 5, alignItems: "center" }}>
+          <View style={{ width: "93%", flexDirection: "row", gap: 10 }}>
+            {/* 카메라 버튼 */}
             <TouchableOpacity
-              style={styles.submitButton}
+              style={[styles.submitButton, { height: 60, width: 60 }]}
               onPress={BtnHandleFunctions.takePhoto}
             >
               <Text style={styles.submitButtonText}>
-                <FontAwesome name="camera" size={24} color="white" />
+                <FontAwesome
+                  name="camera"
+                  size={24}
+                  color="white"
+                />
               </Text>
             </TouchableOpacity>
+            {/* 사진 버튼 */}
             <TouchableOpacity
-              style={styles.submitButton}
+              style={[styles.submitButton, { height: 60, width: 60 }]}
               onPress={BtnHandleFunctions.attachPhoto}
             >
               <Text style={styles.submitButtonText}>
-                <FontAwesome name="photo" size={24} color="white" />
+                <FontAwesome
+                  name="photo"
+                  size={24}
+                  color="white"
+                />
               </Text>
             </TouchableOpacity>
+            {/* 사진 확인 버튼 */}
             {image && (
               <TouchableOpacity
-                style={styles.submitButton}
+                style={[styles.submitButton, { height: 60, width: 60 }]}
                 onPress={() => {
                   setModalType("image");
                   setModalVisible(true);
                 }}
               >
                 <Text style={styles.submitButtonText}>
-                  <Fontisto name="preview" size={24} color="white" />
+                  <Fontisto
+                    name="preview"
+                    size={24}
+                    color="white"
+                  />
                 </Text>
               </TouchableOpacity>
             )}
           </View>
+        </View>
+
+        <View style={{ alignItems: "center" }}>
+          {/* 제목 */}
+          <Input
+            title={t("Function.title")}
+            content={title}
+            onChangeText={setTitle}
+            maxLength={32}
+          />
+          <View style={{ marginTop: 30 }} />
+          {/* 카테고리 */}
+          <View style={{ width: "93%" }}>
+            <DropDownPicker
+              style={{ borderWidth: 1.4 }}
+              open={open}
+              value={value}
+              items={items}
+              placeholder={t("Function.category")}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setItems}
+              maxHeight={200}
+              onChangeValue={(value) => {
+                setCategory(value);
+              }}
+            />
+          </View>
+
+          {/* 내용 */}
+          <Input
+            title={t("Function.content")}
+            content={content}
+            onChangeText={setContent}
+            textArea={true}
+          />
+          <View style={{ marginTop: 10 }} />
+          <View style={styles.submitContainer}>
+            {/* 공개 비공개 토글 버튼 */}
+            <TouchableOpacity
+              style={{
+                height: 30,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+              }}
+              hitSlop={4}
+              onPress={() => {
+                setIsPrivate(!isPrivate);
+              }}
+            >
+              <MaterialCommunityIcons
+                name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"}
+                size={24}
+                color="black"
+              />
+              <Text style={{}}>{`${t("Function.private")}로 질문하기`}</Text>
+              {/* <Text style={styles.submitButtonText}>
+                {isPrivate ? t("Function.private") : t("Function.public")}
+              </Text> */}
+            </TouchableOpacity>
+            <View style={{ marginTop: 10 }} />
+            {/* 등록 버튼 */}
+            <TouchableOpacity
+              style={[
+                styles.submitButton,
+                { alignSelf: "stretch", width: "100%" },
+              ]}
+              hitSlop={4}
+              onPress={handleSubmit}
+              disabled={submitLoading}
+            >
+              <Text style={styles.submitButtonText}>
+                {t("Function.regist")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginBottom: 30 }} />
+
           {modalVisible ? (
             <ModalView
               type={modalType}
               visible={modalVisible}
               setVisible={setModalVisible}
-              image={{image, setImage}}
+              image={{ image, setImage }}
             />
           ) : null}
         </View>

@@ -2,32 +2,60 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { mainColor } from "../../constants/Colors";
 import { styles } from "../../styles/form/FormStyle";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-export default function Input({ title, subTitle, subTitleConfirm, placeholder, content, onChangeText, disabled, maxLength, secure, buttonDisabled, buttonOnPress, buttonText, textArea }) {
+export default function Input({
+  title,
+  subTitle,
+  subTitleConfirm,
+  placeholder,
+  content,
+  onChangeText,
+  disabled,
+  maxLength,
+  secure,
+  buttonDisabled,
+  buttonOnPress,
+  buttonText,
+  textArea,
+}) {
   const { t } = useTranslation();
 
   function lastConvert(text) {
-    if (/^[가-힣]$/.test(text.charAt(text.length - 1)) && (text.charAt(text.length - 1).charCodeAt(0) - 44032) % 28 !== 0) return t("Function.input_final");
+    if (
+      /^[가-힣]$/.test(text.charAt(text.length - 1)) &&
+      (text.charAt(text.length - 1).charCodeAt(0) - 44032) % 28 !== 0
+    )
+      return t("Function.input_final");
     else return t("Function.input_nofinal");
   }
   return (
-    <View style={{width:"93%"}}>
-      <Text style={[styles.textTo, !title ? {marginLeft : 0} : null]}>
+    <View style={{ width: "93%" }}>
+      <Text style={[styles.textTo, !title ? { marginLeft: 0 } : null]}>
         {title}
-        {
-          subTitle ?
-          <Text style={[styles.textTo, { fontSize: 12, color: subTitleConfirm && subTitleConfirm ? "blue" : "red" }]}>
+        {subTitle ? (
+          <Text
+            style={[
+              styles.textTo,
+              {
+                fontSize: 12,
+                color: subTitleConfirm && subTitleConfirm ? "blue" : "red",
+              },
+            ]}
+          >
             ({subTitle})
-          </Text> :
-          null
-        }
+          </Text>
+        ) : null}
       </Text>
       <View style={styles.view}>
         <TextInput
-          style={[styles.inputTo, title && textArea ? { height: 350 } : null]}
-          placeholder={placeholder ? placeholder : `${title}${lastConvert(title)} ${t("Function.input")}`}
+          style={[styles.inputTo, title && textArea ? { height: 280 } : null]}
+          placeholder={
+            placeholder
+              ? placeholder
+              : `${title}${lastConvert(title)} ${t("Function.input")}`
+          }
           value={content}
           onChangeText={onChangeText}
           disabled={disabled}
@@ -35,19 +63,20 @@ export default function Input({ title, subTitle, subTitleConfirm, placeholder, c
           secureTextEntry={secure ? secure : null}
           multiline={textArea ? true : false}
         />
-        {
-          buttonOnPress ?
+        {buttonOnPress ? (
           <TouchableOpacity
             disabled={buttonDisabled}
-            style={[styles.buttonSmall, { backgroundColor: buttonDisabled ? "gray" : mainColor }]}
+            style={[
+              styles.buttonSmall,
+              { backgroundColor: buttonDisabled ? "gray" : mainColor },
+            ]}
             onPress={buttonOnPress}
           >
             <Text style={styles.buttonTextSmall}>
               {buttonText ? buttonText : t("Function.confirm")}
             </Text>
-          </TouchableOpacity> : 
-          null
-        }
+          </TouchableOpacity>
+        ) : null}
       </View>
     </View>
   );

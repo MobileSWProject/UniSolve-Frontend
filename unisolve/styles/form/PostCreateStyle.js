@@ -4,25 +4,25 @@ import { styles as FormStyle } from "./FormStyle";
 
 const styles = StyleSheet.create({
   container: {
-    left: 10,
+    // left: 10,
     top: 10,
-    padding: 35,
+    // padding: 35,
+    paddingHorizontal: 20,
   },
   submitContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    right: 20,
+    width: "93%",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    gap: 10,
   },
   submitButton: {
     backgroundColor: mainColor,
     paddingHorizontal: 16,
-    borderRadius: 15,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     height: 40,
     width: 80,
-    marginLeft: 5,
   },
   submitButtonText: {
     color: "white",
@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   textTo: {
-    ...FormStyle.textTo
-  }
+    ...FormStyle.textTo,
+  },
 });
 
 export default styles;
