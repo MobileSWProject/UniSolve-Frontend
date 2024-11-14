@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
   },
   inputTo: {
     width: "100%",
-    height: 40,
+    height: 44,
     borderColor: "#fff",
     borderWidth: 1.4,
     borderRadius: 6,

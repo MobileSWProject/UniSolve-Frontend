@@ -11,6 +11,7 @@ import ModalView from "../../components/modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import DropDownPicker from "react-native-dropdown-picker";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { useTranslation } from "react-i18next";
 import "../../i18n";
@@ -132,11 +133,11 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
         contentContainerStyle={{}}
       >
         {/* [카메라, 사진, 사진보기 그룹] */}
-        <View style={{ marginTop: 5 }}>
-          <View style={{ width: "93%", flexDirection: "row" }}>
+        <View style={{ marginTop: 5, alignItems: "center" }}>
+          <View style={{ width: "93%", flexDirection: "row", gap: 10 }}>
             {/* 카메라 버튼 */}
             <TouchableOpacity
-              style={styles.submitButton}
+              style={[styles.submitButton, { height: 60, width: 60 }]}
               onPress={BtnHandleFunctions.takePhoto}
             >
               <Text style={styles.submitButtonText}>
@@ -149,7 +150,7 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
             </TouchableOpacity>
             {/* 사진 버튼 */}
             <TouchableOpacity
-              style={styles.submitButton}
+              style={[styles.submitButton, { height: 60, width: 60 }]}
               onPress={BtnHandleFunctions.attachPhoto}
             >
               <Text style={styles.submitButtonText}>
@@ -160,25 +161,25 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
                 />
               </Text>
             </TouchableOpacity>
+            {/* 사진 확인 버튼 */}
+            {image && (
+              <TouchableOpacity
+                style={[styles.submitButton, { height: 60, width: 60 }]}
+                onPress={() => {
+                  setModalType("image");
+                  setModalVisible(true);
+                }}
+              >
+                <Text style={styles.submitButtonText}>
+                  <Fontisto
+                    name="preview"
+                    size={24}
+                    color="white"
+                  />
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
-          {/* 사진 확인 버튼 */}
-          {image && (
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={() => {
-                setModalType("image");
-                setModalVisible(true);
-              }}
-            >
-              <Text style={styles.submitButtonText}>
-                <Fontisto
-                  name="preview"
-                  size={24}
-                  color="white"
-                />
-              </Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         <View style={{ alignItems: "center" }}>
@@ -215,31 +216,38 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
             onChangeText={setContent}
             textArea={true}
           />
-          <View style={{ marginTop: 30 }} />
+          <View style={{ marginTop: 10 }} />
           <View style={styles.submitContainer}>
             {/* 공개 비공개 토글 버튼 */}
             <TouchableOpacity
-              style={[
-                styles.submitButton,
-                {
-                  flex: 1,
-                  left: 15,
-                  marginRight: 15,
-                  backgroundColor: isPrivate ? "#000" : mainColor,
-                },
-              ]}
+              style={{
+                height: 30,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+              }}
               hitSlop={4}
               onPress={() => {
                 setIsPrivate(!isPrivate);
               }}
             >
-              <Text style={styles.submitButtonText}>
+              <MaterialCommunityIcons
+                name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"}
+                size={24}
+                color="black"
+              />
+              <Text style={{}}>{`${t("Function.private")}로 질문하기`}</Text>
+              {/* <Text style={styles.submitButtonText}>
                 {isPrivate ? t("Function.private") : t("Function.public")}
-              </Text>
+              </Text> */}
             </TouchableOpacity>
+            <View style={{ marginTop: 10 }} />
             {/* 등록 버튼 */}
             <TouchableOpacity
-              style={styles.submitButton}
+              style={[
+                styles.submitButton,
+                { alignSelf: "stretch", width: "100%" },
+              ]}
               hitSlop={4}
               onPress={handleSubmit}
               disabled={submitLoading}
@@ -249,6 +257,7 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
               </Text>
             </TouchableOpacity>
           </View>
+          <View style={{ marginBottom: 30 }} />
 
           {modalVisible ? (
             <ModalView
