@@ -10,12 +10,12 @@ import { mainColor } from "../../constants/Colors";
 import ModalView from "../../components/modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
-import DropDownPicker from 'react-native-dropdown-picker';
+import DropDownPicker from "react-native-dropdown-picker";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-export default function PostCreate({setMode, setPost, snackBar, categorys}) {
+export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
   const { t } = useTranslation();
 
   const [title, setTitle] = useState("");
@@ -109,7 +109,10 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
       const postId = response.postId;
       snackBar(`${t("Stage.success")}${t("Function.register_success")}`);
       setSubmitLoading(false);
-      setTimeout(() => {setPost(postId); setMode("post")});
+      setTimeout(() => {
+        setPost(postId);
+        setMode("post");
+      });
     } catch (error) {
       console.log("Error during submission:", error);
       if (
@@ -126,6 +129,7 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
     <>
       <KeyboardAwareScrollView style={styles.container}>
         <View style={styles.submitContainer}>
+          {/* 공개 비공개 토글 버튼 */}
           <TouchableOpacity
             style={[
               styles.submitButton,
@@ -145,6 +149,7 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
               {isPrivate ? t("Function.private") : t("Function.public")}
             </Text>
           </TouchableOpacity>
+          {/* 등록 버튼 */}
           <TouchableOpacity
             style={styles.submitButton}
             hitSlop={4}
@@ -155,23 +160,28 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
           </TouchableOpacity>
         </View>
         <View>
-        <DropDownPicker
-          open={open}
-          value={value}
-          items={items}
-          placeholder={t("Function.category")}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-          maxHeight={200}
-          onChangeValue={(value) => {setCategory(value);}}
-        />
+          {/* 카테고리 */}
+          <DropDownPicker
+            open={open}
+            value={value}
+            items={items}
+            placeholder={t("Function.category")}
+            setOpen={setOpen}
+            setValue={setValue}
+            setItems={setItems}
+            maxHeight={200}
+            onChangeValue={(value) => {
+              setCategory(value);
+            }}
+          />
+          {/* 제목 */}
           <Input
             title={t("Function.title")}
             content={title}
             onChangeText={setTitle}
             maxLength={32}
           />
+          {/* 내용 */}
           <Input
             title={t("Function.content")}
             content={content}
@@ -180,22 +190,33 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
           />
           <Text style={styles.textTo}>{t("Function.attachment")}</Text>
           <View style={{ flexDirection: "row", marginTop: 5 }}>
+            {/* 카메라 버튼 */}
             <TouchableOpacity
               style={styles.submitButton}
               onPress={BtnHandleFunctions.takePhoto}
             >
               <Text style={styles.submitButtonText}>
-                <FontAwesome name="camera" size={24} color="white" />
+                <FontAwesome
+                  name="camera"
+                  size={24}
+                  color="white"
+                />
               </Text>
             </TouchableOpacity>
+            {/* 사진 버튼 */}
             <TouchableOpacity
               style={styles.submitButton}
               onPress={BtnHandleFunctions.attachPhoto}
             >
               <Text style={styles.submitButtonText}>
-                <FontAwesome name="photo" size={24} color="white" />
+                <FontAwesome
+                  name="photo"
+                  size={24}
+                  color="white"
+                />
               </Text>
             </TouchableOpacity>
+            {/* 사진 확인 버튼 */}
             {image && (
               <TouchableOpacity
                 style={styles.submitButton}
@@ -205,7 +226,11 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
                 }}
               >
                 <Text style={styles.submitButtonText}>
-                  <Fontisto name="preview" size={24} color="white" />
+                  <Fontisto
+                    name="preview"
+                    size={24}
+                    color="white"
+                  />
                 </Text>
               </TouchableOpacity>
             )}
@@ -215,7 +240,7 @@ export default function PostCreate({setMode, setPost, snackBar, categorys}) {
               type={modalType}
               visible={modalVisible}
               setVisible={setModalVisible}
-              image={{image, setImage}}
+              image={{ image, setImage }}
             />
           ) : null}
         </View>
