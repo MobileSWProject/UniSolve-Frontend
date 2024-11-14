@@ -25,6 +25,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import SnackBar from "../../../../components/Snackbar";
 
 import BottomView from "../../../../components/modal/BottomView";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Community() {
   const { post } = useLocalSearchParams();
@@ -90,10 +91,16 @@ export default function Community() {
     } catch {
       setItems([]);
     }
-  }
+  };
 
   // 서버에서 데이터 가져오기
-  const getList = async (tempPage, timestamp, postId, isForce = false, category = null) => {
+  const getList = async (
+    tempPage,
+    timestamp,
+    postId,
+    isForce = false,
+    category = null
+  ) => {
     // isForce true인 경우 강제 새로고침
     // 단, isForce true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
     if (isForce === false) {
@@ -104,8 +111,10 @@ export default function Community() {
 
     try {
       const response = await _axios.get(
-        `/posts?page=${tempPage}&last_timestamp=${timestamp || ""
-        }&last_post_id=${postId || ""
+        `/posts?page=${tempPage}&last_timestamp=${
+          timestamp || ""
+        }&last_post_id=${
+          postId || ""
         }&search=${searchText}&category=${category}`
       );
 
@@ -271,146 +280,161 @@ export default function Community() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor }}>
-      <SnackBar
-        visible={snackbarVisible}
-        message={snackbarMessage}
-        onDismiss={() => setSnackbarVisible(false)}
-      />
-      {/* 검색창 */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="검색어"
-          value={searchText}
-          onChangeText={handleChangeText}
-          placeholderTextColor={"white"}
+      <SafeAreaView style={{ flex: 1 }}>
+        <SnackBar
+          visible={snackbarVisible}
+          message={snackbarMessage}
+          onDismiss={() => setSnackbarVisible(false)}
         />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            setMode("create");
-            sheetRef.current?.expand();
-          }}
-        >
-          <Text style={{ left: 10 }}>
-            <Ionicons
-              name="create"
-              size={30}
-              color="white"
-            />
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            setSearchText("");
-            setCategory("");
-          }}
-        >
-          <Text style={{ left: 10 }}>
-            <Ionicons name="arrow-back" size={30} color="white" />
-          </Text>
-        </TouchableOpacity>
-      </View>
-      {!category ? (<FlatList
-        ref={flatListRef}
-        data={items}
-        keyExtractor={(item) => item.value.toString()}
-        renderItem={({ item }) => {
-          return (
-            <TouchableOpacity
-              style={{ padding: 10, borderColor: "#fff", borderWidth: "2px", borderRadius: "15px", margin: 10 }}
-              onPress={() => {setCategory(item.value); getList(1, null, null, false, item.value);}}
-              >
-              <Text style={{ color: "#fff" }}>{item.label}</Text>
-            </TouchableOpacity>
+        {/* 검색창 */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="검색어"
+            value={searchText}
+            onChangeText={handleChangeText}
+            placeholderTextColor={"white"}
+          />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              setMode("create");
+              sheetRef.current?.expand();
+            }}
+          >
+            <Text style={{ left: 10 }}>
+              <Ionicons
+                name="create"
+                size={30}
+                color="white"
+              />
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              setSearchText("");
+              setCategory("");
+            }}
+          >
+            <Text style={{ left: 10 }}>
+              <Ionicons
+                name="arrow-back"
+                size={30}
+                color="white"
+              />
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {!category ? (
+          <FlatList
+            ref={flatListRef}
+            data={items}
+            keyExtractor={(item) => item.value.toString()}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    borderColor: "#fff",
+                    borderWidth: "2px",
+                    borderRadius: "15px",
+                    margin: 10,
+                  }}
+                  onPress={() => {
+                    setCategory(item.value);
+                    getList(1, null, null, false, item.value);
+                  }}
+                >
+                  <Text style={{ color: "#fff" }}>{item.label}</Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        ) : null}
 
-          );
-        }}
-      />) : null}
+        <View style={{ zIndex: 10 }}>
+          <AnimatedIcons
+            name="refresh"
+            size={28}
+            color="white"
+            style={{
+              position: "absolute",
+              alignSelf: "center",
+              // top: -10,
+              ...springs,
+            }}
+          />
+        </View>
 
-      <View style={{ zIndex: 10 }}>
-        <AnimatedIcons
-          name="refresh"
-          size={28}
-          color="white"
-          style={{
-            position: "absolute",
-            alignSelf: "center",
-            // top: -10,
-            ...springs,
-          }}
-        />
-      </View>
-
-      {/* 커뮤니티 리스트 */}
-      <AnimatedView style={{ ...springs2, flex: 1 }}>
-        <>
-          {communitys.length === 0 ? (
-            <>
-              {process || isSearching ? (
-                <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
-                  <SkeletonList length={20} />
-                </ScrollView>
-              ) : (
-                <View>
-                  <Text style={{ color: "white" }}>찾는 결과 없음 ㅋ.</Text>
-                </View>
-              )}
-            </>
-          ) : (
-            category ? (<FlatList
-              ref={flatListRef}
-              style={{ backgroundColor: mainColor }}
-              data={communitys}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item, index }) => (
-                <List
-                  item={item}
-                  index={index}
-                  count={communitys.length}
-                  type="community"
-                  bottomView={{ setMode, setPostID, sheetRef }}
-                />
-              )}
-              contentContainerStyle={{ paddingTop: 20 }}
-              onEndReached={appendNextData}
-              onEndReachedThreshold={0.5} // 적절한 임계값 설정
-              onScroll={handleScroll}
-              onScrollBeginDrag={handleScrollStartDrag}
-              onScrollEndDrag={handleScrollEndDrag}
-              ListFooterComponent={
-                process || isSearching ? (
-                  <SkeletonList />
+        {/* 커뮤니티 리스트 */}
+        <AnimatedView style={{ ...springs2, flex: 1 }}>
+          <>
+            {communitys.length === 0 ? (
+              <>
+                {process || isSearching ? (
+                  <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
+                    <SkeletonList length={20} />
+                  </ScrollView>
                 ) : (
-                  <View style={{ marginBottom: isRemain ? 500 : 100 }} />
-                )
-              }
-              refreshControl={
-                Platform.OS === "android" ? (
-                  <RefreshControl
-                    refreshing={isRefreshing}
-                    onRefresh={() => {
-                      getList(1, null, null, true);
-                    }}
+                  <View>
+                    <Text style={{ color: "white" }}>찾는 결과 없음 ㅋ.</Text>
+                  </View>
+                )}
+              </>
+            ) : category ? (
+              <FlatList
+                ref={flatListRef}
+                style={{ backgroundColor: mainColor }}
+                data={communitys}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item, index }) => (
+                  <List
+                    item={item}
+                    index={index}
+                    count={communitys.length}
+                    type="community"
+                    bottomView={{ setMode, setPostID, sheetRef }}
                   />
-                ) : null
-              }
-            />
-            ) : null
-          )}
-        </>
-      </AnimatedView>
-      <BottomView
-        sheetRef={sheetRef}
-        mode={mode}
-        setMode={setMode}
-        post={postID}
-        setPost={setPostID}
-        snackBar={snackBar}
-        getList={getList}
-        categorys={items}
-      />
+                )}
+                contentContainerStyle={{ paddingTop: 10 }}
+                onEndReached={appendNextData}
+                onEndReachedThreshold={0.5} // 적절한 임계값 설정
+                onScroll={handleScroll}
+                onScrollBeginDrag={handleScrollStartDrag}
+                onScrollEndDrag={handleScrollEndDrag}
+                ListFooterComponent={
+                  process || isSearching ? (
+                    <SkeletonList />
+                  ) : (
+                    <View style={{ marginBottom: isRemain ? 500 : 100 }} />
+                  )
+                }
+                refreshControl={
+                  Platform.OS === "android" ? (
+                    <RefreshControl
+                      refreshing={isRefreshing}
+                      onRefresh={() => {
+                        getList(1, null, null, true);
+                      }}
+                    />
+                  ) : null
+                }
+              />
+            ) : null}
+          </>
+        </AnimatedView>
+        <BottomView
+          sheetRef={sheetRef}
+          mode={mode}
+          setMode={setMode}
+          post={postID}
+          setPost={setPostID}
+          snackBar={snackBar}
+          getList={getList}
+          categorys={items}
+        />
+      </SafeAreaView>
     </GestureHandlerRootView>
   );
 }
@@ -420,6 +444,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: "flex-end",
     flexDirection: "row",
+    paddingBottom: 10,
+    borderBottomColor: "white",
+    borderBottomWidth: 2,
   },
   searchInput: {
     height: 40,
