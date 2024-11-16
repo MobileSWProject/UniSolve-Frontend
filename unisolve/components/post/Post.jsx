@@ -1,4 +1,5 @@
 import Entypo from "@expo/vector-icons/Entypo";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import {
   useFocusEffect,
   useLocalSearchParams,
@@ -27,6 +28,7 @@ import useUserId from "../../hooks/useUserId"; // 커스텀 훅 불러오기
 import formatAuthor from "../../utils/formatAuthor";
 import { mainColor } from "../../constants/Colors";
 import CommentSection from "../../components/post/CommentSection";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { useTranslation } from "react-i18next";
 import "../../i18n";
@@ -54,6 +56,8 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
 
+  const [isPrivate, setIsPrivate] = useState(false);
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -70,21 +74,23 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
         _axios
           .get(`/posts/${post}`)
           .then((response) => {
-            setBan(response.data.ban);
+            setBan(response.data.data.ban);
             setData({
-              id: response.data.id,
-              private: Boolean(response.data.is_private),
-              authorId: formatAuthor(response.data.author_id),
+              id: response.data.data.id,
+              private: Boolean(response.data.data.is_private),
+              authorId: formatAuthor(response.data.data.author_id),
               nickname: formatAuthor(
-                response.data.author_nickname ||
-                  `${response.data.author_id}_temp_nickname`
+                response.data.data.author_nickname ||
+                  `${response.data.data.author_id}_temp_nickname`
               ),
-              title: response.data.title,
-              content: response.data.description,
-              timestamp: response.data.timestamp,
-              image: response.data.image,
-              comments: response.data.comments,
-              commentsCount: response.data.comments_count,
+              private: response.data.data.is_private,
+              category: response.data.data.category,
+              title: response.data.data.title,
+              content: response.data.data.description,
+              timestamp: response.data.data.timestamp,
+              image: response.data.data.image,
+              comments: response.data.data.comments,
+              commentsCount: response.data.data.comments_count,
             });
           })
           .catch((error) => {
@@ -116,8 +122,8 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       const updatedPost = await _axios.get(`/posts/${post}`);
       setData((prev) => ({
         ...prev,
-        comments: updatedPost.data.comments,
-        commentsCount: updatedPost.data.comments_count,
+        comments: updatedPost.data.data.comments,
+        commentsCount: updatedPost.data.data.comments_count,
       }));
     } finally {
       setNewComment("");
@@ -134,8 +140,8 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       const updatedPost = await _axios.get(`/posts/${post}`);
       setData((prev) => ({
         ...prev,
-        comments: updatedPost.data.comments,
-        commentsCount: updatedPost.data.comments_count,
+        comments: updatedPost.data.data.comments,
+        commentsCount: updatedPost.data.data.comments_count,
       }));
     } catch { }
   };
@@ -145,15 +151,15 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       const response = await _axios.put(`/comments/${targetCommentId}`, {
         content: editComment,
       });
-      if (response.data.status === "success") {
+      if (response.data.data.status === "success") {
         setEditComment("");
         setEditing(false);
         // 댓글 수정 후 댓글 목록만 다시 불러옴
         const updatedPost = await _axios.get(`/posts/${post}`);
         setData((prev) => ({
           ...prev,
-          comments: updatedPost.data.comments,
-          commentsCount: updatedPost.data.comments_count,
+          comments: updatedPost.data.data.comments,
+          commentsCount: updatedPost.data.data.comments_count,
         }));
       }
       snackBar(t("Function.edit"));
@@ -209,20 +215,23 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       setEditContent("");
       setEditing(false);
       setProcess(true);
+      setIsPrivate(false);
       const response = await _axios.put(`/posts/${post}`, {
         title: editTitle,
         content: editContent,
+        toggle_privacy: isPrivate,
       });
       if (response.data.status === "success") {
         // 게시글 수정 후 다시 불러오기
         const updatedPost = await _axios.get(`/posts/${post}`);
         setData((prev) => ({
           ...prev,
-          title: updatedPost.data.title,
-          content: updatedPost.data.description,
-          timestamp: updatedPost.data.timestamp,
-          comments: updatedPost.data.comments,
-          commentsCount: updatedPost.data.comments_count,
+          private: updatedPost.data.data.is_private,
+          title: updatedPost.data.data.title,
+          content: updatedPost.data.data.description,
+          timestamp: updatedPost.data.data.timestamp,
+          comments: updatedPost.data.data.comments,
+          commentsCount: updatedPost.data.data.comments_count,
         }));
       }
       snackBar(t("Function.edit"));
@@ -292,6 +301,16 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
               </TouchableOpacity>
             )}
           </View>
+        </View>
+        <View style={styles.categoryContainer}>
+        <Text style={styles.category}>
+            <MaterialIcons name="category" size={15} color="#AAA" />
+            {data.category}
+          </Text>
+          <Text style={styles.category}>
+            <MaterialIcons name={data.private ? "lock" : "lock-open"} size={15} color="#AAA" />
+            {data.private ? t("Function.private") : t("Function.public")}
+          </Text>
         </View>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{data.title}</Text>
@@ -378,6 +397,28 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
                     onChangeText={(text) => setEditContent(text)}
                     multiline={true}
                   />
+                  {data.private ? 
+                    <View style={styles.submitContainer}>
+                    <TouchableOpacity
+                      style={{
+                        height: 30,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                      hitSlop={4}
+                      onPress={() => {
+                        setIsPrivate(!isPrivate);
+                      }}
+                    >
+                      <MaterialCommunityIcons
+                        name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"}
+                        size={24}
+                        color="black"
+                      />
+                      <Text style={{}}>{`${t("Function.public")}로 전환하기(전환 후 비공개로 변경 불가)`}</Text>
+                    </TouchableOpacity>
+                  </View> : null}
                 </>
               ) : (
                 <TextInput

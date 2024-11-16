@@ -26,6 +26,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const flatListRef = useRef(null); // FlatList 참조 생성
 
   const [ban, setBan] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const scrollToBottom = () => {
     if (flatListRef.current) {
@@ -36,11 +37,10 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const loadExistingMessages = async () => {
     try {
       const response = await _axios.get(`/chat/messages?post_id=${post}`);
-      if (response.data && response.data.data) {
-        setBan(response.data.ban || false);
-        setChatData(response.data.data.reverse());
-        scrollToBottom();
-      }
+      setBan(response.data.ban || false);
+      setIsPrivate(response.data.is_private || false);
+      setChatData(response.data.data.reverse());
+      scrollToBottom();
     } catch (error) {
       console.error("Failed to load existing messages:", error);
     }
@@ -161,15 +161,17 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
+          disabled={ban || !isPrivate}
           placeholder={
-            ban ? t("Function.forbidden") : t("Function.input_content")
+            ban ? t("Function.forbidden") : !isPrivate ? "게시글이 비공개인 상태에서만 대화할 수 있습니다." : t("Function.input_content")
           }
           value={message}
           onChangeText={(text) => setMessage(text)}
         />
         <TouchableOpacity
+          disabled={ban || !isPrivate}
           onPress={() => msgSend(true)}
-          style={styles.sendButton}
+          style={[styles.sendButton, {backgroundColor: ban || !isPrivate ? "gray": null}]}
         >
           <Text style={{ fontWeight: 600 }}>{t("Function.send")}</Text>
         </TouchableOpacity>
