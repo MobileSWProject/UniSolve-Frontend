@@ -1,5 +1,5 @@
 import Entypo from "@expo/vector-icons/Entypo";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
   useFocusEffect,
   useLocalSearchParams,
@@ -29,11 +29,24 @@ import formatAuthor from "../../utils/formatAuthor";
 import { mainColor } from "../../constants/Colors";
 import CommentSection from "../../components/post/CommentSection";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+
+import ModalView from "../modal/ModalView";
 
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
+const Post = ({
+  sheetRef,
+  setMode,
+  post,
+  snackBar,
+  getList,
+  modalVisible,
+  setModalVisible,
+  modalType,
+  setModalType,
+}) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
 
@@ -41,7 +54,6 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
 
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
   const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
-  const [modalVisible, setModalVisible] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [commentID, setCommentID] = useState(null);
   const [process, setProcess] = useState(false);
@@ -143,7 +155,7 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
         comments: updatedPost.data.data.comments,
         commentsCount: updatedPost.data.data.comments_count,
       }));
-    } catch { }
+    } catch {}
   };
 
   const handleUpdateComment = async (targetCommentId) => {
@@ -163,7 +175,7 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
         }));
       }
       snackBar(t("Function.edit"));
-    } catch { }
+    } catch {}
   };
 
   const handleReport = async () => {
@@ -204,7 +216,9 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
       } else {
         snackBar(t("Function.delete_failed"));
       }
-    } catch { snackBar(t("Function.delete_failed")); }
+    } catch {
+      snackBar(t("Function.delete_failed"));
+    }
   };
 
   const handleUpdatePost = async () => {
@@ -266,7 +280,24 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
             {formatAuthor(data.authorId) === formatAuthor(userId) ? (
               <>
                 <TouchableOpacity
-                  onPress={() => { setMode("chat"); }}
+                  disabled={!isPrivate}
+                  onPress={() => {
+                    setModalType("user");
+                    setModalVisible(true);
+                  }}
+                  hitSlop={4}
+                >
+                  <FontAwesome
+                    name="user"
+                    size={30}
+                    color={!isPrivate ? "gray" : mainColor}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ marginLeft: 8 }}
+                  onPress={() => {
+                    setMode("chat");
+                  }}
                   hitSlop={4}
                 >
                   <Entypo name="chat" size={30} color={mainColor} />
@@ -290,25 +321,40 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
                 </TouchableOpacity>
               </>
             ) : (
-              <TouchableOpacity
-                hitSlop={8}
-                onPress={() => {
-                  setEditPost(false);
-                  setModalVisible(true);
-                }}
-              >
-                <Text style={{ fontSize: 24 }}>🚨</Text>
-              </TouchableOpacity>
+              <>
+                <TouchableOpacity
+                  style={{ marginLeft: 8 }}
+                  onPress={() => {
+                    setMode("chat");
+                  }}
+                  hitSlop={4}
+                >
+                  <Entypo name="chat" size={30} color={mainColor} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  hitSlop={8}
+                  onPress={() => {
+                    setEditPost(false);
+                    setModalVisible(true);
+                  }}
+                >
+                  <Text style={{ fontSize: 24 }}>🚨</Text>
+                </TouchableOpacity>
+              </>
             )}
           </View>
         </View>
         <View style={styles.categoryContainer}>
-        <Text style={styles.category}>
+          <Text style={styles.category}>
             <MaterialIcons name="category" size={15} color="#AAA" />
             {data.category}
           </Text>
           <Text style={styles.category}>
-            <MaterialIcons name={data.private ? "lock" : "lock-open"} size={15} color="#AAA" />
+            <MaterialIcons
+              name={data.private ? "lock" : "lock-open"}
+              size={15}
+              color="#AAA"
+            />
             {data.private ? t("Function.private") : t("Function.public")}
           </Text>
         </View>
@@ -367,111 +413,35 @@ const Post = ({ sheetRef, setMode, post, snackBar, getList }) => {
             editComment={editComment}
           />
         ))}
-
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setCommentID(null);
-            setModalVisible(false);
-            setEditTitle("");
-            setEditContent("");
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              {editPost ? (
-                <>
-                  <TextInput
-                    style={styles.commentInput}
-                    placeholder={t("Function.title")}
-                    value={editTitle}
-                    onChangeText={(text) => setEditTitle(text)}
-                    multiline={true}
-                  />
-                  <TextInput
-                    style={styles.commentInput}
-                    placeholder={t("Function.content")}
-                    value={editContent}
-                    onChangeText={(text) => setEditContent(text)}
-                    multiline={true}
-                  />
-                  {data.private ? 
-                    <View style={styles.submitContainer}>
-                    <TouchableOpacity
-                      style={{
-                        height: 30,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                      hitSlop={4}
-                      onPress={() => {
-                        setIsPrivate(!isPrivate);
-                      }}
-                    >
-                      <MaterialCommunityIcons
-                        name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"}
-                        size={24}
-                        color="black"
-                      />
-                      <Text style={{}}>{`${t("Function.public")}로 전환하기(전환 후 비공개로 변경 불가)`}</Text>
-                    </TouchableOpacity>
-                  </View> : null}
-                </>
-              ) : (
-                <TextInput
-                  style={styles.commentInput}
-                  placeholder={t("Function.input_content")}
-                  value={reportReason}
-                  onChangeText={(text) => setReportReason(text)}
-                  multiline={true}
-                />
-              )}
-              <TouchableOpacity
-                disabled={false}
-                style={[
-                  styles.buttonSmall,
-                  { backgroundColor: false ? "gray" : mainColor },
-                ]}
-                onPress={() => {
-                  setCommentID(null);
-                  setModalVisible(false);
-                  setEditTitle("");
-                  setEditContent("");
-                }}
-              >
-                <Text style={styles.buttonTextSmall}>
-                  {t("Function.cancel")}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                disabled={false}
-                style={[
-                  styles.buttonSmall,
-                  { backgroundColor: false ? "gray" : mainColor },
-                ]}
-                onPress={() => {
-                  editPost ? handleUpdatePost() : handleReport();
-                }}
-              >
-                <Text style={styles.buttonTextSmall}>
-                  {editPost ? t("Function.btn_edit") : t("Function.btn_report")}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </View>
     </KeyboardAwareScrollView>
   );
 };
 
-export default function PostWithReplyCommentIdProvider({ sheetRef, setMode, post, snackBar, getList }) {
+export default function PostWithReplyCommentIdProvider({
+  sheetRef,
+  setMode,
+  post,
+  snackBar,
+  getList,
+  modalVisible,
+  setModalVisible,
+  modalType,
+  setModalType,
+}) {
   return (
     <ReplyCommentIdProvider>
-      <Post sheetRef = {sheetRef} setMode = {setMode} post={post} snackBar={snackBar} getList={getList}/>
+      <Post
+        sheetRef={sheetRef}
+        setMode={setMode}
+        post={post}
+        snackBar={snackBar}
+        getList={getList}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        modalType={modalType}
+        setModalType={setModalType}
+      />
     </ReplyCommentIdProvider>
   );
 }

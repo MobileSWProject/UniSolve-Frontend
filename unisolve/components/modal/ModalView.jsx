@@ -4,11 +4,12 @@ import Register from "../form/Register";
 import FindAccount from "../form/FindAccount";
 import Modify from "../form/ModifyAccount";
 import Delete from "../form/DeleteAccount";
+import SelectUser from "../form/SelectUser";
 import ModalList from "./ModalList";
 import Image from "../Image";
 import { useEffect } from "react";
 
-export default function ModalView({ type, visible, setVisible, userData, image }) {
+export default function ModalView({ type, visible, setVisible, userData, image, post, setUser }) {
   // type이 falsy일 때 모달을 닫기 위해 setVisible(false)를 호출
   useEffect(() => {
     if (!type) setVisible(false);
@@ -28,6 +29,7 @@ export default function ModalView({ type, visible, setVisible, userData, image }
                   type === "notification" || type === "history" ? <ModalList visible={visible} setVisible={setVisible} type={type} /> :
                   type === "sanction" ? <ModalList visible={visible} setVisible={setVisible} type={type} /> :
                   type === "image" ? <Image visible={visible} setVisible={setVisible} image={image} /> :
+                  type === "user" ? <SelectUser visible={visible} setVisible={setVisible} post={post} setUser={setUser} /> :
                   null
                 }
               </View>

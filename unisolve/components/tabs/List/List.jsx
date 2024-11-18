@@ -9,7 +9,7 @@ import _axios from "../../../api";
 import { useTranslation } from 'react-i18next';
 import "../../../i18n";
 
-export default function PostListItem({ item, index, count, type, bottomView, setVisible }) {
+export default function PostListItem({ item, index, count, type, bottomView, setVisible, setUser, getList }) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -21,19 +21,30 @@ export default function PostListItem({ item, index, count, type, bottomView, set
     } catch (error) {}
   };
 
+  async function invite(post, isGo) {
+    const response = await _axios.post('notifications/send_partner_notification', {not_id: post, acc_deny: isGo})
+    if (response.data){
+      getList(1);
+      console.log("good")
+    }
+  }
+
   return (
     <TouchableOpacity
       style={[
         styles.main,
-        (type === "history" && item.private) ||
-        (type === "notification" && !item.check)
-          ? { backgroundColor: "#BABABA" }
-          : null,
+        (type === "history" && item.private) || (type === "notification" && !item.check) || (type === "users")?
+        { backgroundColor: "#BABABA" } :
+        null,
       ]}
       onPress={async () => {
         if (setVisible) setVisible(false);
+        if (type === "users") return setUser(item.user_nickname);
         if (type === "sanction") null
-        else if (type === "notification") await updateNotification(item.not_id);
+        else if (type === "notification") {
+          await updateNotification(item.not_id);
+          router.push(`community?post=${item.id}`);
+        }
         else if (type === "community") {
           bottomView.sheetRef.current?.collapse();
           bottomView.setMode("post");
@@ -74,18 +85,45 @@ export default function PostListItem({ item, index, count, type, bottomView, set
         </Text>
         <Text>
           {type === "notification" ? item.timebefore : item.timestamp}
+          {type === "users" ? item.user_nickname : ''}
         </Text>
       </View>
       <View style={styles.header}>
         <Text style={styles.title}>{item.title}</Text>
       </View>
       <View style={styles.header}>
+        {item.type === 1 && item.description === "invite" ? 
+        <>
+          <TouchableOpacity
+            style={[
+              styles.buttonSmall,
+              { backgroundColor: "blue" },
+            ]}
+            onPress={() => {invite(item.not_id, true)}}
+          >
+            <Text style={styles.buttonTextSmall}>
+              수락
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[
+              styles.buttonSmall,
+              { backgroundColor: "red" },
+            ]}
+            onPress={() => {invite(item.not_id, false)}}
+          >
+            <Text style={styles.buttonTextSmall}>
+              거절
+            </Text>
+          </TouchableOpacity>
+        </>:
         <Text
-          style={[styles.description, { fontWeight: "bold" }]}
-          numberOfLines={3}
-        >
-          {item.description ? item.description.replace(/\n/g, " ") : ""}
-        </Text>
+        style={[styles.description, { fontWeight: "bold" }]}
+        numberOfLines={3}
+      >
+        {item.description ? item.description.replace(/\n/g, " ") : ""}
+      </Text>}
         <View style={styles.header}>
           {type === "history" || type === "community" ? (
             <Entypo

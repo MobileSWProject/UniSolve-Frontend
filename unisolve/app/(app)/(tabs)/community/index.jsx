@@ -23,6 +23,7 @@ import SkeletonList from "../../../../components/tabs/List/Skeleton-List";
 import { debounce } from "lodash";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SnackBar from "../../../../components/Snackbar";
+import ModalView from "../../../../components/modal/ModalView";
 
 import BottomView from "../../../../components/modal/BottomView";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -36,6 +37,9 @@ export default function Community() {
 
   const [mode, setMode] = useState("");
   const [postID, setPostID] = useState("");
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState("");
 
   const [ban, setBan] = useState(true);
 
@@ -447,6 +451,17 @@ export default function Community() {
           snackBar={snackBar}
           getList={getList}
           categorys={items}
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          modalType={modalType}
+          setModalType={setModalType}
+        />
+        
+        <ModalView
+          type={modalType}
+          visible={modalVisible}
+          setVisible={setModalVisible}
+          post={postID}
         />
       </SafeAreaView>
     </GestureHandlerRootView>

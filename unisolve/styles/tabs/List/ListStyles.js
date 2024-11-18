@@ -44,4 +44,18 @@ export const styles = StyleSheet.create({
     borderColor: "black",
     borderTopWidth: 0,
   },
+  buttonSmall: {
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 35,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  buttonTextSmall: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 20,
+  },
 });

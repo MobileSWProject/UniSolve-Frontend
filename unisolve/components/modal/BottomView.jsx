@@ -15,6 +15,10 @@ export default function BottomView({
   snackBar,
   getList,
   categorys,
+  modalVisible,
+  setModalVisible,
+  modalType,
+  setModalType,
 }) {
   return (
     <BottomSheet
@@ -61,6 +65,10 @@ export default function BottomView({
             post={post}
             snackBar={snackBar}
             getList={getList}
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
+            modalType={modalType}
+            setModalType={setModalType}
           />
         ) : mode === "chat" ? (
           <Chat
