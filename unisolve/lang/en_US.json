@@ -162,6 +162,7 @@
         "notpagego": "You will be redirected in a few seconds.",
         "empty": "Content is empty.",
         "empty_content": "Some information is missing or unchecked.",
+        "empty_category": "Please select a category.",
         "sending": "Sending...",
         "editing": "Editing content...",
         "sent": "Sent",

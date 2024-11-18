@@ -81,6 +81,10 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
 
   // 이미지 및 폼 데이터 전송
   const handleSubmit = async () => {
+    if (!value || value <= 0) {
+      snackBar(`${t("Stage.failed")}${t("Function.empty_category")}`);
+      return;
+    }
     if (title.trim() === "" || content.trim() === "") {
       snackBar(`${t("Stage.failed")}${t("Function.empty")}`);
       return;
@@ -192,7 +196,7 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
           />
           <View style={{ marginTop: 30 }} />
           {/* 카테고리 */}
-          <View style={{ width: "93%" }}>
+          <View style={{ width: "93%", zIndex: 99 }}>
             <DropDownPicker
               style={{ borderWidth: 1.4 }}
               open={open}
