@@ -3,8 +3,8 @@ import {
   ScrollView,
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { useState, useCallback } from "react";
 import _axios from "../../../api";
@@ -22,7 +22,6 @@ export function ExpPage() {
     t("User.ranking"),
     t("User.nickname"),
     t("User.level"),
-    t("User.variation"),
   ];
   const [list, setList] = useState([]);
   const [page, setPage] = useState(1);
@@ -111,7 +110,7 @@ export function ExpPage() {
               getList("down");
             }}
           >
-            <Text style={styles.buttonTextSmall}>{t("User.previous")}</Text>
+            <Text style={styles.buttonTextSmall}>{t("Function.previous")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             disabled={false}
@@ -137,10 +136,60 @@ export function ExpPage() {
               getList("up");
             }}
           >
-            <Text style={styles.buttonTextSmall}>{t("User.next")}</Text>
+            <Text style={styles.buttonTextSmall}>{t("Function.next")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </>
   );
 }
+const styles = StyleSheet.create({
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  me: {
+    flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 15,
+  },
+  meText: {
+    fontSize: 48, // fontSize: 'em은 부모 요소의 값, 24이므로 3em인 72가 됨',
+    fontWeight: "bold",
+  },
+  meSubText: {
+    fontSize: 24, // fontSize: 'em은 부모 요소의 값, 24이므로 3em인 72가 됨',
+    fontWeight: "bold",
+    color: "gray",
+  },
+  head: {
+    height: 40,
+    backgroundColor: mainColor,
+    textAlign: "center",
+  },
+  headText: {
+    margin: 6,
+    color: "white",
+    textAlign: "center",
+  },
+  text: {
+    margin: 6,
+    textAlign: "center",
+  },
+  buttonSmall: {
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 35,
+  },
+  buttonTextSmall: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+});

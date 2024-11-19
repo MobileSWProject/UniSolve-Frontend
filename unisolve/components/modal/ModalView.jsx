@@ -7,6 +7,7 @@ import Delete from "../form/DeleteAccount";
 import SelectUser from "../form/SelectUser";
 import ModalList from "./ModalList";
 import Image from "../Image";
+import { ExpPage } from "../tabs/me/Exp";
 import { useEffect } from "react";
 
 export default function ModalView({ type, visible, setVisible, userData, image, post, setUser }) {
@@ -30,6 +31,7 @@ export default function ModalView({ type, visible, setVisible, userData, image, 
                   type === "sanction" ? <ModalList visible={visible} setVisible={setVisible} type={type} /> :
                   type === "image" ? <Image visible={visible} setVisible={setVisible} image={image} /> :
                   type === "user" ? <SelectUser visible={visible} setVisible={setVisible} post={post} setUser={setUser} /> :
+                  type === "exp" ? <ExpPage  visible={visible} setVisible={setVisible} /> :
                   null
                 }
               </View>

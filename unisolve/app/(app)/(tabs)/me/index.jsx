@@ -66,7 +66,13 @@ export default function MePage() {
       />
       {/* 프로필 이미지 */}
       <View style={styles.profileContainer}>
-        <LevelImage exp={exp} size={120} />
+        <TouchableOpacity
+          onPress={() => {
+            setModalType("exp");
+            setModalVisible(true);
+          }}>
+          <LevelImage exp={exp} size={120} />
+        </TouchableOpacity>
         <View>
           <Text style={styles.nickname}>
             {user.username} | {user.user_nickname}

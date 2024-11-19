@@ -1,3 +1,4 @@
+import Entypo from "@expo/vector-icons/Entypo";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState, useRef, useEffect } from "react";
@@ -116,10 +117,8 @@ export default function Community() {
     setIsSearching(false);
     try {
       const response = await _axios.get(
-        `/posts?page=${tempPage}&last_timestamp=${
-          timestamp || ""
-        }&last_post_id=${postId || ""}&search=${searchText}&category_filter=${
-          tempCategory || category
+        `/posts?page=${tempPage}&last_timestamp=${timestamp || ""
+        }&last_post_id=${postId || ""}&search=${searchText}&category_filter=${tempCategory || category
         }`
       );
       setBan(response.data.ban);
@@ -293,8 +292,22 @@ export default function Community() {
         sheetRef.current?.collapse();
         setBan(response.data.ban);
       }
-    } catch {}
+    } catch { }
   };
+
+  const chatOpen = async () => {
+    try {
+      setPostID(0);
+      setMode("chat");
+      sheetRef.current?.expand();
+      // const response = await _axios.get("/chat/check_ban_status");
+      // if (response.data.ban) {
+      //   sheetRef.current?.collapse();
+      //   setBan(response.data.ban);
+      // }
+    } catch { }
+  };
+
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor }}>
@@ -306,43 +319,62 @@ export default function Community() {
         />
         {/* 검색창 */}
         <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="검색어"
-            value={searchText}
-            onChangeText={handleChangeText}
-            placeholderTextColor={"white"}
-          />
-          <TouchableOpacity
-            style={styles.button}
-            disabled={ban}
-            onPress={() => {
-              postCreate();
-            }}
-          >
-            <Text style={{ left: 10 }}>
-              <Ionicons
-                name="create"
-                size={30}
-                color={ban ? "#AAA" : "white"}
-              />
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setSearchText("");
-              setCategory("");
-            }}
-          >
-            <Text style={{ left: 10 }}>
-              <Ionicons
-                name="arrow-back"
-                size={30}
-                color="white"
-              />
-            </Text>
-          </TouchableOpacity>
+          <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setSearchText("");
+                setCategory("");
+              }}
+            >
+              <Text>
+                <Ionicons
+                  name="arrow-back"
+                  size={30}
+                  color="white"
+                />
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <TouchableOpacity
+              style={styles.button}
+              disabled={ban}
+              onPress={() => {
+                chatOpen();
+              }}
+            >
+              <Text>
+                <Entypo
+                  name="chat"
+                  size={26}
+                  color="white"
+                />
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              disabled={ban}
+              onPress={() => {
+                postCreate();
+              }}
+            >
+              <Text>
+                <Ionicons
+                  name="create"
+                  size={30}
+                  color={ban ? "#AAA" : "white"}
+                />
+              </Text>
+            </TouchableOpacity>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="검색어"
+              value={searchText}
+              onChangeText={handleChangeText}
+              placeholderTextColor={"white"}
+            />
+          </View>
         </View>
         {!category ? (
           <FlatList
@@ -472,10 +504,9 @@ export default function Community() {
 
 const styles = StyleSheet.create({
   searchContainer: {
+    justifyContent: "space-between",
     paddingHorizontal: 20,
-    alignItems: "flex-end",
     flexDirection: "row",
-    paddingBottom: 10,
     borderBottomColor: "white",
     borderBottomWidth: 2,
   },
@@ -489,4 +520,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     margin: 10,
   },
+  button: {
+    margin: 3
+  }
 });

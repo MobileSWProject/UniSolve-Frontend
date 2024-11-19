@@ -70,11 +70,12 @@ export default function BottomView({
             modalType={modalType}
             setModalType={setModalType}
           />
-        ) : mode === "chat" ? (
+        ) : mode === "chat"? (
           <Chat
             sheetRef={sheetRef}
             setMode={setMode}
             post={post}
+            mode={mode}
             snackBar={snackBar}
           />
         ) : null}
