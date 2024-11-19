@@ -118,12 +118,11 @@ export default function Community() {
       const response = await _axios.get(
         `/posts?page=${tempPage}&last_timestamp=${
           timestamp || ""
-        }&last_post_id=${
-          postId || ""
-        }&search=${searchText}&category_filter=${tempCategory || category}`
+        }&last_post_id=${postId || ""}&search=${searchText}&category_filter=${
+          tempCategory || category
+        }`
       );
       setBan(response.data.ban);
-
 
       const newData = response.data.data || [];
       setIsRemain(response.data.is_remain); // 총 페이지 수 설정
@@ -289,13 +288,13 @@ export default function Community() {
     try {
       setMode("create");
       sheetRef.current?.expand();
-      const response = await _axios.get("/posts/check_ban_status")
+      const response = await _axios.get("/posts/check_ban_status");
       if (response.data.ban) {
         sheetRef.current?.collapse();
         setBan(response.data.ban);
       }
-    } catch { }
-  }
+    } catch {}
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor }}>
@@ -317,7 +316,9 @@ export default function Community() {
           <TouchableOpacity
             style={styles.button}
             disabled={ban}
-            onPress={() => {postCreate();}}
+            onPress={() => {
+              postCreate();
+            }}
           >
             <Text style={{ left: 10 }}>
               <Ionicons
@@ -359,6 +360,7 @@ export default function Community() {
                     margin: 10,
                   }}
                   onPress={() => {
+                    setCommunitys([]);
                     setCategory(item.value);
                     getList(1, null, null, true, item.value);
                   }}
@@ -456,7 +458,7 @@ export default function Community() {
           modalType={modalType}
           setModalType={setModalType}
         />
-        
+
         <ModalView
           type={modalType}
           visible={modalVisible}
