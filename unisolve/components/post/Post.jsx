@@ -280,7 +280,7 @@ const Post = ({
             {formatAuthor(data.authorId) === formatAuthor(userId) ? (
               <>
                 <TouchableOpacity
-                  disabled={!isPrivate}
+                  disabled={!data.private}
                   onPress={() => {
                     setModalType("user");
                     setModalVisible(true);
@@ -290,7 +290,7 @@ const Post = ({
                   <FontAwesome
                     name="user"
                     size={30}
-                    color={!isPrivate ? "gray" : mainColor}
+                    color={!data.private ? "gray" : mainColor}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
