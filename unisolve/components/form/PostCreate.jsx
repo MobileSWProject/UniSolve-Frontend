@@ -210,6 +210,7 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
               onChangeValue={(value) => {
                 setCategory(value);
               }}
+              listMode="SCROLLVIEW"
             />
           </View>
 
