@@ -10,12 +10,14 @@ import {
 } from "react-native";
 import { mainColor } from "../../../../constants/Colors";
 import ModalView from "../../../../components/modal/ModalView";
+import { getStatusBarHeight } from "react-native-status-bar-height";
 import _axios from "../../../../api";
 
 import { useTranslation } from 'react-i18next';
 import "../../../../i18n";
 
 export default function Home() {
+  const statusBarSize = StatusBar.currentHeight === null ? getStatusBarHeight() + 40 : 0
   const router = useRouter();
   const { t } = useTranslation();
   
@@ -51,7 +53,7 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { marginTop: statusBarSize }]}>
       <StatusBar backgroundColor={mainColor} barStyle="white-content" />
       <Text style={styles.timeDate}>{currentDate}</Text>
       <Text style={styles.timeText}>{currentTime}</Text>
