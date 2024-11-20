@@ -322,6 +322,7 @@ export default function Community() {
         {/* 검색창 */}
         <View style={styles.searchContainer}>
           <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            {category ?
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
@@ -336,7 +337,9 @@ export default function Community() {
                   color="white"
                 />
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> :
+            null
+            }
           </View>
           <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
