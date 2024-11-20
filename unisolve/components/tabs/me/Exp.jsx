@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import "../../../i18n";
 import { getExpToLevel, getLevel, getPercent } from "../../../utils/expUtils";
 
-export function ExpPage() {
+export function ExpPage({setVisible}) {
   const { t } = useTranslation(); // `t`를 컴포넌트 내부에서 사용 가능하게 함
   const [meRank, setMeRank] = useState(0);
   const [meExp, setMeExp] = useState(0);
@@ -139,6 +139,12 @@ export function ExpPage() {
             <Text style={styles.buttonTextSmall}>{t("Function.next")}</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={[styles.buttonSmall, { backgroundColor: mainColor }]}
+          onPress={() => setVisible(false)}
+        >
+          <Text style={styles.buttonTextSmall}>{t("Function.confirm")}</Text>
+        </TouchableOpacity>
       </ScrollView>
     </>
   );
@@ -181,6 +187,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttonSmall: {
+    marginTop: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: "center",
