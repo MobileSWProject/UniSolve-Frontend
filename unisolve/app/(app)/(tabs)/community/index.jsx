@@ -5,7 +5,6 @@ import { useCallback, useState, useRef, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   FlatList,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -367,13 +366,13 @@ export default function Community() {
                 />
               </Text>
             </TouchableOpacity>
-            <TextInput
+            {category ? <TextInput
               style={styles.searchInput}
               placeholder="검색어"
               value={searchText}
               onChangeText={handleChangeText}
               placeholderTextColor={"white"}
-            />
+            /> : null}
           </View>
         </View>
         {!category ? (
@@ -387,7 +386,7 @@ export default function Community() {
                   style={{
                     padding: 10,
                     borderColor: "#fff",
-                    borderWidth: "2px",
+                    borderWidth: 2,
                     borderRadius: "15px",
                     margin: 10,
                   }}
@@ -424,9 +423,9 @@ export default function Community() {
             {communitys.length === 0 ? (
               <>
                 {process || isSearching ? (
-                  <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
+                  <FlatList contentContainerStyle={{ paddingTop: 20 }}>
                     <SkeletonList length={20} />
-                  </ScrollView>
+                  </FlatList>
                 ) : (
                   <View>
                     <Text style={{ color: "white" }}>찾는 결과 없음 ㅋ.</Text>

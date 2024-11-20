@@ -19,11 +19,12 @@ import Input from "../../components/form/Input";
 import { animated } from "react-spring";
 
 export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
-  post = post || 0
+  post = post || 0;
   const { t } = useTranslation();
   const { userId, loading } = useUserId();
   const [chatData, setChatData] = useState([]);
   const [message, setMessage] = useState("");
+  const [categoryLoad, setCategoryLoad] = useState(false);
   const socket = useRef(null);
   const flatListRef = useRef(null); // FlatList 참조 생성
 
@@ -43,17 +44,21 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
 
   const selectValue = async (value) => {
     post = value;
+    setCategoryLoad(false);
     loadExistingMessages();
   };
 
   const loadExistingMessages = async () => {
     try {
-      const response = await _axios.get(`/chat/messages?post_id=${post}`);
-      setBan(response.data.ban || false);
-      setIsPrivate(response.data.is_private || false);
-      setChatData(response.data.data.reverse());
-      setItems(items.push([...response.data.list]))
-      scrollToBottom();
+      if (!categoryLoad) {
+        if (!post) setCategoryLoad(true);
+        const response = await _axios.get(`/chat/messages?post_id=${post}`);
+        setBan(response.data.ban || false);
+        setIsPrivate(response.data.is_private || false);
+        if (post) setChatData(response.data.data.reverse());
+        else setItems((prevItems) => [...prevItems, ...response.data.data]);
+        scrollToBottom();
+      }
     } catch (error) {
       console.error("Failed to load existing messages:", error);
     }
@@ -162,22 +167,20 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
 
   return (
     <>
-      {
-        post === 0 ?
-          <DropDownPicker
-            style={{ borderWidth: 1.4 }}
-            open={open}
-            value={value}
-            items={items}
-            setOpen={setOpen}
-            setValue={setValue}
-            setItems={setItems}
-            maxHeight={200}
-            onChangeValue={(value) => selectValue(value)}
-            listMode="SCROLLVIEW"
-          /> :
-          null
-      }
+      {post === 0 ? (
+        <DropDownPicker
+          style={{ borderWidth: 1.4 }}
+          open={open}
+          value={value}
+          items={items}
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setItems}
+          maxHeight={200}
+          onChangeValue={(value) => selectValue(value)}
+          listMode="SCROLLVIEW"
+        />
+      ) : null}
       <FlatList
         ref={flatListRef} // FlatList 참조 추가
         data={chatData}
@@ -192,7 +195,11 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
           style={styles.textInput}
           disabled={ban || !isPrivate}
           placeholder={
-            ban ? t("Function.forbidden") : !isPrivate ? "게시글이 비공개인 상태에서만 대화할 수 있습니다." : t("Function.input_content")
+            ban
+              ? t("Function.forbidden")
+              : !isPrivate
+              ? "게시글이 비공개인 상태에서만 대화할 수 있습니다."
+              : t("Function.input_content")
           }
           value={message}
           onChangeText={(text) => setMessage(text)}
@@ -200,7 +207,10 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
         <TouchableOpacity
           disabled={ban || !isPrivate}
           onPress={() => msgSend(true)}
-          style={[styles.sendButton, { backgroundColor: ban || !isPrivate ? "gray" : null }]}
+          style={[
+            styles.sendButton,
+            { backgroundColor: ban || !isPrivate ? "gray" : null },
+          ]}
         >
           <Text style={{ fontWeight: 600 }}>{t("Function.send")}</Text>
         </TouchableOpacity>

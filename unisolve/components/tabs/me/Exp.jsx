@@ -17,6 +17,7 @@ import { getExpToLevel, getLevel, getPercent } from "../../../utils/expUtils";
 
 export function ExpPage() {
   const { t } = useTranslation(); // `t`를 컴포넌트 내부에서 사용 가능하게 함
+  const [meRank, setMeRank] = useState(0);
   const [meExp, setMeExp] = useState(0);
   const listHeader = [
     t("User.ranking"),
@@ -46,17 +47,17 @@ export function ExpPage() {
       .get(`/rankings?page=${tempPage}&self=${tempSelf}`)
       .then((response) => {
         setProcress(false);
+        setMeRank(response.data.self_user.rank);
         setMeExp(response.data.self_user.exp);
         setList(
           response.data.users.map((item, index) => [
-            index + 1 + tempPage * 10 - 10,
+            index + 1 + (tempSelf ? response.data.self_user.page : tempPage) * 10 - 10,
             item.nickname,
             getExpToLevel(t, getLevel(item.exp)),
-            true,
           ])
         );
         setTotalPage(response.data.total_pages);
-        if (tempSelf) setPage(response.data.current_page || 1);
+        if (tempSelf) setPage(response.data.self_user.page || 1);
       })
       .catch((error) => {
         setProcress(false);
@@ -77,8 +78,7 @@ export function ExpPage() {
   return (
     <>
       <Text style={styles.meSubText}>
-        {1}
-        {t("User.rank")}
+        {`${meRank}${t("User.rank")}`}
       </Text>
       <View style={styles.me}>
         <Text style={styles.meText}>★ {numConvert(meExp)}</Text>
@@ -100,10 +100,10 @@ export function ExpPage() {
         </Text>
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
-            disabled={false}
+            disabled={process || page <= 1}
             style={[
               styles.buttonSmall,
-              { backgroundColor: false ? "gray" : mainColor },
+              { backgroundColor: process || page <= 1 ? "gray" : mainColor },
               { width: "33%", marginLeft: 1, marginRight: 1 },
             ]}
             onPress={() => {
@@ -113,10 +113,10 @@ export function ExpPage() {
             <Text style={styles.buttonTextSmall}>{t("Function.previous")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            disabled={false}
+            disabled={process}
             style={[
               styles.buttonSmall,
-              { backgroundColor: false ? "gray" : mainColor },
+              { backgroundColor: process ? "gray" : mainColor },
               { width: "33%", marginLeft: 1, marginRight: 1 },
             ]}
             onPress={() => {
@@ -126,10 +126,10 @@ export function ExpPage() {
             <Text style={styles.buttonTextSmall}>{t("User.rank_me")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            disabled={false}
+            disabled={process || page >= TotalPage}
             style={[
               styles.buttonSmall,
-              { backgroundColor: false ? "gray" : mainColor },
+              { backgroundColor: process || page >= TotalPage ? "gray" : mainColor },
               { width: "33%" },
             ]}
             onPress={() => {
