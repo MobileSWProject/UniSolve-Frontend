@@ -59,7 +59,7 @@ export default function Home() {
 
       {/* 로고 페이지 */}
       <TouchableOpacity
-        onPress={() => {router.replace("/question")}}
+        onPress={() => {router.push(`community?log_click=${true}`);}}
       >
         <Image
           source={require("../../../../assets/logo.png")}

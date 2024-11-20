@@ -29,7 +29,7 @@ import BottomView from "../../../../components/modal/BottomView";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Community() {
-  const { post } = useLocalSearchParams();
+  const { post, log_click } = useLocalSearchParams();
   const sheetRef = useRef(null);
 
   const [items, setItems] = useState([]);
@@ -60,7 +60,7 @@ export default function Community() {
   const router = useRouter();
   useFocusEffect(
     useCallback(() => {
-      if (!post) sheetRef.current?.collapse();
+      if ((!post && log_click) || (post && !log_click)) sheetRef.current?.collapse();
     }, [post])
   );
 
@@ -69,6 +69,9 @@ export default function Community() {
     if (post && post > 0) {
       setMode("post");
       setPostID(post);
+      sheetRef.current?.expand();
+    } else if ( log_click ) {
+      setMode("create");
       sheetRef.current?.expand();
     } else {
       sheetRef.current?.collapse();
