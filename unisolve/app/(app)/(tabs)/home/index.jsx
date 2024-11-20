@@ -2,7 +2,6 @@ import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import {
   Text,
-  View,
   Image,
   StyleSheet,
   TouchableOpacity,
@@ -52,7 +51,7 @@ export default function Home() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { marginTop: StatusBar.currentHeight }]}>
+    <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={mainColor} barStyle="white-content" />
       <Text style={styles.timeDate}>{currentDate}</Text>
       <Text style={styles.timeText}>{currentTime}</Text>
