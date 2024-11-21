@@ -43,7 +43,7 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
           router.push(`community?post=${item.id}`);
         }
         else if (type === "community") {
-          bottomView.sheetRef.current?.collapse();
+          bottomView.sheetRef.current?.close();
           bottomView.setMode("post");
           bottomView.setPostID(item.id);
           bottomView.sheetRef.current?.expand();

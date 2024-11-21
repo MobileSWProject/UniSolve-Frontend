@@ -40,12 +40,6 @@ export default function Community() {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  useFocusEffect(
-    useCallback(() => {
-      if ((!post && log_click) || (post && !log_click)) sheetRef.current?.collapse();
-    }, [post])
-  );
-
   // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
     if (post && post > 0) {
@@ -56,7 +50,7 @@ export default function Community() {
       setMode("create");
       sheetRef.current?.expand();
     } else {
-      sheetRef.current?.collapse();
+      sheetRef.current?.close();
     }
     getCategory();
   }, [post]);
@@ -86,6 +80,9 @@ export default function Community() {
       setBan(response.data.ban);
 
       const newData = response.data.data || [];
+      if (category && newData.length <= 0) {
+        snackBar("게시글이 없습니다!");
+      }
       setIsRemain(response.data.is_remain); // 총 페이지 수 설정
 
       if (newData.length === 0) {
@@ -98,9 +95,6 @@ export default function Community() {
       } else {
         // 중복 데이터 없이 추가
         setCommunitys((prev) => [...prev, ...newData.filter((item) => !prev.some((prevItem) => prevItem.id === item.id))]);
-      }
-      if (category && newData.length <= 0) {
-        snackBar("게시글이 없습니다!");
       }
 
       // 마지막 게시글의 시간과 ID 저장
@@ -145,7 +139,7 @@ export default function Community() {
 
   // 키워드 변경시
   useEffect(() => {
-    sheetRef.current?.collapse();
+    sheetRef.current?.close();
     setIsSearching(true);
     debouncedSearch();
 
@@ -221,7 +215,7 @@ export default function Community() {
       sheetRef.current?.expand();
       const response = await _axios.get("/posts/check_ban_status");
       if (response.data.ban) {
-        sheetRef.current?.collapse();
+        sheetRef.current?.close();
         setBan(response.data.ban);
       }
     } catch { }
@@ -235,15 +229,24 @@ export default function Community() {
     } catch {}
   };
 
+  function getLabelByValue(value) {
+    const item = items.find(item => item.value === value);
+    return item ? item.label : null;
+  }
+
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor, marginBottom: 70 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor }}>
       {/* 검색창 */}
       <View style={styles.searchContainer}>
         <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           {
             category ?
-            <TouchableOpacity style={styles.button} onPress={() => { setSearchText(""); setCategory(""); }}>
+            <TouchableOpacity style={styles.button} onPress={() => { 
+                sheetRef.current?.close();
+                setSearchText("");
+                setCategory("");
+              }}>
               <Text><Ionicons name="arrow-back" size={30} color="white" /></Text>
             </TouchableOpacity> :
             null
@@ -270,25 +273,35 @@ export default function Community() {
         </View>
       </View>
       {
+        category ? 
+        <View style={{margin: 5, alignItems: "center"}}>
+          <Text style={{color: "#fff", fontWeight: "bold", fontSize: 30}}>{getLabelByValue(category)}</Text>
+        </View> :
+        null
+      }
+      {
         !category ?
         <FlatList
           ref={flatListRef}
           data={items}
-          keyExtractor={(item) => item.value.toString()}
+          style={{marginBottom: 75}}
+          keyExtractor={(item) => item.value.toString()}  
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
-                style={{padding: 10, borderColor: "#fff", borderWidth: 2, borderRadius: "15px", margin: 10}}
+              keyboardShouldPersistTaps="handled"
+                style={{padding: 10, borderBottomWidth: 1, borderColor: "#fff", margin: 8}}
                 onPress={() => {
                   setCommunitys([]);
                   setCategory(item.value);
                   getList(1, null, null, true, item.value);
                 }}
               >
-                <Text style={{ color: "#fff" }}>{item.label}</Text>
+                <Text style={{ color: "#fff", fontSize: 18, }}>{item.label}</Text>
               </TouchableOpacity>
             );
           }}
+          refreshControl={ Platform.OS === "android" ? <RefreshControl refreshing={false}/> : null}
         /> :
         null
       }
@@ -300,7 +313,7 @@ export default function Community() {
       <AnimatedView style={{ ...springs2, flex: 1 }}>
         <>
           {
-          communitys.length === 0 ?
+            communitys.length === 0 ?
             <>
               {
                 process || isSearching ?
@@ -313,7 +326,7 @@ export default function Community() {
               category ?
               <FlatList
                 ref={flatListRef}
-                style={{ backgroundColor: mainColor }}
+                style={{ backgroundColor: mainColor, marginBottom: 75}}
                 data={communitys}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item, index }) => (

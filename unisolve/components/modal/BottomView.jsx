@@ -35,7 +35,7 @@ export default function BottomView({
         onPress={() => {
           if (mode === "chat") return setMode("post");
           setMode("");
-          sheetRef.current?.collapse();
+          sheetRef.current?.close();
         }}
       >
         <Feather name="x" size={30} color="black" />

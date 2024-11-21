@@ -175,7 +175,7 @@ const Post = ({
     try {
       const response = await _axios.delete(`/posts/${post}`);
       if (response) {
-        sheetRef.current?.collapse();
+        sheetRef.current?.close();
         snackBar(t("Function.delete_success"));
         getList(1, null, null);
       } else {
