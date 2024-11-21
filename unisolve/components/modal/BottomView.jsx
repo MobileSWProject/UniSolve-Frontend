@@ -1,6 +1,8 @@
 import { TouchableOpacity } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useCallback } from "react";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { useFocusEffect } from "@react-navigation/native";
 import PostCreate from "../form/PostCreate";
 import Post from "../post/Post";
 import Chat from "../post/Chat";
@@ -20,6 +22,11 @@ export default function BottomView({
   modalType,
   setModalType,
 }) {
+  useFocusEffect(
+    useCallback(() => {
+      if (!mode) sheetRef.current?.close();
+    }, [])
+  );
   return (
     <BottomSheet
       ref={sheetRef}

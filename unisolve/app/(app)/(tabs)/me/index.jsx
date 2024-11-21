@@ -123,17 +123,9 @@ export default function MePage() {
       <TouchableOpacity onPress={async () => { await AsyncStorage.removeItem("token"); router.replace("/"); }}>
         <Text style={styles.buttonText}>{t("User.logout")}</Text>
       </TouchableOpacity>
-
-      {
-        modalVisible ? 
-        <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} userData={user}/> :
-        null
-      }
-      <SnackBar
-        visible={snackbarVisible}
-        message={snackbarMessage}
-        onDismiss={() => setSnackbarVisible(false)}
-      />
+      
+      <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} userData={user}/>
+      <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)}/>
     </SafeAreaView>
   );
 }

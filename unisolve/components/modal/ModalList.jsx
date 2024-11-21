@@ -8,7 +8,7 @@ import _axios from "../../api";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
-export default function ModalList({ visible, setVisible, type }) {
+export default function ModalList({ setVisible, type }) {
   const { t } = useTranslation();
   const [list, setList] = useState([]);
   const [page, setPage] = useState(1);

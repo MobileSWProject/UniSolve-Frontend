@@ -17,15 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-const Post = ({
-  sheetRef,
-  setMode,
-  post,
-  snackBar,
-  getList,
-  setModalVisible,
-  setModalType,
-}) => {
+const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setModalType }) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [ban, setBan] = useState(false);
@@ -283,6 +275,7 @@ const Post = ({
                   hitSlop={8}
                   onPress={() => {
                     setEditPost(false);
+                    setModalType("report");
                     setModalVisible(true);
                   }}
                 >
