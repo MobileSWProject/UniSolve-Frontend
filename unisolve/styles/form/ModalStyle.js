@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     maxHeight: "80%",
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 10,
+    padding: 15,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
