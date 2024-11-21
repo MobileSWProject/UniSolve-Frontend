@@ -320,7 +320,9 @@ export default function Community() {
                 <FlatList contentContainerStyle={{ paddingTop: 20 }}>
                   <SkeletonList length={20} />
                 </FlatList> :
-                null
+                <View style={{margin: 5, alignItems: "center"}}>
+                  <Text style={{color: "#fff", fontWeight: "bold", fontSize: 35}}>== 게시글이 없습니다 ==</Text>
+                </View>
               }
             </> :
               category ?
