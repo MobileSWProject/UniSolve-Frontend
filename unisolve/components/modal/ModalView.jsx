@@ -13,7 +13,9 @@ import { useEffect } from "react";
 export default function ModalView({ type, visible, setVisible, userData, image, post, setUser }) {
   // type이 falsy일 때 모달을 닫기 위해 setVisible(false)를 호출
   useEffect(() => {
-    if (!type) setVisible(false);
+    if (!type) {
+      setVisible(false);
+    }
   }, [type, setVisible]);
   return (
     <>

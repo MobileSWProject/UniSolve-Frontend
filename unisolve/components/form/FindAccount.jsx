@@ -4,25 +4,19 @@ import SnackBar from "../Snackbar";
 import Input from "./Input";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
-
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
 export default function FindAccount({ visible, setVisible }) {
   const { t } = useTranslation();
-
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
   const [findName, setFindName] = useState("");
   const [findEmail, setFindEmail] = useState("");
   const [findID, setFindID] = useState("");
   const [findSending, setFindSending] = useState(false);
 
-  const snackBar = (message) => {
-    setSnackbarMessage(message);
-    setSnackbarVisible(true);
-  };
+  const snackBar = (message) => { setSnackbarMessage(message); setSnackbarVisible(true); };
 
   const findAccount = async () => {
     try {
@@ -30,19 +24,18 @@ export default function FindAccount({ visible, setVisible }) {
       let response;
       setFindSending(true);
       snackBar(`${t("Stage.process")}${t("User.search_account_process")}`);
-      if (findID.length === 0)
+      if (findID.length === 0) {
         response = await _axios.post("/accounts/find_user_id", { name: findName, email: findEmail });
-      else if (findID.length > 0)
+      } else if (findID.length > 0) {
         response = await _axios.post("/accounts/reset_password_request", { user_id: findID, username: findName, email: findEmail });
-      if (response.data.isSent || response.data.foundpw) 
+      }
+      if (response.data.isSent || response.data.foundpw) {
         snackBar(`${t("Stage.success")}${t("User.search_account_success")}`);
+      }
     } catch {
       snackBar(`${t("Stage.failed")}${t("User.search_account_failed")}`);
     } finally {
-      setTimeout(() => {
-        setVisible(false);
-        setFindSending(false);
-      }, 2000);
+      setTimeout(() => { setVisible(false); setFindSending(false); }, 2000);
     }
   };
 
@@ -53,12 +46,8 @@ export default function FindAccount({ visible, setVisible }) {
         message={snackbarMessage}
         onDismiss={() => setSnackbarVisible(false)}
       />
-      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
-        {t("User.search_account")}
-      </Text>
-      <Text style={{ fontSize: 12, marginBottom: 10 }}>
-        {t("User.search_account_subtitle")}
-      </Text>
+      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("User.search_account")}</Text>
+      <Text style={{ fontSize: 12, marginBottom: 10 }}>{t("User.search_account_subtitle")}</Text>
       <Input
         title={t("User.name")}
         content={findName}

@@ -3,16 +3,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  TouchableOpacity,
-  RefreshControl,
-  Platform,
-} from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, View, TouchableOpacity, RefreshControl, Platform } from "react-native";
 import _axios from "../../../../api";
 import List from "../../../../components/tabs/List/List";
 import useScrollRefresh from "../../../../hooks/useScrollRefresh";
@@ -31,18 +22,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Community() {
   const { post, log_click } = useLocalSearchParams();
   const sheetRef = useRef(null);
-
   const [items, setItems] = useState([]);
   const [category, setCategory] = useState("");
-
   const [mode, setMode] = useState("");
   const [postID, setPostID] = useState("");
-
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
-
   const [ban, setBan] = useState(true);
-
   const [communitys, setCommunitys] = useState([]);
   const [page, setPage] = useState(1);
   const [isRemain, setIsRemain] = useState(true); // 총 페이지 수 관리
@@ -52,12 +38,10 @@ export default function Community() {
   const [lastPostId, setLastPostId] = useState(null);
   const [hasMore, setHasMore] = useState(true); // 더 가져올 데이터가 있는지 여부
   const [isSearching, setIsSearching] = useState(false);
-
   const flatListRef = useRef(null); // FlatList의 ref 생성
-
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const router = useRouter();
+
   useFocusEffect(
     useCallback(() => {
       if ((!post && log_click) || (post && !log_click)) sheetRef.current?.collapse();

@@ -1,11 +1,10 @@
 import { View, Image, Text, TouchableOpacity } from "react-native";
 import { mainColor } from "../constants/Colors";
 import { styles } from "../styles/form/FormStyle";
-
 import { useTranslation } from 'react-i18next';
 import "../i18n";
 
-export default function InputProcess({ visible, setVisible, image }) {
+export default function InputProcess({ setVisible, image }) {
   const { t } = useTranslation();
   return (
     <>

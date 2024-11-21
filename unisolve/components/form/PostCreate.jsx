@@ -6,34 +6,27 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { _fetchFormData, formFetch } from "../../api";
 import Input from "./Input";
 import * as ImagePicker from "expo-image-picker";
-import { mainColor } from "../../constants/Colors";
 import ModalView from "../../components/modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import DropDownPicker from "react-native-dropdown-picker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
 export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
   const { t } = useTranslation();
-
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState();
   const [items, setItems] = useState(categorys);
   const [category, setCategory] = useState("");
-
   const [image, setImage] = useState(null);
-
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
-
   const router = useRouter();
 
   // 버튼을 눌렀을 때 동작할 함수를 모아놓았습니다.
@@ -42,7 +35,7 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
     takePhoto: async () => {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
-        console.log("Camera permissions not granted");
+        snackBar("카메라를 실행할 권한이 없습니다!");
         return;
       }
       const result = await ImagePicker.launchCameraAsync({
@@ -57,10 +50,9 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
     },
     // 사진 첨부하기
     attachPhoto: async () => {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        console.log("Media library permissions not granted");
+        snackBar("사진/갤러리에 접근할 권한이 없습니다!");
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -99,11 +91,7 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
       if (Platform.OS === "web") {
         data.append("image", image);
       } else {
-        data.append("image", {
-          uri: image,
-          name: "image.jpg",
-          type: "image/jpeg",
-        });
+        data.append("image", { uri: image, name: "image.jpg", type: "image/jpeg" });
       }
     }
 
@@ -114,16 +102,10 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
       const postId = response.postId;
       snackBar(`${t("Stage.success")}${t("Function.register_success")}`);
       setSubmitLoading(false);
-      setTimeout(() => {
-        setPost(postId);
-        setMode("post");
-      });
-    } catch (error) {
-      console.log("Error during submission:", error);
-      if (
-        error.response &&
-        (error.response.status === 400 || error.response.status === 401)
-      ) {
+      setTimeout(() => { setPost(postId); setMode("post"); });
+    } catch {
+      snackBar("오류가 발생했습니다!");
+      if (error.response && (error.response.status === 400 || error.response.status === 401)) {
         router.replace("/notfound");
       }
       setSubmitLoading(false);
@@ -132,68 +114,37 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
 
   return (
     <>
-      <KeyboardAwareScrollView
-        style={styles.container}
-        contentContainerStyle={{}}
-      >
+      <KeyboardAwareScrollView style={styles.container} contentContainerStyle={{}}>
         {/* [카메라, 사진, 사진보기 그룹] */}
         <View style={{ marginTop: 5, alignItems: "center" }}>
           <View style={{ width: "93%", flexDirection: "row", gap: 10 }}>
             {/* 카메라 버튼 */}
-            <TouchableOpacity
-              style={[styles.submitButton, { height: 60, width: 60 }]}
-              onPress={BtnHandleFunctions.takePhoto}
-            >
+            <TouchableOpacity style={[styles.submitButton, { height: 60, width: 60 }]} onPress={BtnHandleFunctions.takePhoto}>
               <Text style={styles.submitButtonText}>
-                <FontAwesome
-                  name="camera"
-                  size={24}
-                  color="white"
-                />
+                <FontAwesome name="camera" size={24} color="white"/>
               </Text>
             </TouchableOpacity>
             {/* 사진 버튼 */}
-            <TouchableOpacity
-              style={[styles.submitButton, { height: 60, width: 60 }]}
-              onPress={BtnHandleFunctions.attachPhoto}
-            >
+            <TouchableOpacity style={[styles.submitButton, { height: 60, width: 60 }]} onPress={BtnHandleFunctions.attachPhoto} >
               <Text style={styles.submitButtonText}>
-                <FontAwesome
-                  name="photo"
-                  size={24}
-                  color="white"
-                />
+                <FontAwesome name="photo" size={24} color="white"/>
               </Text>
             </TouchableOpacity>
             {/* 사진 확인 버튼 */}
-            {image && (
-              <TouchableOpacity
-                style={[styles.submitButton, { height: 60, width: 60 }]}
-                onPress={() => {
-                  setModalType("image");
-                  setModalVisible(true);
-                }}
-              >
-                <Text style={styles.submitButtonText}>
-                  <Fontisto
-                    name="preview"
-                    size={24}
-                    color="white"
-                  />
-                </Text>
-              </TouchableOpacity>
-            )}
+            {
+              image &&
+                <TouchableOpacity style={[styles.submitButton, { height: 60, width: 60 }]} onPress={() => { setModalType("image"); setModalVisible(true); }}>
+                  <Text style={styles.submitButtonText}>
+                    <Fontisto name="preview" size={24} color="white"/>
+                  </Text>
+                </TouchableOpacity>
+            }
           </View>
         </View>
 
         <View style={{ alignItems: "center" }}>
           {/* 제목 */}
-          <Input
-            title={t("Function.title")}
-            content={title}
-            onChangeText={setTitle}
-            maxLength={32}
-          />
+          <Input title={t("Function.title")} content={title} onChangeText={setTitle} maxLength={32}/>
           <View style={{ marginTop: 30 }} />
           {/* 카테고리 */}
           <View style={{ width: "93%", zIndex: 99 }}>
@@ -207,71 +158,47 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
               setValue={setValue}
               setItems={setItems}
               maxHeight={200}
-              onChangeValue={(value) => {
-                setCategory(value);
-              }}
+              onChangeValue={(value) => { setCategory(value); }}
               listMode="SCROLLVIEW"
             />
           </View>
 
           {/* 내용 */}
-          <Input
-            title={t("Function.content")}
-            content={content}
-            onChangeText={setContent}
-            textArea={true}
-          />
+          <Input title={t("Function.content")} content={content} onChangeText={setContent} textArea={true}/>
           <View style={{ marginTop: 10 }} />
           <View style={styles.submitContainer}>
             {/* 공개 비공개 토글 버튼 */}
             <TouchableOpacity
-              style={{
-                height: 30,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-              }}
+              style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
               hitSlop={4}
-              onPress={() => {
-                setIsPrivate(!isPrivate);
-              }}
+              onPress={() => { setIsPrivate(!isPrivate); }}
             >
-              <MaterialCommunityIcons
-                name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"}
-                size={24}
-                color="black"
-              />
+              <MaterialCommunityIcons name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"} size={24} color="black" />
               <Text style={{}}>{`${t("Function.private")}로 질문하기`}</Text>
-              {/* <Text style={styles.submitButtonText}>
-                {isPrivate ? t("Function.private") : t("Function.public")}
-              </Text> */}
             </TouchableOpacity>
             <View style={{ marginTop: 10 }} />
             {/* 등록 버튼 */}
             <TouchableOpacity
-              style={[
-                styles.submitButton,
-                { alignSelf: "stretch", width: "100%" },
-              ]}
+              style={[ styles.submitButton, { alignSelf: "stretch", width: "100%" }]}
               hitSlop={4}
               onPress={handleSubmit}
               disabled={submitLoading}
             >
-              <Text style={styles.submitButtonText}>
-                {t("Function.regist")}
-              </Text>
+              <Text style={styles.submitButtonText}>{t("Function.regist")}</Text>
             </TouchableOpacity>
           </View>
           <View style={{ marginBottom: 30 }} />
 
-          {modalVisible ? (
+          {
+            modalVisible ?
             <ModalView
               type={modalType}
               visible={modalVisible}
               setVisible={setModalVisible}
               image={{ image, setImage }}
-            />
-          ) : null}
+            /> :
+            null
+          }
         </View>
       </KeyboardAwareScrollView>
     </>

@@ -7,19 +7,15 @@ import SnackBar from "../Snackbar";
 import Input from "./Input";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
-
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
 export default function Register({ visible, setVisible }) {
   const { t } = useTranslation();
   const [effect, setEffect] = useState(false);
-
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
   const [schoolData, setSchoolData] = useState([]);
-
   const [reID, setReID] = useState("");
   const [reIDCheck, setReIDCheck] = useState(false);
   const [reName, setReName] = useState("");
@@ -33,7 +29,6 @@ export default function Register({ visible, setVisible }) {
   const [reNicknameCheck, setReNicknameCheck] = useState(false);
   const [reSchool, setReSchool] = useState("");
   const [reProcess, setReProcess] = useState(false);
-
   const [reEmailProcess, setReEmailProcess] = useState(false);
 
   useEffect(() => {
@@ -55,9 +50,7 @@ export default function Register({ visible, setVisible }) {
       const response = await accountCheck({ email: reEmail }, snackBar, t);
       if (response) {
         snackBar(`${t("Stage.process")}${t("User.email_number_process")}`);
-        const responseTo = await _axios.post("/auth/send-code", {
-          email: reEmail,
-        });
+        const responseTo = await _axios.post("/auth/send-code", { email: reEmail });
         setReEmailCheck(responseTo.data.isSent || false);
         setReEmailProcess(false);
         snackBar(`${t("Stage.success")}${t("User.email_number_success")}`);
@@ -72,10 +65,7 @@ export default function Register({ visible, setVisible }) {
   const CheckProcessEmailTo = async () => {
     try {
       snackBar(`${t("Stage.process")}${t("User.email_number_check")}`);
-      const response = await _axios.post("/auth/verify-code", {
-        email: reEmail,
-        code: reEmailTo,
-      });
+      const response = await _axios.post("/auth/verify-code", { email: reEmail, code: reEmailTo });
       setReEmailCheckTo(response.data.isVerified || false);
     } catch {
       snackBar(`${t("Stage.failed")}${t("User.email_number_check_failed")}`);
@@ -91,24 +81,26 @@ export default function Register({ visible, setVisible }) {
   const confirmID = (type) => {
     const regEx = /^(?=.*[a-z])(?=.*[0-9])[a-z0-9]{4,}$/.test(reID);
     if (type === true) return regEx;
-    return !regEx
-      ? t("User.regular_check_failed")
-      : reIDCheck
-      ? t("User.confirm_please_success")
-      : t("User.confirm_please");
+    return !regEx ?
+      t("User.regular_check_failed") :
+        reIDCheck ?
+        t("User.confirm_please_success") :
+        t("User.confirm_please");
   };
 
   const confirmPW = (type) => {
-    const regEx = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W])[a-zA-Z0-9\W]{8,}$/.test(
-      rePw
-    );
-    if (type === true) return regEx && rePw === rePwTo;
-    else if (type === false) return regEx;
-    return !regEx
-      ? t("User.regular_check_failed")
-      : rePw === rePwTo
-      ? t("User.password_confirm_success")
-      : t("User.password_confirm_failed");
+    const regEx = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W])[a-zA-Z0-9\W]{8,}$/.test(rePw);
+    if (type === true) {
+      return regEx && rePw === rePwTo;
+    } else if (type === false) {
+      return regEx;
+    } else {
+    return !regEx ?
+      t("User.regular_check_failed") :
+        rePw === rePwTo ?
+        t("User.password_confirm_success") :
+        t("User.password_confirm_failed");
+    }
   };
 
   const confirmEmail = () => {
@@ -135,37 +127,16 @@ export default function Register({ visible, setVisible }) {
   const registerProcess = async () => {
     if (reProcess) return;
     try {
-      if (
-        reID.length <= 0 ||
-        !reIDCheck ||
-        !confirmID(true) ||
-        reName.length <= 0 ||
-        reEmail.length <= 0 ||
-        !reEmailCheck ||
-        !reEmailCheckTo ||
-        !confirmPW(true) ||
-        rePw !== rePwTo ||
-        reNickname.length <= 0
-      ) {
+      if (reID.length <= 0 || !reIDCheck || !confirmID(true) || reName.length <= 0 || reEmail.length <= 0 || !reEmailCheck || !reEmailCheckTo || !confirmPW(true) || rePw !== rePwTo || reNickname.length <= 0) {
         snackBar(`${t("Stage.failed")}${t("User.empty_content")}`);
         return;
       }
       setReProcess(true);
       snackBar(`${t("Stage.process")}${t("User.regist_process")}`);
-      const response = await _axios.post("/auth/register", {
-        user_id: reID,
-        username: reName,
-        email: reEmail,
-        password: rePw,
-        user_nickname: reNickname,
-        school: reSchool,
-      });
+      const response = await _axios.post("/auth/register", { user_id: reID, username: reName, email: reEmail, password: rePw, user_nickname: reNickname,school: reSchool });
       if (response.data.status === "success") {
         snackBar(`${t("Stage.success")}${t("User.regist_success")}`);
-        setTimeout(() => {
-          setVisible(false);
-          setReProcess(false);
-        }, 2000);
+        setTimeout(() => { setVisible(false); setReProcess(false); }, 2000);
       }
     } catch {
       snackBar(`${t("Stage.failed")}${t("User.regist_failed")}`);
@@ -174,27 +145,18 @@ export default function Register({ visible, setVisible }) {
   };
 
   const getSchool = () => {
-    _axios.get("/universities").then((response) => {
-      setSchoolData(response.data.universities);
-    });
+    _axios.get("/universities").then((response) => { setSchoolData(response.data.universities); }); 
   };
 
   const searchSchool = () => {
-    return schoolData && reSchool
-      ? schoolData.filter((item) => item.univ_name.includes(reSchool))
-      : [];
+    return schoolData && reSchool ?
+      schoolData.filter((item) => item.univ_name.includes(reSchool)) :
+      [];
   };
 
   return (
     <>
-      <SnackBar
-        visible={snackbarVisible}
-        message={snackbarMessage}
-        onDismiss={() => setSnackbarVisible(false)}
-      />
-      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
-        {t("User.regist")}
-      </Text>
+      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("User.regist")}</Text>
       <Input
         title={t("User.regist")}
         subTitle={confirmID()}
@@ -202,11 +164,7 @@ export default function Register({ visible, setVisible }) {
         content={reID}
         onChangeText={(text) => inputReID(text)}
         buttonDisabled={reIDCheck || !confirmID(true)}
-        buttonOnPress={async () => {
-          if (confirmID(true)) {
-            setReIDCheck(await accountCheck({ user_id: reID }, snackBar, t));
-          }
-        }}
+        buttonOnPress={async () => { if (confirmID(true)) { setReIDCheck(await accountCheck({ user_id: reID }, snackBar, t)); }}}
       />
       <Input
         title={t("User.name")}
@@ -215,26 +173,27 @@ export default function Register({ visible, setVisible }) {
       />
       <Input
         title={t("User.email")}
-        subTitle={
-          reEmailCheck && reEmailCheckTo
-            ? t("User.email_confirm_success")
-            : t("User.email_confirm_failed")
+        subTitle=
+        {
+          reEmailCheck && reEmailCheckTo ?
+          t("User.email_confirm_success") :
+          t("User.email_confirm_failed")
         }
         subTitleConfirm={reEmailCheck && reEmailCheckTo}
         content={reEmail}
         onChangeText={(text) => inputEmail(text)}
         buttonDisabled={reEmailCheck || !confirmEmail()}
-        buttonOnPress={() => {
-          if (confirmEmail()) CheckProcessEmail();
-        }}
+        buttonOnPress={() => { if (confirmEmail()) CheckProcessEmail(); }}
       />
-      {reEmailCheck ? (
+      {
+      reEmailCheck ?
         <Input
           title={t("User.email_number")}
-          subTitle={
-            reEmailCheck && reEmailCheckTo
-              ? t("User.email_confirm_success")
-              : t("User.email_confirm_failed")
+          subTitle=
+          {
+            reEmailCheck && reEmailCheckTo ?
+            t("User.email_confirm_success") :
+            t("User.email_confirm_failed")
           }
           subTitleConfirm={reEmailCheck && reEmailCheckTo}
           content={reEmailTo}
@@ -242,11 +201,10 @@ export default function Register({ visible, setVisible }) {
           maxLength={8}
           onChangeText={(text) => setReEmailTo(text.replace(/[^0-9]/g, ""))}
           buttonDisabled={reEmailCheckTo || !confirmEmail(true)}
-          buttonOnPress={() => {
-            CheckProcessEmailTo();
-          }}
-        />
-      ) : null}
+          buttonOnPress={() => { CheckProcessEmailTo(); }}
+        /> :
+        null
+      }
       <Input
         title={t("User.password")}
         subTitle={confirmPW()}
@@ -255,7 +213,8 @@ export default function Register({ visible, setVisible }) {
         onChangeText={(text) => inputPW(text)}
         secure={true}
       />
-      {confirmPW(false) ? (
+      {
+      confirmPW(false) ?
         <Input
           title={t("User.password_confirm")}
           placeholder={t("User.password_confirm_please")}
@@ -264,24 +223,22 @@ export default function Register({ visible, setVisible }) {
           content={rePwTo}
           onChangeText={setRePwTo}
           secure={true}
-        />
-      ) : null}
+        /> :
+        null
+      }
       <Input
         title={t("User.nickname")}
-        subTitle={
-          reNicknameCheck
-            ? t("User.confirm_please_success")
-            : t("User.confirm_please")
+        subTitle=
+        {
+          reNicknameCheck ?
+          t("User.confirm_please_success") :
+          t("User.confirm_please")
         }
         subTitleConfirm={reNicknameCheck}
         content={reNickname}
         onChangeText={(text) => inputReNickname(text)}
         buttonDisabled={reNicknameCheck || reNickname.length <= 0}
-        buttonOnPress={async () =>
-          setReNicknameCheck(
-            await accountCheck({ nickname: reNickname }, snackBar)
-          )
-        }
+        buttonOnPress={async () => setReNicknameCheck( await accountCheck({ nickname: reNickname }, snackBar))}
       />
       <Input
         title={t("User.school")}
@@ -289,7 +246,8 @@ export default function Register({ visible, setVisible }) {
         content={reSchool}
         onChangeText={(text) => setReSchool(text)}
       />
-      {searchSchool().length > 0 ? (
+      {
+        searchSchool().length > 0 ?
         <View style={FlatStyles.flatList}>
           <FlatList
             style={{ margin: 5, marginRight: 0 }}
@@ -302,18 +260,18 @@ export default function Register({ visible, setVisible }) {
             )}
             ListEmptyComponent={<Text style={styles.empty}></Text>}
           />
-        </View>
-      ) : null}
+        </View> :
+        null
+      }
       <InputProcess
         visible={visible}
         setVisible={setVisible}
-        onPress={() => {
-          registerProcess();
-        }}
+        onPress={() => { registerProcess(); }}
         content="회원가입"
         cancel={reProcess}
         disabled={reProcess}
       />
+      <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)} />
     </>
   );
 }
