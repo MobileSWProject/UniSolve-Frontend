@@ -1,7 +1,8 @@
 import { StyleSheet } from "react-native";
+
 export const styles = StyleSheet.create({
   main: {
-    backgroundColor: "#fff",
+    backgroundColor: "#EEE",
     borderWidth: 2,
     borderColor: "#ffffff00",
     borderTopColor: "#fff",

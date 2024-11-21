@@ -58,6 +58,7 @@ const Post = ({
           setBan(response.data.data.ban);
           setData({
             id: response.data.data.id,
+            exp: response.data.data.exp,
             private: Boolean(response.data.data.is_private),
             authorId: formatAuthor(response.data.data.author_id),
             nickname: formatAuthor(response.data.data.author_nickname || `${response.data.data.author_id}_temp_nickname`),
@@ -226,15 +227,9 @@ const Post = ({
   return (
     <KeyboardAwareScrollView style={styles.container}>
       <View style={styles.contentContainer}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
           <View style={{ flexDirection: "row" }}>
-            <LevelImage exp={2} size={36} />
+            <LevelImage exp={data.exp} size={36} />
             <View style={{ flexDirection: "column" }}>
               <Text style={styles.userInfo}>{formatAuthor(data.nickname)}</Text>
               <Text style={styles.userInfo}>{data.timestamp}</Text>
@@ -245,23 +240,14 @@ const Post = ({
               <>
                 <TouchableOpacity
                   disabled={!data.private}
-                  onPress={() => {
-                    setModalType("user");
-                    setModalVisible(true);
-                  }}
+                  onPress={() => { setModalType("user"); setModalVisible(true); }}
                   hitSlop={4}
                 >
-                  <FontAwesome
-                    name="user"
-                    size={30}
-                    color={!data.private ? "gray" : mainColor}
-                  />
+                  <FontAwesome name="user" size={30} color={!data.private ? "gray" : mainColor}/>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={{ marginLeft: 8 }}
-                  onPress={() => {
-                    setMode("chat");
-                  }}
+                  style={{ marginLeft: 5, marginRight: 5 }}
+                  onPress={() => { setMode("chat");}}
                   hitSlop={4}
                 >
                   <Entypo name="chat" size={30} color={mainColor} />
@@ -288,9 +274,7 @@ const Post = ({
               <>
                 <TouchableOpacity
                   style={{ marginLeft: 8 }}
-                  onPress={() => {
-                    setMode("chat");
-                  }}
+                  onPress={() => { setMode("chat"); }}
                   hitSlop={4}
                 >
                   <Entypo name="chat" size={30} color={mainColor} />

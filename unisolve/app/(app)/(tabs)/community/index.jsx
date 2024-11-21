@@ -1,6 +1,6 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import { useFocusEffect } from "@react-navigation/native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { FlatList, StyleSheet, Text, TextInput, View, TouchableOpacity, RefreshControl, Platform } from "react-native";
@@ -15,9 +15,7 @@ import { debounce } from "lodash";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import SnackBar from "../../../../components/Snackbar";
 import ModalView from "../../../../components/modal/ModalView";
-
 import BottomView from "../../../../components/modal/BottomView";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Community() {
   const { post, log_click } = useLocalSearchParams();
@@ -54,7 +52,7 @@ export default function Community() {
       setMode("post");
       setPostID(post);
       sheetRef.current?.expand();
-    } else if ( log_click ) {
+    } else if (log_click) {
       setMode("create");
       sheetRef.current?.expand();
     } else {
@@ -63,19 +61,7 @@ export default function Community() {
     getCategory();
   }, [post]);
 
-  // const resetState = () => {
-  //   setPage(1);
-  //   setTotalPage(1); // 초기화할 때 총 페이지 수도 초기화
-  //   setCommunitys([]);
-  //   setLastTimestamp(null);
-  //   setLastPostId(null);
-  //   setHasMore(true); // 데이터가 더 있다고 초기화
-  // };
-
-  const snackBar = (message) => {
-    setSnackbarMessage(message);
-    setSnackbarVisible(true);
-  };
+  const snackBar = (message) => { setSnackbarMessage(message); setSnackbarVisible(true);};
 
   const getCategory = async () => {
     try {
@@ -87,13 +73,7 @@ export default function Community() {
   };
 
   // 서버에서 데이터 가져오기
-  const getList = async (
-    tempPage,
-    timestamp,
-    postId,
-    isForce = false,
-    tempCategory = null
-  ) => {
+  const getList = async (tempPage, timestamp, postId, isForce = false, tempCategory = null) => {
     // isForce true인 경우 강제 새로고침
     // 단, isForce true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
     if (isForce === false) {
@@ -102,11 +82,7 @@ export default function Community() {
     setProcess(true);
     setIsSearching(false);
     try {
-      const response = await _axios.get(
-        `/posts?page=${tempPage}&last_timestamp=${timestamp || ""
-        }&last_post_id=${postId || ""}&search=${searchText}&category_filter=${tempCategory || category
-        }`
-      );
+      const response = await _axios.get(`/posts?page=${tempPage}&last_timestamp=${timestamp || ""}&last_post_id=${postId || ""}&search=${searchText}&category_filter=${tempCategory || category}`);
       setBan(response.data.ban);
 
       const newData = response.data.data || [];
@@ -121,12 +97,10 @@ export default function Community() {
         setCommunitys(newData);
       } else {
         // 중복 데이터 없이 추가
-        setCommunitys((prev) => [
-          ...prev,
-          ...newData.filter(
-            (item) => !prev.some((prevItem) => prevItem.id === item.id)
-          ),
-        ]);
+        setCommunitys((prev) => [...prev, ...newData.filter((item) => !prev.some((prevItem) => prevItem.id === item.id))]);
+      }
+      if (category && newData.length <= 0) {
+        snackBar("게시글이 없습니다!");
       }
 
       // 마지막 게시글의 시간과 ID 저장
@@ -204,49 +178,26 @@ export default function Community() {
   };
 
   // 새로고침
-  const {
-    isRefreshing,
-    handleScroll,
-    handleScrollEndDrag,
-    canRefresh,
-    handleScrollStartDrag,
-  } = useScrollRefresh(getRefreshData);
+  const {isRefreshing, handleScroll, handleScrollEndDrag, canRefresh,handleScrollStartDrag} = useScrollRefresh(getRefreshData);
 
   const AnimatedIcons = animated(Icons);
   const AnimatedView = animated(View);
-  const [springs, api] = useSpring(() => ({
-    marginTop: 0,
-    opacity: 0,
-    rotate: 0,
-  }));
+  const [springs, api] = useSpring(() => ({ marginTop: 0, opacity: 0, rotate: 0 }));
   const [springs2, api2] = useSpring(() => ({ y: 0 }));
   // "READY" | "CAN_REFRESH" | "IS_REFRESHING"
   const animationStep = useRef("READY");
 
   useEffect(() => {
     if (canRefresh && animationStep.current === "READY") {
-      api.start({
-        opacity: 1,
-        marginTop: 12,
-        rotate: 360,
-        config: { duration: 300 },
-      });
-      api2.start({
-        y: 30,
-        config: { duration: 300 },
-      });
+      api.start({ opacity: 1, marginTop: 12, rotate: 360, config: { duration: 300 }});
+      api2.start({y: 30, config: { duration: 300 }});
       animationStep.current = "CAN_REFRESH";
     }
 
     if (isRefreshing && animationStep.current === "CAN_REFRESH") {
       api.start({ cancel: "rotate" });
       const curRotateValue = springs.rotate.get();
-      api.start({
-        from: { rotate: curRotateValue },
-        to: { rotate: curRotateValue + 360 },
-        config: { duration: 800 },
-        loop: true, // 명시적으로 무한 반복
-      });
+      api.start({ from: { rotate: curRotateValue }, to: { rotate: curRotateValue + 360 }, config: { duration: 800 }, loop: true }); // 명시적으로 무한 반복
       animationStep.current = "IS_REFRESHING";
     }
 
@@ -258,12 +209,7 @@ export default function Community() {
     }
 
     if (!canRefresh && animationStep.current === "CAN_REFRESH") {
-      api.start({
-        opacity: 0,
-        marginTop: 0,
-        rotate: 0,
-        config: { duration: 300 },
-      });
+      api.start({ opacity: 0, marginTop: 0, rotate: 0, config: { duration: 300 }});
       api2.start({ y: 0, duration: 300 });
       animationStep.current = "READY";
     }
@@ -286,143 +232,85 @@ export default function Community() {
       setPostID(0);
       setMode("chat");
       sheetRef.current?.expand();
-      // const response = await _axios.get("/chat/check_ban_status");
-      // if (response.data.ban) {
-      //   sheetRef.current?.collapse();
-      //   setBan(response.data.ban);
-      // }
-    } catch { }
+    } catch {}
   };
 
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <SnackBar
-          visible={snackbarVisible}
-          message={snackbarMessage}
-          onDismiss={() => setSnackbarVisible(false)}
-        />
-        {/* 검색창 */}
-        <View style={styles.searchContainer}>
-          <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-            {category ?
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                setSearchText("");
-                setCategory("");
-              }}
-            >
-              <Text>
-                <Ionicons
-                  name="arrow-back"
-                  size={30}
-                  color="white"
-                />
-              </Text>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: mainColor, marginBottom: 70 }}>
+      {/* 검색창 */}
+      <View style={styles.searchContainer}>
+        <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          {
+            category ?
+            <TouchableOpacity style={styles.button} onPress={() => { setSearchText(""); setCategory(""); }}>
+              <Text><Ionicons name="arrow-back" size={30} color="white" /></Text>
             </TouchableOpacity> :
             null
-            }
-          </View>
-          <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-            <TouchableOpacity
-              style={styles.button}
-              disabled={ban}
-              onPress={() => {
-                chatOpen();
-              }}
-            >
-              <Text>
-                <Entypo
-                  name="chat"
-                  size={26}
-                  color="white"
-                />
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              disabled={ban}
-              onPress={() => {
-                postCreate();
-              }}
-            >
-              <Text>
-                <Ionicons
-                  name="create"
-                  size={30}
-                  color={ban ? "#AAA" : "white"}
-                />
-              </Text>
-            </TouchableOpacity>
-            {category ? <TextInput
+          }
+        </View>
+        <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity style={styles.button} disabled={ban} onPress={() => { chatOpen(); }}>
+            <Text><Entypo name="chat" size={26} color="white"/></Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} disabled={ban} onPress={() => { postCreate(); }}>
+            <Text><Ionicons name="create" size={30} color={ban ? "#AAA" : "white"}/></Text>
+          </TouchableOpacity>
+          {
+            category ?
+            <TextInput
               style={styles.searchInput}
               placeholder="검색어"
               value={searchText}
               onChangeText={handleChangeText}
               placeholderTextColor={"white"}
-            /> : null}
-          </View>
+            /> :
+            null
+          }
         </View>
-        {!category ? (
-          <FlatList
-            ref={flatListRef}
-            data={items}
-            keyExtractor={(item) => item.value.toString()}
-            renderItem={({ item }) => {
-              return (
-                <TouchableOpacity
-                  style={{
-                    padding: 10,
-                    borderColor: "#fff",
-                    borderWidth: 2,
-                    borderRadius: "15px",
-                    margin: 10,
-                  }}
-                  onPress={() => {
-                    setCommunitys([]);
-                    setCategory(item.value);
-                    getList(1, null, null, true, item.value);
-                  }}
-                >
-                  <Text style={{ color: "#fff" }}>{item.label}</Text>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        ) : null}
+      </View>
+      {
+        !category ?
+        <FlatList
+          ref={flatListRef}
+          data={items}
+          keyExtractor={(item) => item.value.toString()}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity
+                style={{padding: 10, borderColor: "#fff", borderWidth: 2, borderRadius: "15px", margin: 10}}
+                onPress={() => {
+                  setCommunitys([]);
+                  setCategory(item.value);
+                  getList(1, null, null, true, item.value);
+                }}
+              >
+                <Text style={{ color: "#fff" }}>{item.label}</Text>
+              </TouchableOpacity>
+            );
+          }}
+        /> :
+        null
+      }
+      <View style={{ zIndex: 10 }}>
+        <AnimatedIcons name="refresh" size={28} color="white" style={{ position: "absolute", alignSelf: "center", ...springs}}/>
+      </View>
 
-        <View style={{ zIndex: 10 }}>
-          <AnimatedIcons
-            name="refresh"
-            size={28}
-            color="white"
-            style={{
-              position: "absolute",
-              alignSelf: "center",
-              // top: -10,
-              ...springs,
-            }}
-          />
-        </View>
-
-        {/* 커뮤니티 리스트 */}
-        <AnimatedView style={{ ...springs2, flex: 1 }}>
-          <>
-            {communitys.length === 0 ? (
-              <>
-                {process || isSearching ? (
-                  <FlatList contentContainerStyle={{ paddingTop: 20 }}>
-                    <SkeletonList length={20} />
-                  </FlatList>
-                ) : (
-                  <View>
-                    <Text style={{ color: "white" }}>찾는 결과 없음 ㅋ.</Text>
-                  </View>
-                )}
-              </>
-            ) : category ? (
+      {/* 커뮤니티 리스트 */}
+      <AnimatedView style={{ ...springs2, flex: 1 }}>
+        <>
+          {
+          communitys.length === 0 ?
+            <>
+              {
+                process || isSearching ?
+                <FlatList contentContainerStyle={{ paddingTop: 20 }}>
+                  <SkeletonList length={20} />
+                </FlatList> :
+                null
+              }
+            </> :
+              category ?
               <FlatList
                 ref={flatListRef}
                 style={{ backgroundColor: mainColor }}
@@ -443,12 +331,11 @@ export default function Community() {
                 onScroll={handleScroll}
                 onScrollBeginDrag={handleScrollStartDrag}
                 onScrollEndDrag={handleScrollEndDrag}
-                ListFooterComponent={
-                  process || isSearching ? (
-                    <SkeletonList />
-                  ) : (
-                    <View style={{ marginBottom: isRemain ? 500 : 100 }} />
-                  )
+                ListFooterComponent=
+                {
+                  process || isSearching ?
+                  <SkeletonList /> :
+                  <View style={{ marginBottom: isRemain ? 500 : 100 }} />
                 }
                 refreshControl={
                   Platform.OS === "android" ? (
@@ -460,33 +347,28 @@ export default function Community() {
                     />
                   ) : null
                 }
-              />
-            ) : null}
-          </>
-        </AnimatedView>
-        <BottomView
-          sheetRef={sheetRef}
-          ban={ban}
-          mode={mode}
-          setMode={setMode}
-          post={postID}
-          setPost={setPostID}
-          snackBar={snackBar}
-          getList={getList}
-          categorys={items}
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-          modalType={modalType}
-          setModalType={setModalType}
-        />
-
-        <ModalView
-          type={modalType}
-          visible={modalVisible}
-          setVisible={setModalVisible}
-          post={postID}
-        />
-      </SafeAreaView>
+              /> :
+              null
+            }
+        </>
+      </AnimatedView>
+      <BottomView
+        sheetRef={sheetRef}
+        ban={ban}
+        mode={mode}
+        setMode={setMode}
+        post={postID}
+        setPost={setPostID}
+        snackBar={snackBar}
+        getList={getList}
+        categorys={items}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        modalType={modalType}
+        setModalType={setModalType}
+      />
+      <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} post={postID}/>
+      <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)}/>
     </GestureHandlerRootView>
   );
 }
