@@ -1,22 +1,16 @@
 import { useFocusEffect } from "expo-router";
-import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useState, useCallback } from "react";
 import _axios from "../../../api";
+import { styles } from "../../../styles/tabs/me/ExpStyle";
 import { mainColor } from "../../../constants/Colors";
 import { Table, Row, Rows } from "react-native-table-component";
-
 import { useTranslation } from "react-i18next";
 import "../../../i18n";
 import { getExpToLevel, getLevel, getPercent } from "../../../utils/expUtils";
 
-export function ExpPage() {
-  const { t } = useTranslation(); // `t`를 컴포넌트 내부에서 사용 가능하게 함
+export function ExpPage({setVisible}) {
+  const { t } = useTranslation();
   const [meRank, setMeRank] = useState(0);
   const [meExp, setMeExp] = useState(0);
   const listHeader = [
@@ -27,7 +21,6 @@ export function ExpPage() {
   const [list, setList] = useState([]);
   const [page, setPage] = useState(1);
   const [TotalPage, setTotalPage] = useState(1);
-
   const [process, setProcress] = useState(false);
 
   const getList = async (temp) => {
@@ -43,23 +36,23 @@ export function ExpPage() {
     } else if (temp === "self") tempSelf = true;
     setPage(tempPage);
     setProcress(true);
-    await _axios
-      .get(`/rankings?page=${tempPage}&self=${tempSelf}`)
-      .then((response) => {
-        setProcress(false);
-        setMeRank(response.data.self_user.rank);
-        setMeExp(response.data.self_user.exp);
-        setList(
-          response.data.users.map((item, index) => [
-            index + 1 + (tempSelf ? response.data.self_user.page : tempPage) * 10 - 10,
-            item.nickname,
-            getExpToLevel(t, getLevel(item.exp)),
-          ])
-        );
-        setTotalPage(response.data.total_pages);
-        if (tempSelf) setPage(response.data.self_user.page || 1);
+    await _axios.get(`/rankings?page=${tempPage}&self=${tempSelf}`).then((response) => {
+      setProcress(false);
+      setMeRank(response.data.self_user.rank);
+      setMeExp(response.data.self_user.exp);
+      setList(
+        response.data.users.map((item, index) => [
+          index + 1 + (tempSelf ? response.data.self_user.page : tempPage) * 10 - 10,
+          item.nickname,
+          getExpToLevel(t, getLevel(item.exp)),
+        ])
+      );
+      setTotalPage(response.data.total_pages);
+      if (tempSelf) {
+        setPage(response.data.self_user.page || 1);
+      }
       })
-      .catch((error) => {
+      .catch(() => {
         setProcress(false);
         setList([]);
       });
@@ -77,119 +70,46 @@ export function ExpPage() {
 
   return (
     <>
-      <Text style={styles.meSubText}>
-        {`${meRank}${t("User.rank")}`}
-      </Text>
+      <Text style={styles.meSubText}>{`${meRank}${t("User.rank")}`}</Text>
       <View style={styles.me}>
         <Text style={styles.meText}>★ {numConvert(meExp)}</Text>
       </View>
       <ScrollView style={{ width: "100%" }}>
         <Table borderStyle={{ borderWidth: 0, borderColor: "#C1C0B9" }}>
-          <Row
-            data={listHeader}
-            style={styles.head}
-            textStyle={styles.headText}
-          />
-          <Rows
-            data={list}
-            textStyle={styles.text}
-          ></Rows>
+          <Row data={listHeader} style={styles.head} textStyle={styles.headText}/>
+          <Rows data={list} textStyle={styles.text}></Rows>
         </Table>
-        <Text style={{ alignContent: "center" }}>
-          {page}/{TotalPage}
-        </Text>
+        <Text style={{ alignContent: "center" }}>{page}/{TotalPage}</Text>
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
             disabled={process || page <= 1}
-            style={[
-              styles.buttonSmall,
-              { backgroundColor: process || page <= 1 ? "gray" : mainColor },
-              { width: "33%", marginLeft: 1, marginRight: 1 },
-            ]}
-            onPress={() => {
-              getList("down");
-            }}
+            style={[styles.buttonSmall, { backgroundColor: process || page <= 1 ? "gray" : mainColor }, { width: "33%", marginLeft: 1, marginRight: 1 }]}
+            onPress={() => { getList("down");}}
           >
             <Text style={styles.buttonTextSmall}>{t("Function.previous")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             disabled={process}
-            style={[
-              styles.buttonSmall,
-              { backgroundColor: process ? "gray" : mainColor },
-              { width: "33%", marginLeft: 1, marginRight: 1 },
-            ]}
-            onPress={() => {
-              getList("self");
-            }}
+            style={[styles.buttonSmall, { backgroundColor: process ? "gray" : mainColor }, { width: "33%", marginLeft: 1, marginRight: 1 }]}
+            onPress={() => { getList("self"); }}
           >
             <Text style={styles.buttonTextSmall}>{t("User.rank_me")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             disabled={process || page >= TotalPage}
-            style={[
-              styles.buttonSmall,
-              { backgroundColor: process || page >= TotalPage ? "gray" : mainColor },
-              { width: "33%" },
-            ]}
-            onPress={() => {
-              getList("up");
-            }}
+            style={[styles.buttonSmall, { backgroundColor: process || page >= TotalPage ? "gray" : mainColor }, { width: "33%" }]}
+            onPress={() => { getList("up"); }}
           >
             <Text style={styles.buttonTextSmall}>{t("Function.next")}</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={[styles.buttonSmall, { backgroundColor: mainColor }]}
+          onPress={() => setVisible(false)}
+        >
+          <Text style={styles.buttonTextSmall}>{t("Function.confirm")}</Text>
+        </TouchableOpacity>
       </ScrollView>
     </>
   );
 }
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  me: {
-    flexDirection: "row",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 15,
-  },
-  meText: {
-    fontSize: 48, // fontSize: 'em은 부모 요소의 값, 24이므로 3em인 72가 됨',
-    fontWeight: "bold",
-  },
-  meSubText: {
-    fontSize: 24, // fontSize: 'em은 부모 요소의 값, 24이므로 3em인 72가 됨',
-    fontWeight: "bold",
-    color: "gray",
-  },
-  head: {
-    height: 40,
-    backgroundColor: mainColor,
-    textAlign: "center",
-  },
-  headText: {
-    margin: 6,
-    color: "white",
-    textAlign: "center",
-  },
-  text: {
-    margin: 6,
-    textAlign: "center",
-  },
-  buttonSmall: {
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 35,
-  },
-  buttonTextSmall: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-});

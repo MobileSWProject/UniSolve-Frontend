@@ -1,28 +1,18 @@
-import { useRouter } from "expo-router";
 import { Text, FlatList  } from "react-native";
-import { useCallback, useState, useRef, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import SnackBar from "../Snackbar";
-import Input from "./Input";
+import { useState, useRef, useEffect } from "react";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
 import List from "../tabs/List/List";
-
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
 export default function SelectUser({ visible, setVisible, post }) {
-  const router = useRouter();
   const { t } = useTranslation();
-
   const [loding, setLoding] = useState(false);
-
-  const flatListRef = useRef(null); // FlatList의 ref 생성
-
+  const flatListRef = useRef(null);
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState("");
 
-  // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
     if (loding) return;
     getUsers();
@@ -36,19 +26,15 @@ export default function SelectUser({ visible, setVisible, post }) {
 
   async function SettingsUser() {
     const response = await _axios.post(`category/${post}/select_partner`, {partner_nickname: user});
-    if (response.data.post_id === post){
+    if (response.data.post_id === post) {
       setVisible(false);
     }
   }
 
   return (
     <>
-      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>
-        1:1 대화 상대 지정
-      </Text>
-      <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>
-        선택을 완료하시면 취소하거나 변경할 수 없습니다! 
-      </Text>
+      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>1:1 대화 상대 지정</Text>
+      <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>선택을 완료하시면 취소하거나 상대방이 수락하면 변경할 수 없습니다! </Text>
       <FlatList
         ref={flatListRef}
         data={users}

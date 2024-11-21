@@ -1,6 +1,6 @@
-import { View, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import PostCreate from "../form/PostCreate";
 import Post from "../post/Post";
 import Chat from "../post/Chat";
@@ -38,27 +38,18 @@ export default function BottomView({
           sheetRef.current?.collapse();
         }}
       >
-        <Feather
-          name="x"
-          size={30}
-          color="black"
-        />
+        <Feather name="x" size={30} color="black" />
       </TouchableOpacity>
-      <BottomSheetScrollView
-        style={{
-          flex: 1,
-          marginTop: 35,
-          marginBottom: 75,
-        }}
-      >
-        {mode === "create" ? (
+      <BottomSheetScrollView style={{ flex: 1, marginTop: 35, marginBottom: 75, }} >
+        {
+          mode === "create" ?
           <PostCreate
             setMode={setMode}
             setPost={setPost}
             snackBar={snackBar}
             categorys={categorys}
-          />
-        ) : mode === "post" ? (
+          /> :
+          mode === "post" ?
           <Post
             sheetRef={sheetRef}
             setMode={setMode}
@@ -69,16 +60,17 @@ export default function BottomView({
             setModalVisible={setModalVisible}
             modalType={modalType}
             setModalType={setModalType}
-          />
-        ) : mode === "chat"? (
+          /> :
+          mode === "chat" ?
           <Chat
             sheetRef={sheetRef}
             setMode={setMode}
             post={post}
             mode={mode}
             snackBar={snackBar}
-          />
-        ) : null}
+          /> :
+          null
+        }
       </BottomSheetScrollView>
     </BottomSheet>
   );

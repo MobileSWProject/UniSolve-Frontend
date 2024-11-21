@@ -1,38 +1,19 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import {
-  useFocusEffect,
-  useLocalSearchParams,
-  usePathname,
-  useRouter,
-} from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import Input from "../../components/form/Input";
-import {
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-  TextInput,
-  Modal,
-} from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import styles from "../../styles/post/PostStyles";
 import { useCallback, useState, useEffect } from "react";
 import _axios from "../../api";
 import LevelImage from "../../components/tabs/me/LevelImage";
-import {
-  ReplyCommentIdProvider,
-  useReplyCommentId,
-} from "../../components/post/ReplyCommentIdContext";
+import { ReplyCommentIdProvider, useReplyCommentId } from "../../components/post/ReplyCommentIdContext";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useUserId from "../../hooks/useUserId"; // 커스텀 훅 불러오기
 import formatAuthor from "../../utils/formatAuthor";
 import { mainColor } from "../../constants/Colors";
 import CommentSection from "../../components/post/CommentSection";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-
-import ModalView from "../modal/ModalView";
-
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
@@ -42,35 +23,25 @@ const Post = ({
   post,
   snackBar,
   getList,
-  modalVisible,
   setModalVisible,
-  modalType,
   setModalType,
 }) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
-
   const [ban, setBan] = useState(false);
-
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
   const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
   const [reportReason, setReportReason] = useState("");
   const [commentID, setCommentID] = useState(null);
   const [process, setProcess] = useState(false);
-
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
   const [editComment, setEditComment] = useState("");
   const [editing, setEditing] = useState(false);
-
   const [editPost, setEditPost] = useState(false);
-
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
-
   const [isPrivate, setIsPrivate] = useState(false);
-
-  const pathname = usePathname();
   const router = useRouter();
 
   // selectedComment가 변경될 때마다 replyComment 초기화
@@ -83,33 +54,27 @@ const Post = ({
   useFocusEffect(
     useCallback(() => {
       const getData = async () => {
-        _axios
-          .get(`/posts/${post}`)
-          .then((response) => {
-            setBan(response.data.data.ban);
-            setData({
-              id: response.data.data.id,
-              private: Boolean(response.data.data.is_private),
-              authorId: formatAuthor(response.data.data.author_id),
-              nickname: formatAuthor(
-                response.data.data.author_nickname ||
-                  `${response.data.data.author_id}_temp_nickname`
-              ),
-              private: response.data.data.is_private,
-              category: response.data.data.category,
-              title: response.data.data.title,
-              content: response.data.data.description,
-              timestamp: response.data.data.timestamp,
-              image: response.data.data.image,
-              comments: response.data.data.comments,
-              commentsCount: response.data.data.comments_count,
-            });
-          })
-          .catch((error) => {
-            router.replace("community");
+        _axios.get(`/posts/${post}`).then((response) => {
+          setBan(response.data.data.ban);
+          setData({
+            id: response.data.data.id,
+            private: Boolean(response.data.data.is_private),
+            authorId: formatAuthor(response.data.data.author_id),
+            nickname: formatAuthor(response.data.data.author_nickname || `${response.data.data.author_id}_temp_nickname`),
+            private: response.data.data.is_private,
+            category: response.data.data.category,
+            title: response.data.data.title,
+            content: response.data.data.description,
+            timestamp: response.data.data.timestamp,
+            image: response.data.data.image,
+            comments: response.data.data.comments,
+            commentsCount: response.data.data.comments_count,
           });
+        })
+        .catch(() => {
+          router.replace("community");
+        });
       };
-
       getData();
     }, [post])
   );
@@ -118,7 +83,6 @@ const Post = ({
   const handleAddComment = async (isReply) => {
     const commentContent = isReply ? replyComment : newComment;
     if (!commentContent) {
-      console.log("댓글 내용이 있어야합니다.");
       return;
     }
 

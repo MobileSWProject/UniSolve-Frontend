@@ -1,13 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, TextInput } from "react-native";
+import { styles } from "../../styles/post/ChatStyle";
 import ChatMessage from "./ChatMessage";
 import { io } from "socket.io-client";
 import _axios from "../../api";
@@ -15,8 +9,6 @@ import { useTranslation } from "react-i18next";
 import "../../i18n";
 import useUserId from "../../hooks/useUserId";
 import DropDownPicker from "react-native-dropdown-picker";
-import Input from "../../components/form/Input";
-import { animated } from "react-spring";
 
 export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   post = post || 0;
@@ -27,12 +19,9 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const [categoryLoad, setCategoryLoad] = useState(false);
   const socket = useRef(null);
   const flatListRef = useRef(null); // FlatList 참조 생성
-
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
   const [items, setItems] = useState([{ label: "선택안함", value: 0 }]);
-  const [category, setCategory] = useState("");
-
   const [ban, setBan] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
 
@@ -218,38 +207,3 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    paddingVertical: 60,
-  },
-  inputContainer: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    bottom: 0,
-    position: "absolute",
-    width: "100%",
-    gap: 10,
-    backgroundColor: "white",
-  },
-  textInput: {
-    flex: 1,
-    height: 40,
-    // backgroundColor: "#ccc",
-    borderColor: "black",
-    borderBottomWidth: 1,
-    paddingHorizontal: 10,
-  },
-  sendButton: {
-    width: 80,
-    // backgroundColor: "skyblue",
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: "black",
-    borderWidth: 1,
-    borderRadius: 6,
-    // paddingHorizontal: 15,
-  },
-});

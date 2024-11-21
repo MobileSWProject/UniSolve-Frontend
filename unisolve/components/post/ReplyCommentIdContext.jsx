@@ -6,9 +6,7 @@ export const ReplyCommentIdProvider = ({ children }) => {
   const [selectedComment, setSelectedComment] = useState(null);
 
   return (
-    <ReplyCommentIdContext.Provider
-      value={{ selectedComment, setSelectedComment }}
-    >
+    <ReplyCommentIdContext.Provider value={{ selectedComment, setSelectedComment }}>
       {children}
     </ReplyCommentIdContext.Provider>
   );

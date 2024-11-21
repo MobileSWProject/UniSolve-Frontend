@@ -1,17 +1,10 @@
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-} from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, TextInput } from "react-native";
 import Markdown from "react-native-markdown-display";
 import SyntaxHighlighter from "react-native-syntax-highlighter";
 import { mainColor } from "../../constants/Colors";
 import formatAuthor from "../../utils/formatAuthor";
 import Input from "../../components/form/Input";
-
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
@@ -38,27 +31,9 @@ const CommentSection = ({
   const { t } = useTranslation();
 
   return (
-    <View
-      style={{
-        paddingTop: 2,
-        paddingBottom: 8,
-        borderBottomWidth: isReply ? 0 : 1,
-        borderBottomColor: "#e0e0e0",
-      }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: 28,
-        }}
-      >
-        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-          {formatAuthor(
-            comment.author_nickname || `${comment.author_id}_temp_nickname`
-          )}
-        </Text>
+    <View style={{ paddingTop: 2, paddingBottom: 8, borderBottomWidth: isReply ? 0 : 1, borderBottomColor: "#e0e0e0" }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", height: 28 }}>
+        <Text style={{ fontSize: 16, fontWeight: "bold" }}>{formatAuthor(comment.author_nickname || `${comment.author_id}_temp_nickname`)}</Text>
         {comment.author_id.toLowerCase() === userId.toLowerCase() ? (
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
@@ -98,29 +73,21 @@ const CommentSection = ({
           </TouchableOpacity>
         )}
       </View>
-      <Text style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>
-        {comment.created_at}
-      </Text>
-      {editing ? (
+      <Text style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>{comment.created_at}</Text>
+      {
+        editing ?
         <TextInput
           placeholder={t("Function.input_content")}
           placeholderTextColor={"black"}
           value={editComment}
           onChangeText={(text) => setEditComment(text)}
           multiline={true}
-        />
-      ) : (
+        /> :
         <Markdown
           style={{
             body: { fontSize: 14 },
             fence: { backgroundColor: "black", color: "white" },
-            code_inline: {
-              backgroundColor: "opacity",
-              border: "none",
-              fontWeight: 700,
-              padding: 0,
-            },
-          }}
+            code_inline: { backgroundColor: "opacity", border: "none", fontWeight: 700, padding: 0 }, }}
           rules={{
             fence: (node) => {
               const language = node.sourceInfo || "text";
@@ -160,7 +127,7 @@ const CommentSection = ({
         >
           {comment.content}
         </Markdown>
-      )}
+      }
 
       {/* Render the reply button only for top-level comments */}
       {!isReply && (
