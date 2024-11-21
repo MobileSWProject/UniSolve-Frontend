@@ -52,7 +52,7 @@ export default function ModalList({ visible, setVisible, type }) {
     setPage(nextPage);
     await getList(nextPage);
   };
-
+ // ㅇ알림
   return (
     <>
       <Text style={[styles.timeDate, { color: mainColor, marginTop: 4 }]}>
@@ -76,7 +76,7 @@ export default function ModalList({ visible, setVisible, type }) {
         onEndReached={refresh}
         onEndReachedThreshold={0.05}
         ListFooterComponent={process && (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color="#ffffff" />
         )}
       />
 
