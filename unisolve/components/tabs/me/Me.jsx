@@ -62,7 +62,7 @@ export default function Me() {
               <Text style={[ styles.experienceText, { color: getPercent(exp) <= 33 ? mainColor : "#000" } ]}> {getPercent(exp)}% </Text> :
               null
             }
-            <ProgressBar styleAttr="Horizontal" indeterminate={false} progress={getPercent(exp) / 100} color={mainColor} style={styles.progressBar} />
+            <ProgressBar styleAttr="Horizontal" indeterminate={false} progress={Number((getPercent(exp) / 100).toFixed(2))} color={mainColor} style={styles.progressBar} />
           </View>
         </View>
       </View>
@@ -79,9 +79,6 @@ export default function Me() {
       </TouchableOpacity>
 
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}> {t("Menu.settings")} </Text>
-      <TouchableOpacity onPress={() => {}}>
-        <Text style={styles.buttonText}> {true ? t("Menu.darkmode") : t("Menu.lightmode")} </Text>
-      </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
           if (i18n.language === "ko") {

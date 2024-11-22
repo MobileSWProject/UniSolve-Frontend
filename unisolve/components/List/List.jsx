@@ -97,7 +97,7 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
             <Entypo name="new-message" size={16} color="#ccc"/> :
             null
           }
-          <Text> {item.reply_count}</Text>
+          <Text>{item.reply_count}</Text>
         </View>
       </View>
       {

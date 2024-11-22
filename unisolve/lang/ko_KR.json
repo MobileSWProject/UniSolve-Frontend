@@ -33,7 +33,7 @@
     "User": {
         "confirm_success": "확인되었습니다!",
         "confirm_failed": "잘못 입력했거나 이미 사용 중입니다.",
-        "sanction": "이용 제한 내역",
+        "sanction": "이용 제한 기록",
         "sanction_start": "시작",
         "sanction_end": "종료",
         "sanction_writeban": "글 작성 제한",

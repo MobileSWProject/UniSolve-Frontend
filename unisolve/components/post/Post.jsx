@@ -17,23 +17,16 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }) => {
+const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setModalType, setComment}) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [ban, setBan] = useState(false);
+  const [process, setProcess] = useState(false);
   const [newComment, setNewComment] = useState(""); // 새 댓글 내용 저장
   const [replyComment, setReplyComment] = useState(""); // 대댓글 내용 저장
-  const [reportReason, setReportReason] = useState("");
-  const [commentID, setCommentID] = useState(null);
-  const [process, setProcess] = useState(false);
-  const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
   const [editComment, setEditComment] = useState("");
-  const [editing, setEditing] = useState(false);
-  const [editPost, setEditPost] = useState(false);
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
-  const [isPrivate, setIsPrivate] = useState(false);
   const router = useRouter();
 
   // selectedComment가 변경될 때마다 replyComment 초기화
@@ -46,14 +39,18 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
   useFocusEffect(
     useCallback(() => {
       const getData = async () => {
+        if (process) return;
+        setProcess(true);
         _axios.get(`/posts/${post}`).then((response) => {
+          setProcess(false);
           setBan(response.data.data.ban);
           setData({
             id: response.data.data.id,
             exp: response.data.data.exp,
             private: Boolean(response.data.data.is_private),
-            authorId: formatAuthor(response.data.data.author_id),
-            nickname: formatAuthor(response.data.data.author_nickname || `${response.data.data.author_id}_temp_nickname`),
+            authorId: formatAuthor(response.data.data.author_id || null),
+            nickname: formatAuthor(response.data.data.author_nickname || `@undefined`),
+            authorExp: response.data.data.author_exp,
             private: response.data.data.is_private,
             category: response.data.data.category,
             title: response.data.data.title,
@@ -66,6 +63,7 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
           });
         })
         .catch(() => {
+          setProcess(false);
           router.replace("community");
         });
       };
@@ -76,18 +74,15 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
   // 댓글 또는 대댓글 추가 로직
   const handleAddComment = async (isReply) => {
     const commentContent = isReply ? replyComment : newComment;
-    if (!commentContent) {
-      return;
-    }
-
+    if (!commentContent || process) return;
     try {
+      setProcess(true);
       let data = JSON.stringify({
         post_id: post,
         content: commentContent,
         parent_id: isReply ? selectedComment : null,
       });
-      const response = await _axios.post("/comments", data);
-
+      await _axios.post("/comments", data);
       // 댓글 추가 후 댓글 목록만 다시 불러옴
       const updatedPost = await _axios.get(`/posts/${post}`);
       setData((prev) => ({
@@ -95,6 +90,10 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
         comments: updatedPost.data.data.comments,
         commentsCount: updatedPost.data.data.comments_count,
       }));
+      setProcess(false);
+      snackBar("댓글을 등록했습니다!");
+    } catch {
+      setProcess(false);
     } finally {
       setNewComment("");
       setReplyComment("");
@@ -104,8 +103,9 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
 
   const handleRemoveComment = async (targetCommentId) => {
     try {
-      const response = await _axios.delete(`/comments/${targetCommentId}`);
-
+      if (process) return;
+      setProcess(true);
+      await _axios.delete(`/comments/${targetCommentId}`);
       // 댓글 삭제 후 댓글 목록만 다시 불러옴
       const updatedPost = await _axios.get(`/posts/${post}`);
       setData((prev) => ({
@@ -114,60 +114,24 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
         commentsCount: updatedPost.data.data.comments_count,
         matched: {nickname: updatedPost.data.data.matched_nickname, status: updatedPost.data.data.matched_status}
       }));
-    } catch {}
-  };
-
-  const handleUpdateComment = async (targetCommentId) => {
-    try {
-      const response = await _axios.put(`/comments/${targetCommentId}`, {
-        content: editComment,
-      });
-      if (response.data.data.status === "success") {
-        setEditComment("");
-        setEditing(false);
-        // 댓글 수정 후 댓글 목록만 다시 불러옴
-        const updatedPost = await _axios.get(`/posts/${post}`);
-        setData((prev) => ({
-          ...prev,
-          comments: updatedPost.data.data.comments,
-          commentsCount: updatedPost.data.data.comments_count,
-        }));
-      }
-      snackBar(t("Function.edit"));
-    } catch {}
-  };
-
-  const handleReport = async () => {
-    if (reportReason.length < 1 || process) return;
-    try {
-      setProcess(true);
-      const response = await _axios.post(`/reports`, {
-        post_id: post,
-        comment_id: commentID || null,
-        reason: reportReason,
-      });
       setProcess(false);
-      setModalVisible(false);
-      setCommentID(null);
-      if (response.data.status === "success") {
-        setReportReason("");
-        snackBar(t("Function.report_success"));
-      }
-    } catch (error) {
+      snackBar("댓글을 삭제했습니다!");
+    } catch {
       setProcess(false);
-      setModalVisible(false);
-      snackBar(t("Function.report_failed"));
     }
   };
 
   // comment_id를 선택한 후 대댓글 초기화는 useEffect에서 처리
-  const handleReply = (comment) => {
-    setSelectedComment(comment.comment_id);
+  const handleReply = (commentData) => {
+    setSelectedComment(commentData.comment_id);
   };
 
   const handleRemovePost = async () => {
     try {
+      if (process) return;
+      setProcess(true);
       const response = await _axios.delete(`/posts/${post}`);
+      setProcess(false);
       if (response) {
         sheetRef.current?.close();
         snackBar(t("Function.delete_success"));
@@ -176,41 +140,8 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
         snackBar(t("Function.delete_failed"));
       }
     } catch {
+      setProcess(false);
       snackBar(t("Function.delete_failed"));
-    }
-  };
-
-  const handleUpdatePost = async () => {
-    try {
-      if (editTitle.length < 1 || editContent.length < 1 || process) return;
-      setModalVisible(false);
-      setEditTitle("");
-      setEditContent("");
-      setEditing(false);
-      setProcess(true);
-      setIsPrivate(false);
-      const response = await _axios.put(`/posts/${post}`, {
-        title: editTitle,
-        content: editContent,
-        toggle_privacy: isPrivate,
-      });
-      if (response.data.status === "success") {
-        // 게시글 수정 후 다시 불러오기
-        const updatedPost = await _axios.get(`/posts/${post}`);
-        setData((prev) => ({
-          ...prev,
-          private: updatedPost.data.data.is_private,
-          title: updatedPost.data.data.title,
-          content: updatedPost.data.data.description,
-          timestamp: updatedPost.data.data.timestamp,
-          comments: updatedPost.data.data.comments,
-          commentsCount: updatedPost.data.data.comments_count,
-        }));
-      }
-      snackBar(t("Function.edit"));
-      setProcess(false);
-    } catch (error) {
-      setProcess(false);
     }
   };
 
@@ -223,7 +154,7 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
       <View style={styles.contentContainer}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
           <View style={{ flexDirection: "row" }}>
-            <LevelImage exp={data.exp} size={36} />
+            <LevelImage exp={data.authorExp} size={42} />
             <View style={{ flexDirection: "column" }}>
               <Text style={styles.userInfo}>{formatAuthor(data.nickname)}</Text>
               <Text style={styles.userInfo}>{data.timestamp}</Text>
@@ -233,11 +164,11 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
             {formatAuthor(data.authorId) === formatAuthor(userId) ? (
               <>
                 <TouchableOpacity
-                  disabled={!data.private}
+                  disabled={!data.private || data.matched.nickname && data.matched.nickname.length > 0}
                   onPress={() => { setModalType("user"); setModalVisible(true); }}
                   hitSlop={4}
                 >
-                  <FontAwesome name="user" size={30} color={!data.private ? "gray" : mainColor}/>
+                  <FontAwesome name="user" size={30} color={!data.private || data.matched.nickname ? "gray" : mainColor}/>
                   <Text>{`${data.matched.nickname ? data.matched.nickname : ""}${data.matched.nickname && !data.matched.status ? "님에게 요청함" : "" }`}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -250,13 +181,15 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
                 <TouchableOpacity
                   hitSlop={8}
                   onPress={() => {
-                    setEditPost(true);
-                    setEditTitle(data.title);
-                    setEditContent(data.content);
-                    setModalVisible(true);
+                    if (ban) {
+                      snackBar(t("운영정책 위반으로 게시글 수정이 불가합니다."));
+                    }
+                    else {
+                      setMode("edit");
+                    }
                   }}
                 >
-                  <Text style={{ fontSize: 24 }}>✏️</Text>
+                  <Text style={{ fontSize: 24, color: "#fff"}}>✏️</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   hitSlop={8}
@@ -277,7 +210,7 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
                 <TouchableOpacity
                   hitSlop={8}
                   onPress={() => {
-                    setEditPost(false);
+                    setComment(null);
                     setModalType("report");
                     setModalVisible(true);
                   }}
@@ -319,30 +252,33 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
         </Text>
         <View style={styles.commentInputContainer}>
           <Input
-            placeholder={
-              ban ? t("Function.forbidden") : t("Function.input_content")
-            }
+            placeholder={ban ? t("Function.forbidden") : t("Function.input_content")}
             content={newComment}
             onChangeText={(text) => setNewComment(text)}
-            buttonDisabled={ban}
+            buttonDisabled={ban || process}
             buttonText={t("Function.regist")}
             buttonOnPress={() => handleAddComment(false)}
-            disabled={ban}
+            disabled={ban || process}
             textArea={true}
           />
         </View>
-        {data.comments.map((comment, index) => (
+        {data.comments.map((commentData, index) => (
           <CommentSection
+            disabled={process}
             ban={ban}
-            key={comment.comment_id}
-            comment={comment}
+            key={commentData.comment_id}
+            comment={commentData}
             userId={userId}
-            handleUpdateComment={handleUpdateComment}
+            handleUpdateComment={(commentId) => {
+              setComment(commentId);
+              setModalType("comment");
+              setModalVisible(true);
+            }}
             handleRemoveComment={handleRemoveComment}
             handleReportComment={(commentId) => {
-              setEditPost(false);
+              setComment(commentId);
+              setModalType("report");
               setModalVisible(true);
-              setCommentID(commentId);
             }}
             handleReply={handleReply}
             handleAddComment={handleAddComment}
@@ -352,8 +288,6 @@ const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }
             setReplyComment={setReplyComment}
             isReply={false} // Top-level comment, not a reply
             setEditComment={setEditComment}
-            setEditing={setEditing}
-            editing={editing}
             editComment={editComment}
           />
         ))}
@@ -372,6 +306,7 @@ export default function PostWithReplyCommentIdProvider({
   setModalVisible,
   modalType,
   setModalType,
+  setComment,
 }) {
   return (
     <ReplyCommentIdProvider>
@@ -385,6 +320,7 @@ export default function PostWithReplyCommentIdProvider({
         setModalVisible={setModalVisible}
         modalType={modalType}
         setModalType={setModalType}
+        setComment={setComment}
       />
     </ReplyCommentIdProvider>
   );

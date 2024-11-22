@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Text } from "react-native";
 import { accountCheck } from "../../utils/accountCheck";
+import { mainColor } from "../../constants/Colors";
 import SnackBar from "../Snackbar";
 import Input from "./Input";
 import InputProcess from "./InputProcess";
@@ -134,7 +135,7 @@ export default function Modify({ visible, setVisible, userData }) {
   return (
     <>
       <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)} />
-      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("User.edit")}</Text>
+      <Text style={{  fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{t("User.edit")}</Text>
       <Input
         title={t("User.email")}
         subTitle=

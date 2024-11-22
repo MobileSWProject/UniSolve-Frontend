@@ -23,9 +23,8 @@ const CommentSection = ({
   setReplyComment,
   isReply = false,
   setEditComment,
-  setEditing,
-  editing,
   editComment,
+  disabled,
 }) => {
   const isReplying = selectedComment === comment.comment_id;
   const { t } = useTranslation();
@@ -37,35 +36,23 @@ const CommentSection = ({
         {comment.author_id.toLowerCase() === userId.toLowerCase() ? (
           <View style={{ flexDirection: "row" }}>
             <TouchableOpacity
+              disabled = {disabled}
               hitSlop={8}
-              onPress={() => {
-                if (editing) {
-                  handleUpdateComment(comment.comment_id);
-                  return;
-                } else if (!editing) {
-                  setEditComment(comment.content);
-                  setEditing(true);
-                }
-              }}
+              onPress={() => {handleUpdateComment(comment.comment_id);}}
             >
               <Text style={{ fontSize: 12 }}>✏️</Text>
             </TouchableOpacity>
             <TouchableOpacity
+              disabled = {disabled}
               hitSlop={8}
-              onPress={() => {
-                if (editing) {
-                  setEditing(false);
-                } else {
-                  setEditComment("");
-                  handleRemoveComment(comment.comment_id);
-                }
-              }}
+              onPress={() => {handleRemoveComment(comment.comment_id);}}
             >
               <Text style={{ fontSize: 12 }}>❌</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <TouchableOpacity
+            disabled = {disabled}
             hitSlop={8}
             onPress={() => handleReportComment(comment.comment_id)}
           >
@@ -74,61 +61,45 @@ const CommentSection = ({
         )}
       </View>
       <Text style={{ fontSize: 12, color: "#666", marginBottom: 5 }}>{comment.created_at}</Text>
-      {
-        editing ?
-        <TextInput
-          placeholder={t("Function.input_content")}
-          placeholderTextColor={"black"}
-          value={editComment}
-          onChangeText={(text) => setEditComment(text)}
-          multiline={true}
-        /> :
-        <Markdown
-          style={{
-            body: { fontSize: 14 },
-            fence: { backgroundColor: "black", color: "white" },
-            code_inline: { backgroundColor: "opacity", border: "none", fontWeight: 700, padding: 0 }, }}
-          rules={{
-            fence: (node) => {
-              const language = node.sourceInfo || "text";
-              const content = node.content || "";
-
-              return (
-                <ScrollView
-                  key={node.key}
-                  horizontal={true}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={true}
-                  style={{ width: "100%" }}
-                  contentContainerStyle={{
-                    flexGrow: 1,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <View style={{ width: "100%", flexDirection: "row" }}>
-                    <SyntaxHighlighter
-                      key={node.key}
-                      language={language}
-                      highlighter={"prism"}
-                      customStyle={{
-                        width: "100%",
-                        overflowX: "hidden",
-                        overflowY: "hidden",
-                      }}
-                      pointerEvents="none"
-                    >
-                      {content}
-                    </SyntaxHighlighter>
-                  </View>
-                </ScrollView>
-              );
-            },
-          }}
-        >
-          {comment.content}
-        </Markdown>
-      }
-
+      <Markdown style={{ body: { fontSize: 14 }, fence: { backgroundColor: "black", color: "white" }, code_inline: { backgroundColor: "opacity", border: "none", fontWeight: 700, padding: 0 }, }}
+        rules={{
+          fence: (node) => {
+            const language = node.sourceInfo || "text";
+            const content = node.content || "";
+            return (
+              <ScrollView
+                key={node.key}
+                horizontal={true}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={true}
+                style={{ width: "100%" }}
+                contentContainerStyle={{
+                  flexGrow: 1,
+                  alignItems: "flex-start",
+                }}
+              >
+                <View style={{ width: "100%", flexDirection: "row" }}>
+                  <SyntaxHighlighter
+                    key={node.key}
+                    language={language}
+                    highlighter={"prism"}
+                    customStyle={{
+                      width: "100%",
+                      overflowX: "hidden",
+                      overflowY: "hidden",
+                    }}
+                    pointerEvents="none"
+                  >
+                    {content}
+                  </SyntaxHighlighter>
+                </View>
+              </ScrollView>
+            );
+          },
+        }}
+      >
+        {comment.content}
+      </Markdown>
       {/* Render the reply button only for top-level comments */}
       {!isReply && (
         <TouchableOpacity
@@ -150,13 +121,9 @@ const CommentSection = ({
 
       {/* Input box for replying */}
       {isReplying && (
-        <View
-          style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}
-        >
+        <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
           <Input
-            placeholder={
-              ban ? t("Function.forbidden") : t("Function.input_content")
-            }
+            placeholder={ban ? t("Function.forbidden") : t("Function.input_content")}
             content={replyComment}
             onChangeText={(text) => setReplyComment(text)}
             buttonDisabled={ban}
@@ -195,8 +162,6 @@ const CommentSection = ({
               setReplyComment={setReplyComment}
               isReply={true} // Indicating this is a reply
               setEditComment={setEditComment}
-              setEditing={setEditing}
-              editing={editing}
               editComment={editComment}
             />
           </View>

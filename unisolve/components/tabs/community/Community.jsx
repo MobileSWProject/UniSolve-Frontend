@@ -23,6 +23,7 @@ export default function Community() {
   const [category, setCategory] = useState("");
   const [mode, setMode] = useState("");
   const [postID, setPostID] = useState("");
+  const [commentID, setCommentID] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
   const [ban, setBan] = useState(true);
@@ -390,9 +391,10 @@ export default function Community() {
         setModalVisible={setModalVisible}
         modalType={modalType}
         setModalType={setModalType}
+        setComment={setCommentID}
       />
       <View>
-        <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} post={postID}/>
+        <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} post={postID} comment={commentID} setComment={setCommentID}/>
       </View>
       <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)}/>
     </>
