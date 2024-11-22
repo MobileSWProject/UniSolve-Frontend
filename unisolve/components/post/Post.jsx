@@ -17,7 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setModalType }) => {
+const Post = ({setMode, post, snackBar, getList, setModalVisible, setModalType }) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [ban, setBan] = useState(false);
@@ -62,6 +62,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setM
             image: response.data.data.image,
             comments: response.data.data.comments,
             commentsCount: response.data.data.comments_count,
+            matched: {nickname: response.data.data.matched_nickname, status: response.data.data.matched_status}
           });
         })
         .catch(() => {
@@ -111,6 +112,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setM
         ...prev,
         comments: updatedPost.data.data.comments,
         commentsCount: updatedPost.data.data.comments_count,
+        matched: {nickname: updatedPost.data.data.matched_nickname, status: updatedPost.data.data.matched_status}
       }));
     } catch {}
   };
@@ -236,6 +238,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setM
                   hitSlop={4}
                 >
                   <FontAwesome name="user" size={30} color={!data.private ? "gray" : mainColor}/>
+                  <Text>{`${data.matched.nickname ? data.matched.nickname : ""}${data.matched.nickname && !data.matched.status ? "님에게 요청함" : "" }`}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{ marginLeft: 5, marginRight: 5 }}

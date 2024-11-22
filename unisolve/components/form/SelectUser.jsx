@@ -6,7 +6,7 @@ import List from "../List/List";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
-export default function SelectUser({ visible, setVisible, post, postMatched, setPostMatched }) {
+export default function SelectUser({ visible, setVisible, post }) {
   const { t } = useTranslation();
   const [loding, setLoding] = useState(false);
   const flatListRef = useRef(null);
@@ -34,7 +34,7 @@ export default function SelectUser({ visible, setVisible, post, postMatched, set
   return (
     <>
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>1:1 대화 상대 지정</Text>
-      <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>{!postMatched.nickname ? "요청 후 거절하지 않거나 상대방이 수락하면 변경할 수 없습니다!" : "이미 요청을 보낸 상태입니다."}</Text>
+      <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>요청 후 거절하지 않거나 상대방이 수락하면 변경할 수 없습니다! </Text>
       <FlatList
         ref={flatListRef}
         data={users}

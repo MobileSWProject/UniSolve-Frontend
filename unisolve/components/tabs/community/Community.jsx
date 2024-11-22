@@ -1,6 +1,7 @@
 import Entypo from "@expo/vector-icons/Entypo";
+import { useFocusEffect } from '@react-navigation/native';
 import { useLocalSearchParams } from "expo-router";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { FlatList, StyleSheet, Text, TextInput, View, TouchableOpacity, RefreshControl, Platform } from "react-native";
 import _axios from "../../../api";
 import List from "../../../components/List/List";
@@ -38,6 +39,16 @@ export default function Community() {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        sheetRef.current?.close();
+        setMode("");
+        setPostID("");
+      };
+    }, [])
+  );
+
   // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
     if (post && post > 0) {
@@ -51,7 +62,7 @@ export default function Community() {
       sheetRef.current?.close();
     }
     getCategory();
-  }, [post]);
+  }, [post, log_click]);
 
   const snackBar = (message) => { setSnackbarMessage(message); setSnackbarVisible(true);};
 
@@ -380,7 +391,9 @@ export default function Community() {
         modalType={modalType}
         setModalType={setModalType}
       />
-      <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} post={postID}/>
+      <View>
+        <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} post={postID}/>
+      </View>
       <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)}/>
     </>
   );
