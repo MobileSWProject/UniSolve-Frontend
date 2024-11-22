@@ -2,11 +2,11 @@ import { Text, FlatList  } from "react-native";
 import { useState, useRef, useEffect } from "react";
 import InputProcess from "./InputProcess";
 import _axios from "../../api";
-import List from "../tabs/List/List";
+import List from "../List/List";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
-export default function SelectUser({ visible, setVisible, post }) {
+export default function SelectUser({ visible, setVisible, post, postMatched, setPostMatched }) {
   const { t } = useTranslation();
   const [loding, setLoding] = useState(false);
   const flatListRef = useRef(null);
@@ -34,7 +34,7 @@ export default function SelectUser({ visible, setVisible, post }) {
   return (
     <>
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>1:1 대화 상대 지정</Text>
-      <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>선택을 완료하시면 취소하거나 상대방이 수락하면 변경할 수 없습니다! </Text>
+      <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>{!postMatched.nickname ? "요청 후 거절하지 않거나 상대방이 수락하면 변경할 수 없습니다!" : "이미 요청을 보낸 상태입니다."}</Text>
       <FlatList
         ref={flatListRef}
         data={users}

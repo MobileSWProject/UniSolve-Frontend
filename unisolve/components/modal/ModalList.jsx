@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "../../styles/modal/ModalListStyle";
 import { mainColor } from "../../constants/Colors";
-import List from "../tabs/List/List";
+import List from "../List/List";
 import _axios from "../../api";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";

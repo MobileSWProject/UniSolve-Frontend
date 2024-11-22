@@ -44,7 +44,7 @@ export default function Home({setType, setVisible}) {
       <Text style={styles.timeDate}>{currentDate}</Text>
       <Text style={styles.timeText}>{currentTime}</Text>
 
-      <TouchableOpacity onPress={() => {router.push(`community?log_click=${true}`);}} >
+      <TouchableOpacity style={{alignItems: "center"}} onPress={() => {router.push(`community?log_click=${true}`);}} >
         <Image source={require("../../../assets/logo.png")} style={styles.logo} />
       </TouchableOpacity>
 

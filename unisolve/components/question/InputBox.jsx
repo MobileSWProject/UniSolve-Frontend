@@ -1,7 +1,7 @@
 // import { useState } from "react";
 
 import { Platform, StyleSheet, TextInput } from "react-native";
-import { mainColor } from "../../../constants/Colors";
+import { mainColor } from "../../constants/Colors";
 
 export default function InputBox({
   width = "full",
