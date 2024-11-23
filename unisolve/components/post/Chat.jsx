@@ -170,15 +170,17 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
           listMode="SCROLLVIEW"
         />
       ) : null}
-      <FlatList
-        ref={flatListRef} // FlatList 참조 추가
-        data={chatData}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.container}
-        // onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
-        inverted
-      />
+      <View>
+        <FlatList
+          ref={flatListRef} // FlatList 참조 추가
+          data={chatData}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.container}
+          // onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
+          inverted
+        />
+      </View>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}

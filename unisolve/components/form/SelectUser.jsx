@@ -61,7 +61,7 @@ export default function SelectUser({ visible, setVisible, post }) {
         onPress={() => {SettingsUser();}}
         content={t("Function.confirm")}
         cancel={false}
-        disabled={!users || users.length <= 0 }
+        disabled={!users || users.length <= 0 || !user || user.length <= 0}
       />
     </>
   );

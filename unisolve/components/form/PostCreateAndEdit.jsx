@@ -14,6 +14,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslation } from "react-i18next";
 import _axios from "../../api";
 import "../../i18n";
+import { mainColor } from "../../constants/Colors";
 
 export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackBar, categorys }) {
   const { t } = useTranslation();
@@ -22,7 +23,6 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
-  const [submitLoading, setSubmitLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState();
   const [items, setItems] = useState(categorys);
@@ -36,7 +36,7 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
     useCallback(() => {
       if (mode === "edit") {
         const getData = async () => {
-          _axios.get(`/posts/${post}`).then((response) => {
+          await _axios.get(`/posts/${post}`).then((response) => {
             setTitle(response.data.data.title);
             setContent(response.data.data.description);
             setImage(response.data.data.image);
@@ -142,19 +142,18 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
     }
 
     snackBar(`${t("Stage.process")}${t("Function.registering")}`);
-    setSubmitLoading(true);
+    setProcess(true);
     try {
       const response = await formFetch("/posts", data);
       const postId = response.postId;
       snackBar(`${t("Stage.success")}${t("Function.register_success")}`);
-      setSubmitLoading(false);
-      setTimeout(() => { setPost(postId); setMode("post"); }, 2000);
+      setTimeout(() => { setPost(postId); setMode("post"); setProcess(false); }, 2000);
     } catch {
       snackBar("오류가 발생했습니다!");
       if (error.response && (error.response.status === 400 || error.response.status === 401)) {
         router.replace("/notfound");
       }
-      setSubmitLoading(false);
+      setProcess(false);
     }
   };
 
@@ -239,10 +238,10 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
             <View style={{ marginTop: 10 }} />
             {/* 등록 버튼 */}
             <TouchableOpacity
-              style={[ styles.submitButton, { alignSelf: "stretch", width: "100%" }]}
+              style={[ styles.submitButton, { alignSelf: "stretch", width: "100%", backgroundColor: process ? "gray" : mainColor }]}
               hitSlop={4}
               onPress={() => {mode === "edit" ? handleUpdate() : handleSubmit() }}
-              disabled={submitLoading}
+              disabled={process}
             >
               <Text style={styles.submitButtonText}>{mode === "edit" ? t("Function.btn_edit") : t("Function.regist")}</Text>
             </TouchableOpacity>

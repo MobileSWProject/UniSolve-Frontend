@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: "row",
     bottom: 0,
-    position: "absolute",
+    position: "sticky",
     width: "100%",
     gap: 10,
     backgroundColor: "white",

@@ -18,17 +18,21 @@ export default function Report({visible, setVisible, comment, setComment}) {
 
   const snackBar = (message) => { setSnackbarMessage(message); setSnackbarVisible(true); };
 
-  // useFocusEffect(
-  //   useCallback(async () => {
-  //     try {
-  //       const response = _axios.get(`/comment/${comment}`);
-  //       setCommentContent(response.data.data.content);
-  //     } catch {
-  //       setVisible(false);
-  //       setComment(null);
-  //     }
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(async () => {
+      try {
+        if (process) return;
+        setProcess(true);
+        const response = await _axios.get(`/comments/${comment}`);
+        setProcess(false);
+        setCommentContent(response.data.data.content);
+      } catch {
+        setProcess(false);
+        setVisible(false);
+        setComment(null);
+      }
+    }, [])
+  );
 
   const handleUpdateComment = async () => {
     try {
