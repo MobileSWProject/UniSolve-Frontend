@@ -34,28 +34,34 @@ export default function SelectUser({ visible, setVisible, post }) {
   return (
     <>
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>1:1 대화 상대 지정</Text>
-      <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>요청 후 거절하지 않거나 상대방이 수락하면 변경할 수 없습니다! </Text>
-      <FlatList
-        ref={flatListRef}
-        data={users}
-        keyExtractor={(item) => item.user_id}
-        renderItem={({ item, index }) => (
-          <List
-            type="users"
-            item={item}
-            index={index}
-            count={users.length}
-            setUser={setUser}
-          />
-        )}
-      />
+      {
+        users && users.length > 0 ?
+        <>
+        <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>요청 후 거절하지 않거나 상대방이 수락하면 변경할 수 없습니다! </Text>
+        <FlatList
+          ref={flatListRef}
+          data={users}
+          keyExtractor={(item) => item.user_id}
+          renderItem={({ item, index }) => (
+            <List
+              type="users"
+              item={item}
+              index={index}
+              count={users.length}
+              setUser={setUser}
+            />
+          )}
+        />
+        </> :
+        <Text style={{fontSize: 40, marginBottom: 10, color: "black", textAlign: "center", fontWeight: "bold", marginTop: 4, fontSize: 20 }}>== 선택 가능한 사용자가 없습니다 ==</Text> 
+      }
       <InputProcess
         visible={visible}
         setVisible={setVisible}
         onPress={() => {SettingsUser();}}
         content={t("Function.confirm")}
         cancel={false}
-        disabled={false}
+        disabled={!users || users.length <= 0 }
       />
     </>
   );
