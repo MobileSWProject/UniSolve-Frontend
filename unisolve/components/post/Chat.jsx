@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import "../../i18n";
 import useUserId from "../../hooks/useUserId";
 import DropDownPicker from "react-native-dropdown-picker";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   post = post || 0;
@@ -24,6 +25,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const [items, setItems] = useState([{ label: "선택안함", value: 0 }]);
   const [ban, setBan] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [isAI, setIsAI] = useState(true);
 
   const scrollToBottom = () => {
     if (flatListRef.current) {
@@ -144,6 +146,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       content: message,
       is_me: true,
       sent_at: t("Function.sending"),
+      is_ai: isAI,
     });
 
     const token = await AsyncStorage.getItem("token");
@@ -191,6 +194,16 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
         />
       </View>
       <View style={styles.inputContainer}>
+        <TouchableOpacity
+          style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
+          hitSlop={4}
+          onPress={() => { setIsAI(!isAI); }}
+        >
+          <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
+          <View>
+            <Text style={{fontSize: 20, fontWeight: "bold"}}>AI와 대화</Text>
+          </View>
+        </TouchableOpacity>
         <TextInput
           style={styles.textInput}
           disabled={ban || !isPrivate}

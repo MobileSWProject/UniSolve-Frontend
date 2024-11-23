@@ -222,7 +222,8 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
             <View style={styles.submitContainer}>
             {/* 공개 비공개 토글 버튼 */}
             {
-              mode !== "edit" || mode === "edit" && Private ? <TouchableOpacity
+              mode !== "edit" || mode === "edit" && Private ?
+              <TouchableOpacity
                 style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
                 hitSlop={4}
                 onPress={() => { setIsPrivate(!isPrivate); }}

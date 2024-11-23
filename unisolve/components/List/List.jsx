@@ -22,7 +22,6 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
     const response = await _axios.post('notifications/send_partner_notification', {not_id: post, acc_deny: isGo})
     if (response.data){
       getList(1);
-      console.log("good")
     }
   }
 
@@ -36,8 +35,11 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
       ]}
       onPress={async () => {
         if (setVisible) setVisible(false);
-        if (type === "users") return setUser(item.user_nickname);
-        if (type === "sanction") null
+        if (type === "users") {
+          return setUser(item.user_nickname);
+        }
+        if (type === "sanction") {
+        }
         else if (type === "notification") {
           await updateNotification(item.not_id);
           router.push(`community?post=${item.id}`);
@@ -71,13 +73,10 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
                   null
           }
         </Text>
-        <Text>
-          {type === "notification" ? item.timebefore : item.timestamp}
-          {type === "users" ? item.user_nickname : ''}
-        </Text>
+        <Text>{type === "notification" ? item.timebefore : item.timestamp}</Text>
       </View>
       <View style={styles.header}>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.title}>{type === "users" ? item.user_nickname : item.title}</Text>
       </View>
       <View style={styles.header}>
         {item.type === 1 && item.description === "invite" ? 
