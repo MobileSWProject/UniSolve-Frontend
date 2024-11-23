@@ -194,16 +194,21 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
         />
       </View>
       <View style={styles.inputContainer}>
-        <TouchableOpacity
-          style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
-          hitSlop={4}
-          onPress={() => { setIsAI(!isAI); }}
-        >
-          <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
-          <View>
-            <Text style={{fontSize: 20, fontWeight: "bold"}}>AI와 대화</Text>
-          </View>
-        </TouchableOpacity>
+       { !ban && isPrivate ?
+        <>
+          <TouchableOpacity
+            style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
+            hitSlop={4}
+            onPress={() => { setIsAI(!isAI); }}
+          >
+            <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
+            <View>
+              <Text style={{fontSize: 14, fontWeight: "bold"}}>AI와 대화</Text>
+            </View>
+          </TouchableOpacity>
+        </> : 
+        null
+       } 
         <TextInput
           style={styles.textInput}
           disabled={ban || !isPrivate}
