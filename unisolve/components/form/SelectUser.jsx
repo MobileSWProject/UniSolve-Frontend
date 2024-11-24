@@ -15,7 +15,7 @@ export default function SelectUser({ visible, setVisible, post }) {
 
   useEffect(() => {
     getUsers();
-  }, [users]);
+  }, []);
 
   async function getUsers() {
     const response = await _axios.get(`category/${post}/users`);
