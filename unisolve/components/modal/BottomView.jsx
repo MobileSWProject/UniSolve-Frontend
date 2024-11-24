@@ -1,5 +1,5 @@
 import { TouchableOpacity } from "react-native";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetVirtualizedList } from "@gorhom/bottom-sheet";
 import { useCallback } from "react";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useFocusEffect } from "@react-navigation/native";
@@ -34,7 +34,7 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
       >
         <Feather name="x" size={30} color="black" />
       </TouchableOpacity>
-      <BottomSheetScrollView style={{ flex: 1, marginTop: 35, marginBottom: 75, }} >
+      <BottomSheetView style={{ flex: 1, marginTop: 35, marginBottom: 75, }}>
         {
           mode === "create" || mode === "edit" ?
           <PostCreateAndEdit
@@ -68,7 +68,7 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
           /> :
           null
         }
-      </BottomSheetScrollView>
+      </BottomSheetView>
     </BottomSheet>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, Text, FlatList, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { styles } from "../../styles/post/ChatStyle";
 import ChatMessage from "./ChatMessage";
 import { io } from "socket.io-client";
@@ -10,6 +10,7 @@ import "../../i18n";
 import useUserId from "../../hooks/useUserId";
 import DropDownPicker from "react-native-dropdown-picker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { FlatList } from "react-native-gesture-handler";
 
 export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   post = post || 0;
@@ -178,7 +179,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
               setItems={setItems}
               maxHeight={200}
               onChangeValue={(value) => selectValue(value)}
-              listMode="SCROLLVIEW"
+              // listMode="SCROLLVIEW"
             />
           </View>
         </View>
