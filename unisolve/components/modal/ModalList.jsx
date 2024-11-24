@@ -69,13 +69,9 @@ export default function ModalList({ visible, setVisible, type }) {
         contentContainerStyle={{ paddingTop: 20 }}
         onEndReached={refresh}
         onEndReachedThreshold={0.05}
-<<<<<<< HEAD
         ListFooterComponent={process && (
           <ActivityIndicator size="large" color="#ffffff" />
         )}
-=======
-        ListFooterComponent={process && <ActivityIndicator size="large" color="#0000ff" />}
->>>>>>> 5db4ff11459305cd32ae8540c34be5d18d92d512
       />
 
       <TouchableOpacity style={[styles.buttonSmall, { backgroundColor: mainColor }]} onPress={() => setVisible(false)}>
