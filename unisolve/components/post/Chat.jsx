@@ -91,6 +91,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       socket.current.emit("join", { room: post, token });
 
       socket.current.on("receive_message", (data) => {
+        console.log(data);
         setChatData((prevData) => {
           const updatedData = [...prevData];
           if (updatedData.length > 0) {
@@ -99,10 +100,10 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
               sent_at: checkDate(data.sent_at) || "",
             };
           }
-          if (!(updatedData[0].content === data.content)) {
+          if (!(updatedData[0]?.content === data.content)) {
             const isMe = data.sender === userId;
             updatedData.unshift({ ...data, is_me: isMe });
-          }
+          } 
           return updatedData;
         });
       });
