@@ -7,8 +7,11 @@ import formatAuthor from "../../utils/formatAuthor";
 import _axios from "../../api";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
+import { router } from "expo-router";
 
 export default function PostListItem({ item, type, bottomView, setVisible, setUser, getList }) {
+ 
+
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -42,15 +45,16 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
         }
         else if (type === "notification") {
           await updateNotification(item.not_id);
-          router.push(`community?post=${item.id}`);
+          router.push(`community?post=${item.id}&history=True`);
         }
         else if (type === "community") {
+          router.setParams({ history: undefined, post: undefined });
           bottomView.sheetRef.current?.close();
           bottomView.setMode("post");
           bottomView.setPostID(item.id);
           bottomView.sheetRef.current?.expand();
         } else {
-          router.push(`community?post=${item.id}`);
+          router.push(`community?post=${item.id}&history=True`);
         }
       }}
     >
