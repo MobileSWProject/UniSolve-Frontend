@@ -12,7 +12,7 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
   useFocusEffect(
     useCallback(() => {
       if (!mode) sheetRef.current?.close();
-    }, [])
+    }, [mode])
   );
   return (
     <BottomSheet

@@ -40,15 +40,16 @@ export default function Community() {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        sheetRef.current?.close();
-        setMode("");
-        setPostID("");
-      };
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     return () => {
+  //       sheetRef.current?.close();
+  //       setMode("");
+  //       setPostID("");
+  //     };
+  //   }, [])
+  // );
+
 
   // 초기 데이터 로드 및 상태 초기화
   useEffect(() => {
