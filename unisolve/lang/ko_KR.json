@@ -130,6 +130,8 @@
         "lang": "언어 변경",
         "ko": "한국어",
         "en": "영어",
+        "ja": "일본어",
+        "zh": "중국어",
         "darkmode": "다크 모드",
         "lightmode": "라이트 모드",
         "notification": "알림 설정",

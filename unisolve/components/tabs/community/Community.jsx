@@ -16,10 +16,13 @@ import SnackBar from "../../../components/Snackbar";
 import ModalView from "../../../components/modal/ModalView";
 import BottomView from "../../../components/modal/BottomView";
 import { router } from "expo-router";
+import { useTranslation } from 'react-i18next';
+import "../../../i18n";
 
 export default function Community() {
   const { post, log_click, history } = useLocalSearchParams();
   const sheetRef = useRef(null);
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [category, setCategory] = useState("");
   const [mode, setMode] = useState("");

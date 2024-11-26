@@ -10,7 +10,7 @@ import { mainColor } from "../../constants/Colors";
 import ModalView from "../modal/ModalView";
 
 export default function PageView({ type }) {
-  const statusBarSize = StatusBar.currentHeight === null ? getStatusBarHeight() + 40 : 0
+  const statusBarSize = StatusBar.currentHeight === null ? getStatusBarHeight() + 40 : 0;
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
 

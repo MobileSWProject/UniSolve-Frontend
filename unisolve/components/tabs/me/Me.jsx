@@ -87,13 +87,16 @@ export default function Me() {
           } else if (i18n.language === "en") {
             i18n.changeLanguage("ja");
             snackBar(`${t("Stage.success")} ${t("Menu.ja")}${t("Function.convert")}`);
+          } else if (i18n.language === "ja") {
+            i18n.changeLanguage("zh");
+            snackBar(`${t("Stage.success")} ${t("Menu.zh")}${t("Function.convert")}`);
           } else {
             i18n.changeLanguage("ko");
             snackBar(`${t("Stage.success")} ${t("Menu.ko")}${t("Function.convert")}`);
           }
         }}
       >
-        <Text style={styles.buttonText}>{`${t("Menu.lang")}(${t(i18n.language === "ko" ? "Menu.ko" : i18n.language === "en" ? "Menu.ja" : "Menu.ko")})`}</Text>
+        <Text style={styles.buttonText}>{`${t("Menu.lang")}(${t(i18n.language === "ko" ? "Menu.en" : i18n.language === "en" ? "Menu.ja" : i18n.language === "ja" ? "Menu.zh" : "Menu.ko")})`}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.notification")}</Text>
