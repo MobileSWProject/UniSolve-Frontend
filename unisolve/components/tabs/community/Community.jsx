@@ -15,9 +15,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import SnackBar from "../../../components/Snackbar";
 import ModalView from "../../../components/modal/ModalView";
 import BottomView from "../../../components/modal/BottomView";
+import { router } from "expo-router";
 
 export default function Community() {
-  const { post, log_click } = useLocalSearchParams();
+  const { post, log_click, history } = useLocalSearchParams();
   const sheetRef = useRef(null);
   const [items, setItems] = useState([]);
   const [category, setCategory] = useState("");
@@ -39,31 +40,53 @@ export default function Community() {
   const flatListRef = useRef(null); // FlatList의 ref 생성
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const lastPostRef = useRef(null); // 이전 post ID를 저장하는 useRef
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        sheetRef.current?.close();
-        setMode("");
-        setPostID("");
-      };
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     return () => {
+  //       sheetRef.current?.close();
+  //       setMode("");
+  //       setPostID("");
+  //     };
+  //   }, [])
+  // );
 
   // 초기 데이터 로드 및 상태 초기화
+// post 및 log_click 처리
+// post 및 log_click 처리
   useEffect(() => {
     if (post && post > 0) {
-      setMode("post");
-      setPostID(post);
-      sheetRef.current?.expand();
+      if (post !== lastPostRef.current) {
+        // post가 변경된 경우 로직 실행
+        setMode("post");
+        setPostID(post);
+        sheetRef.current?.expand();
+
+        // lastPostRef 업데이트
+        lastPostRef.current = post;
+      }
     } else if (log_click) {
       setMode("create");
       sheetRef.current?.expand();
     } else {
       sheetRef.current?.close();
     }
+
+    // 카테고리 가져오기 (한 번만 실행)
     getCategory();
   }, [post, log_click]);
+
+  // history가 이전 값과 동일할 때 트리거
+  useEffect(() => {
+    if (history === "True" && history !== lastPostRef.current) {
+      setMode("post");
+      sheetRef.current?.expand();
+
+      // history 처리 후 undefined로 변경
+      router.setParams({ history: undefined });
+    }
+  }, [history]);
 
   const snackBar = (message) => { setSnackbarMessage(message); setSnackbarVisible(true);};
 
@@ -91,7 +114,7 @@ export default function Community() {
 
       const newData = response.data.data || [];
       if (category && newData.length <= 0) {
-        snackBar("게시글이 없습니다!");
+        snackBar(t("Function.post_empty"));
       }
       setIsRemain(response.data.is_remain); // 총 페이지 수 설정
 
@@ -331,7 +354,7 @@ export default function Community() {
                   <SkeletonList length={20} />
                 </FlatList> :
                 <View style={{margin: 5, alignItems: "center"}}>
-                  <Text style={{color: "#fff", fontWeight: "bold", fontSize: 35}}>== 게시글이 없습니다 ==</Text>
+                  <Text style={{color: "#fff", fontWeight: "bold", fontSize: 35}}>== {t("Function.post_empty")} ==</Text>
                 </View>
               }
             </> :

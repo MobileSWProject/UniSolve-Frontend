@@ -66,11 +66,11 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
         snackBar(t("Function.edit"));
         setMode("post");
       } else {
-        snackBar("수정에 실패했습니다.");
+        snackBar(t("Function.edit_failed"));
         setProcess(false);
       }
     } catch (error) {
-      snackBar("수정에 실패했습니다.");
+      snackBar(t("Function.edit_failed"));
       setProcess(false);
     }
   };
@@ -81,7 +81,7 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
     takePhoto: async () => {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
-        snackBar("카메라를 실행할 권한이 없습니다!");
+        snackBar(t("Function.permission_camera"));
         return;
       }
       const result = await ImagePicker.launchCameraAsync({
@@ -98,7 +98,7 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
     attachPhoto: async () => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        snackBar("사진/갤러리에 접근할 권한이 없습니다!");
+        snackBar(t("Function.permission_image"));
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -149,7 +149,7 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
       snackBar(`${t("Stage.success")}${t("Function.register_success")}`);
       setTimeout(() => { setPost(postId); setMode("post"); setProcess(false); }, 2000);
     } catch {
-      snackBar("오류가 발생했습니다!");
+      snackBar(t("User.error"));
       if (error.response && (error.response.status === 400 || error.response.status === 401)) {
         router.replace("/notfound");
       }
@@ -230,8 +230,8 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
               >
               <MaterialCommunityIcons name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"} size={24} color={isPrivate && mode === "edit" ? "red" : "black"} />
               <View>
-                <Text style={{fontSize: 20, fontWeight: "bold", color: isPrivate && mode === "edit" ? "red" : "black"}}>{mode === "edit" ? `${t("Function.public")}로 전환하기` : `${t("Function.private")}로 질문하기`}</Text>
-                {mode === "edit" ? <Text style={{color: isPrivate ? "red" : "black"}}>{"전환 후에는 비공개로 전환할 수 없으며,\n이 게시글의 채팅을 이용(열람만 가능)할 수 없게 됩니다."}</Text> : null}
+                <Text style={{fontSize: 20, fontWeight: "bold", color: isPrivate && mode === "edit" ? "red" : "black"}}>{mode === "edit" ? `${t("Function.public_convert")}` : `${t("Function.private_convert")}`}</Text>
+                {mode === "edit" ? <Text style={{color: isPrivate ? "red" : "black"}}>{t("Function.public_convert_alert")}</Text> : null}
               </View>
               </TouchableOpacity> :
               null

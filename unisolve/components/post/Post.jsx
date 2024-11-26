@@ -28,7 +28,6 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
   const router = useRouter();
-
   // selectedComment가 변경될 때마다 replyComment 초기화
   useEffect(() => {
     if (selectedComment) {
@@ -36,40 +35,43 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
     }
   }, [selectedComment]);
 
-  useFocusEffect(
-    useCallback(() => {
-      const getData = async () => {
-        if (process) return;
-        setProcess(true);
-        _axios.get(`/posts/${post}`).then((response) => {
-          setProcess(false);
-          setBan(response.data.data.ban);
-          setData({
-            id: response.data.data.id,
-            exp: response.data.data.exp,
-            private: Boolean(response.data.data.is_private),
-            authorId: formatAuthor(response.data.data.author_id || null),
-            nickname: formatAuthor(response.data.data.author_nickname || `@undefined`),
-            authorExp: response.data.data.author_exp,
-            private: response.data.data.is_private,
-            category: response.data.data.category,
-            title: response.data.data.title,
-            content: response.data.data.description,
-            timestamp: response.data.data.timestamp,
-            image: response.data.data.image,
-            comments: response.data.data.comments,
-            commentsCount: response.data.data.comments_count,
-            matched: {nickname: response.data.data.matched_nickname, status: response.data.data.matched_status}
-          });
-        })
-        .catch(() => {
-          setProcess(false);
-          router.replace("community");
+  useEffect(() => {
+    const getData = async () => {
+      if (process) return;
+      setProcess(true);
+  
+      try {
+        const response = await _axios.get(`/posts/${post}`);
+        setProcess(false);
+        setBan(response.data.data.ban);
+        setData({
+          id: response.data.data.id,
+          exp: response.data.data.exp,
+          private: Boolean(response.data.data.is_private),
+          authorId: formatAuthor(response.data.data.author_id || null),
+          nickname: formatAuthor(response.data.data.author_nickname || `@undefined`),
+          authorExp: response.data.data.author_exp,
+          private: response.data.data.is_private,
+          category: response.data.data.category,
+          title: response.data.data.title,
+          content: response.data.data.description,
+          timestamp: response.data.data.timestamp,
+          image: response.data.data.image,
+          comments: response.data.data.comments,
+          commentsCount: response.data.data.comments_count,
+          matched: {
+            nickname: response.data.data.matched_nickname,
+            status: response.data.data.matched_status,
+          },
         });
-      };
-      getData();
-    }, [post])
-  );
+      } catch (error) {
+        setProcess(false);
+        router.replace("community");
+      }
+    };
+  
+    getData();
+  }, [post]);
 
   // 댓글 또는 대댓글 추가 로직
   const handleAddComment = async (isReply) => {
@@ -77,6 +79,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
     if (!commentContent || process) return;
     try {
       setProcess(true);
+      snackBar(t("Function.registering"));
       let data = JSON.stringify({
         post_id: post,
         content: commentContent,
@@ -91,8 +94,9 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
         commentsCount: updatedPost.data.data.comments_count,
       }));
       setProcess(false);
-      snackBar("댓글을 등록했습니다!");
+      snackBar(t("Function.register_success"));
     } catch {
+      snackBar(t("Function.register_failed"));
       setProcess(false);
     } finally {
       setNewComment("");
@@ -105,6 +109,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
     try {
       if (process) return;
       setProcess(true);
+      snackBar(t("Function.deleting"));
       await _axios.delete(`/comments/${targetCommentId}`);
       // 댓글 삭제 후 댓글 목록만 다시 불러옴
       const updatedPost = await _axios.get(`/posts/${post}`);
@@ -115,8 +120,9 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
         matched: {nickname: updatedPost.data.data.matched_nickname, status: updatedPost.data.data.matched_status}
       }));
       setProcess(false);
-      snackBar("댓글을 삭제했습니다!");
+      snackBar(t("Function.delete_success"));
     } catch {
+      snackBar(t("Function.delete_failed"));
       setProcess(false);
     }
   };
@@ -169,7 +175,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
                   hitSlop={4}
                 >
                   <FontAwesome name="user" size={30} color={!data.private || data.matched.nickname ? "gray" : mainColor}/>
-                  <Text>{`${data.matched.nickname ? data.matched.nickname : ""}${data.matched.nickname && !data.matched.status ? "님에게 요청함" : "" }`}</Text>
+                  <Text>{`${data.matched.nickname ? data.matched.nickname : ""}${data.matched.nickname && !data.matched.status ? t("Function.matching_go") : "" }`}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{ marginLeft: 5, marginRight: 5 }}
@@ -182,7 +188,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
                   hitSlop={8}
                   onPress={() => {
                     if (ban) {
-                      snackBar(t("운영정책 위반으로 게시글 수정이 불가합니다."));
+                      snackBar(t("Function.sanction_write"));
                     }
                     else {
                       setMode("edit");

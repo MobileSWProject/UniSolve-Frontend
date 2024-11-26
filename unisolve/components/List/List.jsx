@@ -7,8 +7,12 @@ import formatAuthor from "../../utils/formatAuthor";
 import _axios from "../../api";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
+import { router } from "expo-router";
+import { mainColor } from "../../constants/Colors";
 
 export default function PostListItem({ item, type, bottomView, setVisible, setUser, getList }) {
+ 
+
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -42,15 +46,16 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
         }
         else if (type === "notification") {
           await updateNotification(item.not_id);
-          router.push(`community?post=${item.id}`);
+          router.push(`community?post=${item.id}&history=True`);
         }
         else if (type === "community") {
+          router.setParams({ history: undefined, post: undefined });
           bottomView.sheetRef.current?.close();
           bottomView.setMode("post");
           bottomView.setPostID(item.id);
           bottomView.sheetRef.current?.expand();
         } else {
-          router.push(`community?post=${item.id}`);
+          router.push(`community?post=${item.id}&history=True`);
         }
       }}
     >
@@ -79,17 +84,11 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
         <Text style={styles.title}>{type === "users" ? item.user_nickname : item.title}</Text>
       </View>
       <View style={styles.header}>
-        {item.type === 1 && item.description === "invite" ? 
-        <>
-          <TouchableOpacity style={[styles.buttonSmall, { backgroundColor: "blue" }]} onPress={() => {invite(item.not_id, true)}}>
-            <Text style={styles.buttonTextSmall}>수락</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={[styles.buttonSmall, { backgroundColor: "red" }]} onPress={() => {invite(item.not_id, false)}}>
-            <Text style={styles.buttonTextSmall}>거절</Text>
-          </TouchableOpacity>
-        </> :
-        <Text style={[styles.description, { fontWeight: "bold" }]} numberOfLines={3}>{item.description ? item.description.replace(/\n/g, " ") : ""}</Text>}
+        {
+          item.type === 1 && item.description === "invite" ? 
+          null :
+          <Text style={[styles.description, { fontWeight: "bold" }]} numberOfLines={3}>{item.description ? item.description.replace(/\n/g, " ") : ""}</Text>
+        }
         <View style={styles.header}>
           {
             type === "history" || type === "community" ?
@@ -100,9 +99,32 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
         </View>
       </View>
       {
-        type === "notification" ? 
-        <Text style={styles.footer}>{item.timestamp}</Text> :
-        null
+        type === "notification" ?
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <Text style={styles.footer}>{item.timestamp}</Text>
+            {
+              item.type === 1 && item.description === "invite" ?
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  style={[styles.buttonSmall, { margin: 0, paddingHorizontal: 0, height: 30, width: 50, backgroundColor: mainColor, marginRight: 5 }]}
+                  onPress={() => {
+                    invite(item.not_id, true);
+                  }}
+                >
+                  <Text style={[styles.buttonTextSmall, { fontSize: 15 }]}>{t("Function.accept")}</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.buttonSmall, { margin: 0, paddingHorizontal: 0, height: 30, width: 50, backgroundColor: "gray" }]}
+                  onPress={() => { invite(item.not_id, false); }}
+                >
+                  <Text style={[styles.buttonTextSmall, { fontSize: 15 }]}>{t("Function.refuse")}</Text>
+                </TouchableOpacity>
+              </View> :
+              null
+            }
+          </View> :
+          null
       }
     </TouchableOpacity>
   );

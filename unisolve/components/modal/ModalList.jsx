@@ -54,7 +54,7 @@ export default function ModalList({ setVisible, type }) {
       <Text style={[styles.timeDate, { color: mainColor, marginTop: 4 }]}>{type === "notification" ? t("Function.notification") : type === "history" ? t("Function.history") : t("Function.sanction")}</Text>
       {
         !process && !list.length ?
-        <Text style={[styles.timeDate, { color: mainColor, marginTop: 4, fontSize: 20 }]}>== 기록이 없습니다 ==</Text> :
+        <Text style={[styles.timeDate, { color: mainColor, marginTop: 4, fontSize: 20 }]}>== {t("Function.history_empty")} ==</Text> :
         null
       }
       <FlatList
