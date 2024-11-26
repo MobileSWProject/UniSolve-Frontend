@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import "../../i18n";
 import useUserId from "../../hooks/useUserId";
 import DropDownPicker from "react-native-dropdown-picker";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   post = post || 0;
@@ -24,6 +25,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const [items, setItems] = useState([{ label: "선택안함", value: 0 }]);
   const [ban, setBan] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [isAI, setIsAI] = useState(true);
 
   const scrollToBottom = () => {
     if (flatListRef.current) {
@@ -33,6 +35,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
 
   const selectValue = async (value) => {
     post = value;
+    setChatData([]);
     setCategoryLoad(false);
     loadExistingMessages();
   };
@@ -44,8 +47,12 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
         const response = await _axios.get(`/chat/messages?post_id=${post}`);
         setBan(response.data.ban || false);
         setIsPrivate(response.data.is_private || false);
-        if (post) setChatData(response.data.data.reverse());
-        else setItems((prevItems) => [...prevItems, ...response.data.data]);
+        if (post) {
+          setChatData(response.data.data.reverse());
+        }
+        else {
+          setItems((prevItems) => [...prevItems, ...response.data.data]);
+        }
         scrollToBottom();
       }
     } catch (error) {
@@ -139,6 +146,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       content: message,
       is_me: true,
       sent_at: t("Function.sending"),
+      is_ai: isAI,
     });
 
     const token = await AsyncStorage.getItem("token");
@@ -157,29 +165,50 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   return (
     <>
       {post === 0 ? (
-        <DropDownPicker
-          style={{ borderWidth: 1.4 }}
-          open={open}
-          value={value}
-          items={items}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-          maxHeight={200}
-          onChangeValue={(value) => selectValue(value)}
-          listMode="SCROLLVIEW"
-        />
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <View style={{ width: "93%", zIndex: 99 }}>
+            <DropDownPicker
+              style={{ borderWidth: 1.4 }}
+              open={open}
+              value={value}
+              items={items}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setItems}
+              maxHeight={200}
+              onChangeValue={(value) => selectValue(value)}
+              listMode="SCROLLVIEW"
+            />
+          </View>
+        </View>
       ) : null}
-      <FlatList
-        ref={flatListRef} // FlatList 참조 추가
-        data={chatData}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.container}
-        // onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
-        inverted
-      />
+      <View style={{height: 600}}>
+        <FlatList
+          ref={flatListRef} // FlatList 참조 추가
+          data={chatData}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString() || "0"}
+          contentContainerStyle={styles.container}
+          // onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
+          inverted
+        />
+      </View>
       <View style={styles.inputContainer}>
+       { !ban && isPrivate ?
+        <>
+          <TouchableOpacity
+            style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
+            hitSlop={4}
+            onPress={() => { setIsAI(!isAI); }}
+          >
+            <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
+            <View>
+              <Text style={{fontSize: 14, fontWeight: "bold"}}>AI와 대화</Text>
+            </View>
+          </TouchableOpacity>
+        </> : 
+        null
+       } 
         <TextInput
           style={styles.textInput}
           disabled={ban || !isPrivate}

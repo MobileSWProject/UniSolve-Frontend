@@ -3,12 +3,12 @@ import { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "../../styles/modal/ModalListStyle";
 import { mainColor } from "../../constants/Colors";
-import List from "../tabs/List/List";
+import List from "../List/List";
 import _axios from "../../api";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
-export default function ModalList({ visible, setVisible, type }) {
+export default function ModalList({ setVisible, type }) {
   const { t } = useTranslation();
   const [list, setList] = useState([]);
   const [page, setPage] = useState(1);
@@ -52,6 +52,11 @@ export default function ModalList({ visible, setVisible, type }) {
   return (
     <>
       <Text style={[styles.timeDate, { color: mainColor, marginTop: 4 }]}>{type === "notification" ? t("Function.notification") : type === "history" ? t("Function.history") : t("Function.sanction")}</Text>
+      {
+        !process && !list.length ?
+        <Text style={[styles.timeDate, { color: mainColor, marginTop: 4, fontSize: 20 }]}>== 기록이 없습니다 ==</Text> :
+        null
+      }
       <FlatList
         style={{ width: "100%" }}
         data={list}

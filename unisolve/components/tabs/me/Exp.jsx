@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import _axios from "../../../api";
 import { styles } from "../../../styles/tabs/me/ExpStyle";
 import { mainColor } from "../../../constants/Colors";
+import LevelImage from "../../../components/tabs/me/LevelImage";
 import { Table, Row, Rows } from "react-native-table-component";
 import { useTranslation } from "react-i18next";
 import "../../../i18n";
@@ -44,7 +45,10 @@ export function ExpPage({setVisible}) {
         response.data.users.map((item, index) => [
           index + 1 + (tempSelf ? response.data.self_user.page : tempPage) * 10 - 10,
           item.nickname,
-          getExpToLevel(t, getLevel(item.exp)),
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center"}}>
+            <LevelImage exp={item.exp} size={32} />
+            <Text style={styles.text}>| {getExpToLevel(t, getLevel(item.exp))}</Text>
+          </View>,
         ])
       );
       setTotalPage(response.data.total_pages);
@@ -72,14 +76,16 @@ export function ExpPage({setVisible}) {
     <>
       <Text style={styles.meSubText}>{`${meRank}${t("User.rank")}`}</Text>
       <View style={styles.me}>
-        <Text style={styles.meText}>★ {numConvert(meExp)}</Text>
+        <Text style={styles.meText}><LevelImage exp={meExp} size={42} /> {numConvert(meExp)}</Text>
       </View>
       <ScrollView style={{ width: "100%" }}>
         <Table borderStyle={{ borderWidth: 0, borderColor: "#C1C0B9" }}>
           <Row data={listHeader} style={styles.head} textStyle={styles.headText}/>
           <Rows data={list} textStyle={styles.text}></Rows>
         </Table>
-        <Text style={{ alignContent: "center" }}>{page}/{TotalPage}</Text>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: 10 }}>
+          <Text style={{ fontSize: 20, fontWeight: "bold"}}>{page}/{TotalPage}</Text>
+        </View>
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
             disabled={process || page <= 1}

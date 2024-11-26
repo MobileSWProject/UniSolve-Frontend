@@ -1,25 +1,19 @@
 import { TouchableOpacity } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useCallback } from "react";
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import PostCreate from "../form/PostCreate";
+import { useFocusEffect } from "@react-navigation/native";
+import PostCreateAndEdit from "../form/PostCreateAndEdit";
 import Post from "../post/Post";
 import Chat from "../post/Chat";
 import Feather from "@expo/vector-icons/Feather";
 
-export default function BottomView({
-  sheetRef,
-  mode,
-  setMode,
-  post,
-  setPost,
-  snackBar,
-  getList,
-  categorys,
-  modalVisible,
-  setModalVisible,
-  modalType,
-  setModalType,
-}) {
+export default function BottomView({ sheetRef, mode, setMode, post, setPost, snackBar, getList, categorys, modalVisible, setModalVisible, modalType, setModalType, setComment}) {
+  useFocusEffect(
+    useCallback(() => {
+      if (!mode) sheetRef.current?.close();
+    }, [])
+  );
   return (
     <BottomSheet
       ref={sheetRef}
@@ -33,18 +27,20 @@ export default function BottomView({
       <TouchableOpacity
         style={{ position: "absolute", zIndex: 999, left: 10 }}
         onPress={() => {
-          if (mode === "chat") return setMode("post");
+          if (mode === "chat" || mode === "edit") return setMode("post");
           setMode("");
-          sheetRef.current?.collapse();
+          sheetRef.current?.close();
         }}
       >
         <Feather name="x" size={30} color="black" />
       </TouchableOpacity>
       <BottomSheetScrollView style={{ flex: 1, marginTop: 35, marginBottom: 75, }} >
         {
-          mode === "create" ?
-          <PostCreate
+          mode === "create" || mode === "edit" ?
+          <PostCreateAndEdit
+            mode={mode}
             setMode={setMode}
+            post={post}
             setPost={setPost}
             snackBar={snackBar}
             categorys={categorys}
@@ -60,6 +56,7 @@ export default function BottomView({
             setModalVisible={setModalVisible}
             modalType={modalType}
             setModalType={setModalType}
+            setComment={setComment}
           /> :
           mode === "chat" ?
           <Chat

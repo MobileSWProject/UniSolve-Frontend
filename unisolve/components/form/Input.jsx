@@ -41,7 +41,7 @@ export default function Input({
       </Text>
       <View style={styles.view}>
         <TextInput
-          style={[styles.inputTo, title && textArea ? { height: 280 } : null]}
+          style={[styles.inputTo, title && textArea ? { height: 280 } : null, {width: buttonOnPress ? "80%" : "100%"}]}
           placeholder={placeholder ? placeholder : `${title}${lastConvert(title)} ${t("Function.input")}`}
           value={content}
           onChangeText={onChangeText}

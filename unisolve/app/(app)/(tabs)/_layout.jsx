@@ -49,8 +49,8 @@ export default function TabsLayout() {
           options={{
             title: "Home",
             tabBarIcon: ({ color, focused }) => ( <AnimatedIcon name={focused ? "home-variant" : "home-variant-outline"} color={color} focused={focused} /> ),
-            tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} />
-            ),
+            // tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} />
+            // ),
           }}
         />
         <Tabs.Screen
@@ -58,7 +58,7 @@ export default function TabsLayout() {
           options={{
             title: "Community",
             tabBarIcon: ({ color, focused }) => ( <AnimatedIcon name={focused ? "chat-processing" : "chat-processing-outline"} color={color} focused={focused} /> ),
-            tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} /> ),
+            // tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} /> ),
           }}
         />
         <Tabs.Screen
@@ -66,7 +66,7 @@ export default function TabsLayout() {
           options={{
             title: "Me",
             tabBarIcon: ({ color, focused }) => ( <AnimatedIcon name={focused ? "account" : "account-outline"} color={color} focused={focused} /> ),
-            tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} /> ),
+            // tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} /> ),
           }}
         />
       </Tabs>

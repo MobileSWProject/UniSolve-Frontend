@@ -1,25 +1,28 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useState, useCallback } from "react";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 import styles from "../../styles/form/PostCreateStyle";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { _fetchFormData, formFetch } from "../../api";
 import Input from "./Input";
 import * as ImagePicker from "expo-image-picker";
-import ModalView from "../../components/modal/ModalView";
+import ModalView from "../modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import DropDownPicker from "react-native-dropdown-picker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslation } from "react-i18next";
+import _axios from "../../api";
 import "../../i18n";
+import { mainColor } from "../../constants/Colors";
 
-export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
+export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackBar, categorys }) {
   const { t } = useTranslation();
+  const [process, setProcess] = useState(false);
+  const [Private, setPrivate] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
-  const [submitLoading, setSubmitLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState();
   const [items, setItems] = useState(categorys);
@@ -28,6 +31,49 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
   const router = useRouter();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (mode === "edit") {
+        const getData = async () => {
+          await _axios.get(`/posts/${post}`).then((response) => {
+            setTitle(response.data.data.title);
+            setContent(response.data.data.description);
+            setImage(response.data.data.image);
+            setPrivate(response.data.data.is_private);
+          })
+          .catch(() => {
+            setMode("post");
+          });
+        };
+        getData();
+      }
+    }, [])
+  );
+
+  const handleUpdate = async () => {
+    try {
+      if (title.length < 1 || content.length < 1 || process) return;
+      setProcess(true);      
+      const response = await _axios.put(`/posts/${post}`, {
+        title: title,
+        content: content,
+        toggle_privacy: isPrivate,
+        image: image
+      });
+      setProcess(false);
+      if (response.data.status === "success") {
+        snackBar(t("Function.edit"));
+        setMode("post");
+      } else {
+        snackBar("수정에 실패했습니다.");
+        setProcess(false);
+      }
+    } catch (error) {
+      snackBar("수정에 실패했습니다.");
+      setProcess(false);
+    }
+  };
 
   // 버튼을 눌렀을 때 동작할 함수를 모아놓았습니다.
   const BtnHandleFunctions = {
@@ -96,19 +142,18 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
     }
 
     snackBar(`${t("Stage.process")}${t("Function.registering")}`);
-    setSubmitLoading(true);
+    setProcess(true);
     try {
       const response = await formFetch("/posts", data);
       const postId = response.postId;
       snackBar(`${t("Stage.success")}${t("Function.register_success")}`);
-      setSubmitLoading(false);
-      setTimeout(() => { setPost(postId); setMode("post"); });
+      setTimeout(() => { setPost(postId); setMode("post"); setProcess(false); }, 2000);
     } catch {
       snackBar("오류가 발생했습니다!");
       if (error.response && (error.response.status === 400 || error.response.status === 401)) {
         router.replace("/notfound");
       }
-      setSubmitLoading(false);
+      setProcess(false);
     }
   };
 
@@ -118,18 +163,23 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
         {/* [카메라, 사진, 사진보기 그룹] */}
         <View style={{ marginTop: 5, alignItems: "center" }}>
           <View style={{ width: "93%", flexDirection: "row", gap: 10 }}>
-            {/* 카메라 버튼 */}
-            <TouchableOpacity style={[styles.submitButton, { height: 60, width: 60 }]} onPress={BtnHandleFunctions.takePhoto}>
-              <Text style={styles.submitButtonText}>
-                <FontAwesome name="camera" size={24} color="white"/>
-              </Text>
-            </TouchableOpacity>
-            {/* 사진 버튼 */}
-            <TouchableOpacity style={[styles.submitButton, { height: 60, width: 60 }]} onPress={BtnHandleFunctions.attachPhoto} >
-              <Text style={styles.submitButtonText}>
-                <FontAwesome name="photo" size={24} color="white"/>
-              </Text>
-            </TouchableOpacity>
+          { mode !== "edit" ?
+            <>
+              {/* 카메라 버튼 */} 
+              <TouchableOpacity style={[styles.submitButton, { height: 60, width: 60 }]} onPress={BtnHandleFunctions.takePhoto}>
+                <Text style={styles.submitButtonText}>
+                  <FontAwesome name="camera" size={24} color="white"/>
+                </Text>
+              </TouchableOpacity>
+              {/* 사진 버튼 */}
+              <TouchableOpacity style={[styles.submitButton, { height: 60, width: 60 }]} onPress={BtnHandleFunctions.attachPhoto} >
+                <Text style={styles.submitButtonText}>
+                  <FontAwesome name="photo" size={24} color="white"/>
+                </Text>
+              </TouchableOpacity> 
+            </> :
+            null
+          }
             {/* 사진 확인 버튼 */}
             {
               image &&
@@ -147,44 +197,54 @@ export default function PostCreate({ setMode, setPost, snackBar, categorys }) {
           <Input title={t("Function.title")} content={title} onChangeText={setTitle} maxLength={32}/>
           <View style={{ marginTop: 30 }} />
           {/* 카테고리 */}
-          <View style={{ width: "93%", zIndex: 99 }}>
-            <DropDownPicker
-              style={{ borderWidth: 1.4 }}
-              open={open}
-              value={value}
-              items={items}
-              placeholder={t("Function.category")}
-              setOpen={setOpen}
-              setValue={setValue}
-              setItems={setItems}
-              maxHeight={200}
-              onChangeValue={(value) => { setCategory(value); }}
-              listMode="SCROLLVIEW"
-            />
-          </View>
-
+          { 
+            mode !== "edit" ? 
+            <View style={{ width: "93%", zIndex: 99 }}>
+              <DropDownPicker
+                style={{ borderWidth: 1.4 }}
+                open={open}
+                value={value}
+                items={items}
+                placeholder={t("Function.category")}
+                setOpen={setOpen}
+                setValue={setValue}
+                setItems={setItems}
+                maxHeight={200}
+                onChangeValue={(value) => { setCategory(value); }}
+                listMode="SCROLLVIEW"
+              />
+            </View> :
+            null
+          }
           {/* 내용 */}
           <Input title={t("Function.content")} content={content} onChangeText={setContent} textArea={true}/>
           <View style={{ marginTop: 10 }} />
-          <View style={styles.submitContainer}>
+            <View style={styles.submitContainer}>
             {/* 공개 비공개 토글 버튼 */}
-            <TouchableOpacity
-              style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
-              hitSlop={4}
-              onPress={() => { setIsPrivate(!isPrivate); }}
-            >
-              <MaterialCommunityIcons name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"} size={24} color="black" />
-              <Text style={{}}>{`${t("Function.private")}로 질문하기`}</Text>
-            </TouchableOpacity>
+            {
+              mode !== "edit" || mode === "edit" && Private ?
+              <TouchableOpacity
+                style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
+                hitSlop={4}
+                onPress={() => { setIsPrivate(!isPrivate); }}
+              >
+              <MaterialCommunityIcons name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"} size={24} color={isPrivate && mode === "edit" ? "red" : "black"} />
+              <View>
+                <Text style={{fontSize: 20, fontWeight: "bold", color: isPrivate && mode === "edit" ? "red" : "black"}}>{mode === "edit" ? `${t("Function.public")}로 전환하기` : `${t("Function.private")}로 질문하기`}</Text>
+                {mode === "edit" ? <Text style={{color: isPrivate ? "red" : "black"}}>{"전환 후에는 비공개로 전환할 수 없으며,\n이 게시글의 채팅을 이용(열람만 가능)할 수 없게 됩니다."}</Text> : null}
+              </View>
+              </TouchableOpacity> :
+              null
+            }
             <View style={{ marginTop: 10 }} />
             {/* 등록 버튼 */}
             <TouchableOpacity
-              style={[ styles.submitButton, { alignSelf: "stretch", width: "100%" }]}
+              style={[ styles.submitButton, { alignSelf: "stretch", width: "100%", backgroundColor: process ? "gray" : mainColor }]}
               hitSlop={4}
-              onPress={handleSubmit}
-              disabled={submitLoading}
+              onPress={() => {mode === "edit" ? handleUpdate() : handleSubmit() }}
+              disabled={process}
             >
-              <Text style={styles.submitButtonText}>{t("Function.regist")}</Text>
+              <Text style={styles.submitButtonText}>{mode === "edit" ? t("Function.btn_edit") : t("Function.regist")}</Text>
             </TouchableOpacity>
           </View>
           <View style={{ marginBottom: 30 }} />

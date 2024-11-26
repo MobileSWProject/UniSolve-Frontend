@@ -2,17 +2,11 @@ import { StyleSheet } from "react-native";
 import { mainColor } from "../../../constants/Colors";
 
 export const styles = StyleSheet.create({
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        textAlign: "center",
-        marginBottom: 20,
-    },
     me: {
         flexDirection: "row",
         justifyContent: "center",
         backgroundColor: "#fff",
-        padding: 10,
+        marginBottom: 10,
         borderRadius: 15,
     },
     meText: {
@@ -28,13 +22,16 @@ export const styles = StyleSheet.create({
         height: 40,
         backgroundColor: mainColor,
         textAlign: "center",
+        borderRadius: 8,
     },
     headText: {
+        fontSize: 24,
         margin: 6,
         color: "white",
         textAlign: "center",
     },
     text: {
+        fontSize: 16 ,
         margin: 6,
         textAlign: "center",
     },

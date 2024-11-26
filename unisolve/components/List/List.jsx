@@ -1,12 +1,12 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import { styles } from "../../../styles/tabs/List/ListStyles";
+import { styles } from "../../styles/tabs/List/ListStyles";
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
-import formatAuthor from "../../../utils/formatAuthor";
-import _axios from "../../../api";
+import formatAuthor from "../../utils/formatAuthor";
+import _axios from "../../api";
 import { useTranslation } from 'react-i18next';
-import "../../../i18n";
+import "../../i18n";
 
 export default function PostListItem({ item, type, bottomView, setVisible, setUser, getList }) {
   const { t } = useTranslation();
@@ -22,7 +22,6 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
     const response = await _axios.post('notifications/send_partner_notification', {not_id: post, acc_deny: isGo})
     if (response.data){
       getList(1);
-      console.log("good")
     }
   }
 
@@ -36,14 +35,17 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
       ]}
       onPress={async () => {
         if (setVisible) setVisible(false);
-        if (type === "users") return setUser(item.user_nickname);
-        if (type === "sanction") null
+        if (type === "users") {
+          return setUser(item.user_nickname);
+        }
+        if (type === "sanction") {
+        }
         else if (type === "notification") {
           await updateNotification(item.not_id);
           router.push(`community?post=${item.id}`);
         }
         else if (type === "community") {
-          bottomView.sheetRef.current?.collapse();
+          bottomView.sheetRef.current?.close();
           bottomView.setMode("post");
           bottomView.setPostID(item.id);
           bottomView.sheetRef.current?.expand();
@@ -71,13 +73,10 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
                   null
           }
         </Text>
-        <Text>
-          {type === "notification" ? item.timebefore : item.timestamp}
-          {type === "users" ? item.user_nickname : ''}
-        </Text>
+        <Text>{type === "notification" ? item.timebefore : item.timestamp}</Text>
       </View>
       <View style={styles.header}>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.title}>{type === "users" ? item.user_nickname : item.title}</Text>
       </View>
       <View style={styles.header}>
         {item.type === 1 && item.description === "invite" ? 
@@ -97,7 +96,7 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
             <Entypo name="new-message" size={16} color="#ccc"/> :
             null
           }
-          <Text> {item.reply_count}</Text>
+          <Text>{item.reply_count}</Text>
         </View>
       </View>
       {
