@@ -38,12 +38,12 @@ export default function SelectUser({ visible, setVisible, post }) {
 
   return (
     <>
-      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>1:1 대화 상대 지정</Text>
+      <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("Function.matching")}</Text>
       {
         users && users.length > 0 ?
         <>
-        <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>{"요청 후 거절하지 않거나\n상대방이 수락하면 변경할 수 없습니다!\n"}</Text>
-        <Text style={{ textAlign: "center", fontSize: 25, fontWeight: "bold" }}>{`선택된 상대: ${user}\n`}</Text>
+        <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>{t("Function.matching_alert")}</Text>
+        <Text style={{ textAlign: "center", fontSize: 25, fontWeight: "bold" }}>{`${t("Function.matching_select")}: ${user}\n`}</Text>
         <FlatList
           style={{width: "100%"}}
           ref={flatListRef}
@@ -60,7 +60,7 @@ export default function SelectUser({ visible, setVisible, post }) {
           )}
         />
         </> :
-        <Text style={{fontSize: 40, marginBottom: 10, color: "black", textAlign: "center", fontWeight: "bold", marginTop: 4, fontSize: 20 }}>== 선택 가능한 사용자가 없습니다 ==</Text> 
+        <Text style={{fontSize: 40, marginBottom: 10, color: "black", textAlign: "center", fontWeight: "bold", marginTop: 4, fontSize: 20 }}>== {t("Function.matching_empty")} ==</Text> 
       }
       <InputProcess
         visible={visible}

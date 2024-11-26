@@ -48,7 +48,7 @@ export default function Report({visible, setVisible, comment, setComment}) {
         setTimeout(() => { setVisible(false); setComment(null); setCommentContent(""); }, 2000);
       }
     } catch {
-      snackBar("댓글 수정에 실패했습니다.");
+      snackBar(t("Function.edit_failed"));
     }
   };
 
@@ -61,8 +61,8 @@ export default function Report({visible, setVisible, comment, setComment}) {
       />
       <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>댓글 수정하기</Text>
       <Input
-        title="댓글 수정"
-        placeholder="댓글을 입력하세요."
+        title={`${t("Function.comment")} ${t("Function.edited")}`}
+        placeholder={t("Function.input_content")}
         content={commentContent}
         onChangeText={setCommentContent}
         disabled={process}

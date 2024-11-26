@@ -80,7 +80,6 @@ export default function Community() {
   // history가 이전 값과 동일할 때 트리거
   useEffect(() => {
     if (history === "True" && history !== lastPostRef.current) {
-      console.log("강제 open");
       setMode("post");
       sheetRef.current?.expand();
 
@@ -115,7 +114,7 @@ export default function Community() {
 
       const newData = response.data.data || [];
       if (category && newData.length <= 0) {
-        snackBar("게시글이 없습니다!");
+        snackBar(t("Function.post_empty"));
       }
       setIsRemain(response.data.is_remain); // 총 페이지 수 설정
 
@@ -355,7 +354,7 @@ export default function Community() {
                   <SkeletonList length={20} />
                 </FlatList> :
                 <View style={{margin: 5, alignItems: "center"}}>
-                  <Text style={{color: "#fff", fontWeight: "bold", fontSize: 35}}>== 게시글이 없습니다 ==</Text>
+                  <Text style={{color: "#fff", fontWeight: "bold", fontSize: 35}}>== {t("Function.post_empty")} ==</Text>
                 </View>
               }
             </> :

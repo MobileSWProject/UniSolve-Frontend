@@ -46,10 +46,10 @@ export default function Report({visible, setVisible, post, comment, setComment})
         message={snackbarMessage}
         onDismiss={() => setSnackbarVisible(false)}
       />
-      <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{comment ? "댓글 신고하기" : "게시글 신고하기"}</Text>
+      <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{comment ? `${t("Function.comment")} ${t("Function.btn_report")}` : `${t("Function.post")} ${t("Function.btn_report")}`}</Text>
       <Input
-        title="신고 내용"
-        placeholder="신고할 내용을 자세하게 입력하세요."
+        title={`${t("Function.report")} ${t("Function.content")}`}
+        placeholder={t("Function.report_please")}
         content={reportReason}
         onChangeText={setReportReason}
         disabled={process}

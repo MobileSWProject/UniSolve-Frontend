@@ -111,14 +111,14 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
                     invite(item.not_id, true);
                   }}
                 >
-                  <Text style={[styles.buttonTextSmall, { fontSize: 15 }]}>수락</Text>
+                  <Text style={[styles.buttonTextSmall, { fontSize: 15 }]}>{t("Function.accept")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={[styles.buttonSmall, { margin: 0, paddingHorizontal: 0, height: 30, width: 50, backgroundColor: "gray" }]}
                   onPress={() => { invite(item.not_id, false); }}
                 >
-                  <Text style={[styles.buttonTextSmall, { fontSize: 15 }]}>거절</Text>
+                  <Text style={[styles.buttonTextSmall, { fontSize: 15 }]}>{t("Function.refuse")}</Text>
                 </TouchableOpacity>
               </View> :
               null

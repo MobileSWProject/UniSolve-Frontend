@@ -267,7 +267,7 @@ export default function Register({ visible, setVisible }) {
         visible={visible}
         setVisible={setVisible}
         onPress={() => { registerProcess(); }}
-        content="회원가입"
+        content={t("User.regist")}
         cancel={reProcess}
         disabled={reProcess}
       />
