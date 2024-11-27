@@ -45,51 +45,48 @@ export default function Community() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const lastPostRef = useRef(null); // 이전 post ID를 저장하는 useRef
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     return () => {
-  //       sheetRef.current?.close();
-  //       setMode("");
-  //       setPostID("");
-  //     };
-  //   }, [])
-  // );
+  const firstRender = useRef(true)
 
-  // 초기 데이터 로드 및 상태 초기화
-// post 및 log_click 처리
-// post 및 log_click 처리
-  useEffect(() => {
-    if (post && post > 0) {
-      if (post !== lastPostRef.current) {
-        // post가 변경된 경우 로직 실행
-        setMode("post");
-        setPostID(post);
-        sheetRef.current?.expand();
 
-        // lastPostRef 업데이트
-        lastPostRef.current = post;
-      }
-    } else if (log_click) {
-      setMode("create");
-      sheetRef.current?.expand();
-    } else {
-      sheetRef.current?.close();
-    }
-
-    // 카테고리 가져오기 (한 번만 실행)
+  useEffect(()=>{
     getCategory();
-  }, [post, log_click]);
+  }, [])
 
-  // history가 이전 값과 동일할 때 트리거
-  useEffect(() => {
-    if (history === "True" && history !== lastPostRef.current) {
-      setMode("post");
-      sheetRef.current?.expand();
+  const resetParams = () => {
+    router.setParams({ log_click: undefined, post: undefined, history: undefined });
+  }
 
-      // history 처리 후 undefined로 변경
-      router.setParams({ history: undefined });
+  useEffect(()=> {
+    if (log_click==="True") {
+      setMode("create");
+      resetParams();
     }
-  }, [history]);
+  }, [log_click, router])
+
+  useEffect(()=>{
+    if (post && post > 0) {
+      setMode("post");
+      setPostID(post);
+      resetParams();
+    }
+  }, [post, router])
+
+  useEffect(() => {
+    if (mode === "") return;
+  
+    console.log("open the door");
+
+    if (firstRender.current) {
+      console.log("첫 번째 렌더링");
+      setTimeout(()=>{
+        sheetRef.current?.expand();
+        firstRender.current = false
+      },100)
+    }
+    sheetRef.current?.expand();
+
+    resetParams();
+  }, [mode, postID]);
 
   const snackBar = (message) => { setSnackbarMessage(message); setSnackbarVisible(true);};
 

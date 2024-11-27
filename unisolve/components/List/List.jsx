@@ -49,11 +49,11 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
           router.push(`community?post=${item.id}&history=True`);
         }
         else if (type === "community") {
-          router.setParams({ history: undefined, post: undefined });
-          bottomView.sheetRef.current?.close();
+          router.setParams({ history: undefined, post: undefined, log_click: undefined });
+          // bottomView.sheetRef.current?.close();
           bottomView.setMode("post");
           bottomView.setPostID(item.id);
-          bottomView.sheetRef.current?.expand();
+          // bottomView.sheetRef.current?.expand();
         } else {
           router.push(`community?post=${item.id}&history=True`);
         }
