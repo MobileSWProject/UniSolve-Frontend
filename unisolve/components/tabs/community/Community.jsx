@@ -56,9 +56,19 @@ export default function Community() {
     router.setParams({ log_click: undefined, post: undefined, history: undefined });
   }
 
+  useFocusEffect(()=>{
+    let id = 0
+    if (log_click==="True" || post !=="undefined") {
+      id = setTimeout(resetParams, 100)
+    }
+
+    return () => clearTimeout(id)
+  })
+
   useEffect(()=> {
     if (log_click==="True") {
       setMode("create");
+      sheetRef.current?.expand();
       resetParams();
     }
   }, [log_click, router])
@@ -67,6 +77,7 @@ export default function Community() {
     if (post && post > 0) {
       setMode("post");
       setPostID(post);
+      sheetRef.current?.expand();
       resetParams();
     }
   }, [post, router])
