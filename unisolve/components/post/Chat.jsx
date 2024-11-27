@@ -13,7 +13,6 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { FlatList } from "react-native-gesture-handler";
 
 export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
-  post = post || 0;
   const { t } = useTranslation();
   const { userId, loading } = useUserId();
   const [chatData, setChatData] = useState([]);
@@ -27,7 +26,9 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const [ban, setBan] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isAI, setIsAI] = useState(true);
-  const [room, setRoom] = useState(0);
+  const [room, setRoom] = useState("0");
+
+  
 
   // 스크롤 아래로 내리기
   const scrollToBottom = () => {
@@ -52,7 +53,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       setItems(response.data.data);
     };
 
-    if (post === 0) loadCategory();
+    if (String(post) === "0") loadCategory();
     else setRoom(String(post));
   }, [post]);
 
@@ -122,7 +123,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
     };
 
     // room 이 세팅되었을 때 and user가 불러와졌을 때
-    if (room !== 0 && loading === false) {
+    if (room !== "0" && loading === false) {
       // 채팅 내역 불러오기
       loadChatHistory();
 
