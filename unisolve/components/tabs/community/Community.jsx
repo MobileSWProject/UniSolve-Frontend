@@ -328,7 +328,7 @@ export default function Community() {
         <FlatList
           ref={flatListRef}
           data={items}
-          style={{marginBottom: 75}}
+          style={{marginBottom: 14, borderBottomWidth: 2, borderBottomColor: "white", borderRadius: 6}}
           keyExtractor={(item) => item.value.toString()}  
           renderItem={({ item }) => {
             return (
@@ -372,7 +372,7 @@ export default function Community() {
               category ?
               <FlatList
                 ref={flatListRef}
-                style={{ backgroundColor: mainColor, marginBottom: 75}}
+                style={{ backgroundColor: mainColor, marginBottom: 14, borderBottomWidth: 2, borderBottomColor: "white", borderRadius: 6}}
                 data={communitys}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item, index }) => (
