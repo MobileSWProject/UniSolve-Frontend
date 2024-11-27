@@ -27,40 +27,102 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const [ban, setBan] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isAI, setIsAI] = useState(true);
+  const [room, setRoom] = useState(0);
 
+  // 스크롤 아래로 내리기
   const scrollToBottom = () => {
     if (flatListRef.current) {
       flatListRef.current.scrollToOffset({ animated: true, offset: 0 });
     }
   };
 
+  // 카테고리에서 아이템 선택했을 때
   const selectValue = async (value) => {
-    post = value;
+    setRoom(String(value));
     setChatData([]);
     setCategoryLoad(false);
-    loadExistingMessages();
   };
 
-  const loadExistingMessages = async () => {
-    try {
-      if (!categoryLoad) {
-        if (!post) setCategoryLoad(true);
-        const response = await _axios.get(`/chat/messages?post_id=${post}`);
+  // post 상태에 따라 카테고리를 로드할 것인지, Room 을 세팅할 것인지
+  useEffect(() => {
+    const loadCategory = async () => {
+      const response = await _axios.get(`/chat/messages?post_id=${0}`);
+      setBan(response.data.ban || false);
+      setIsPrivate(response.data.is_private || false);
+      setItems(response.data.data);
+    };
+
+    if (post === 0) loadCategory();
+    else setRoom(String(post));
+  }, [post]);
+
+  // Room이 세팅되면 채팅 불러오고, 소켓 연결하기
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      console.log("채팅 불러오기");
+      try {
+        const response = await _axios.get(`/chat/messages?post_id=${room}`);
+        setChatData(response.data.data.reverse());
         setBan(response.data.ban || false);
         setIsPrivate(response.data.is_private || false);
-        if (post) {
-          setChatData(response.data.data.reverse());
-        }
-        else {
-          setItems((prevItems) => [...prevItems, ...response.data.data]);
-        }
         scrollToBottom();
+      } catch (error) {
+        console.error("Failed to load existing messages:", error);
       }
-    } catch (error) {
-      console.error("Failed to load existing messages:", error);
-    }
-  };
+    };
 
+    const initializeSocket = async () => {
+      // 기존 소켓 연결 해제
+      if (socket.current) {
+        console.log("기존 소켓 연결 끊기");
+        const token = await AsyncStorage.getItem("token");
+        socket.current.emit("leave", { room, token });
+        socket.current.disconnect();
+      }
+
+      console.log("소켓 연결하기");
+      if (loading) return;
+      socket.current = io(process.env.EXPO_PUBLIC_SERVER_BASE_URL);
+      const token = await AsyncStorage.getItem("token");
+
+      console.log("소켓 연결하기2");
+      socket.current.emit("join", { room, token });
+      console.log("소켓 연결하기3");
+
+      socket.current.on("receive_message", (data) => {
+        console.log(data);
+        setChatData((prevData) => {
+          const updatedData = [...prevData];
+          if (updatedData.length > 0) {
+            updatedData[0] = {
+              ...updatedData[0],
+              sent_at: checkDate(data.sent_at) || "",
+            };
+          }
+          if (!(updatedData[0]?.content === data.content)) {
+            const isMe = data.sender === userId;
+            updatedData.unshift({ ...data, is_me: isMe });
+          }
+          return updatedData;
+        });
+      });
+
+      socket.current.on("error", (data) => {
+        console.error("Error:", data.msg);
+      });
+    };
+
+    // room 이 세팅되었을 때 and user가 불러와졌을 때
+    if (room !== 0 && loading === false) {
+      // 채팅 내역 불러오기
+      loadChatHistory();
+
+      // 소켓 연결하기
+      initializeSocket();
+    }
+  }, [room, loading]);
+
+  // 데이터 포맷?
   function checkDate(sentDt) {
     if (!sentDt || isNaN(new Date(sentDt))) return sentDt;
     sentDt = new Date(sentDt);
@@ -83,49 +145,6 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
     return resultDate;
   }
 
-  useEffect(() => {
-    const initializeSocket = async () => {
-      if (loading) return;
-      socket.current = io(process.env.EXPO_PUBLIC_SERVER_BASE_URL);
-      const token = await AsyncStorage.getItem("token");
-
-      socket.current.emit("join", { room: post, token });
-
-      socket.current.on("receive_message", (data) => {
-        console.log(data);
-        setChatData((prevData) => {
-          const updatedData = [...prevData];
-          if (updatedData.length > 0) {
-            updatedData[0] = {
-              ...updatedData[0],
-              sent_at: checkDate(data.sent_at) || "",
-            };
-          }
-          if (!(updatedData[0]?.content === data.content)) {
-            const isMe = data.sender === userId;
-            updatedData.unshift({ ...data, is_me: isMe });
-          } 
-          return updatedData;
-        });
-      });
-
-      socket.current.on("error", (data) => {
-        console.error("Error:", data.msg);
-      });
-    };
-
-    loadExistingMessages();
-    initializeSocket();
-
-    return async () => {
-      if (socket.current) {
-        const token = await AsyncStorage.getItem("token");
-        socket.current.emit("leave", { room: post, token });
-        socket.current.disconnect();
-      }
-    };
-  }, [post, userId, loading]);
-
   // chatData가 변경될 때마다 스크롤을 아래로 이동
   useEffect(() => {
     scrollToBottom();
@@ -140,6 +159,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
     />
   );
 
+  // 메세지 보내기
   async function msgSend() {
     if (!message || message.length <= 0) return;
     setMessage("");
@@ -152,8 +172,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
     });
 
     const token = await AsyncStorage.getItem("token");
-
-    socket.current.emit("send_message", { room: post, message, token });
+    socket.current.emit("send_message", { room, message, token });
   }
 
   if (loading) {
@@ -179,12 +198,13 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
               setItems={setItems}
               maxHeight={200}
               onChangeValue={(value) => selectValue(value)}
+              itemKey="value"
               // listMode="SCROLLVIEW"
             />
           </View>
         </View>
       ) : null}
-      <View style={{height: 600}}>
+      <View style={{ height: 600 }}>
         <FlatList
           ref={flatListRef} // FlatList 참조 추가
           data={chatData}
@@ -196,21 +216,32 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
         />
       </View>
       <View style={styles.inputContainer}>
-       { !ban && isPrivate ?
-        <>
-          <TouchableOpacity
-            style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
-            hitSlop={4}
-            onPress={() => { setIsAI(!isAI); }}
-          >
-            <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
-            <View>
-              <Text style={{fontSize: 14, fontWeight: "bold"}}>AI와 대화</Text>
-            </View>
-          </TouchableOpacity>
-        </> : 
-        null
-       } 
+        {!ban && isPrivate ? (
+          <>
+            <TouchableOpacity
+              style={{
+                height: 30,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+              }}
+              hitSlop={4}
+              onPress={() => {
+                setIsAI(!isAI);
+              }}
+            >
+              <MaterialCommunityIcons
+                name={isAI ? "checkbox-marked" : "checkbox-blank-outline"}
+                size={24}
+              />
+              <View>
+                <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                  AI와 대화
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </>
+        ) : null}
         <TextInput
           style={styles.textInput}
           disabled={ban || !isPrivate}
