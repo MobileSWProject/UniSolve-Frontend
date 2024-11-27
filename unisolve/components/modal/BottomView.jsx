@@ -34,7 +34,7 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
       >
         <Feather name="x" size={30} color="black" />
       </TouchableOpacity>
-      <BottomSheetView style={{ flex: 1, marginTop: 35, marginBottom: 75, }}>
+      <BottomSheetView style={{ flex: 1, marginTop: 35, marginBottom: 35, }}>
         {
           mode === "create" || mode === "edit" ?
           <PostCreateAndEdit

@@ -15,31 +15,37 @@ function AnimatedIcon({ name, color, focused }) {
   );
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
   return (
-    <Animated.View style={animatedStyle}>
-      <TabBarIcon name={name} color={color} />
+    <Animated.View style={[animatedStyle, {height: BAR_HEIGHT, marginBottom: -7, justifyContent: "center"}]}>
+      <TabBarIcon name={name} color={color}/>
     </Animated.View>
   );
 }
 
+const BAR_HEIGHT = 54
+
 export default function TabsLayout() {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: mainColor }}>
       <Tabs
         initialRouteName="home"
         screenOptions={{
-          tabBarActiveTintColor: mainColor,
+          tabBarActiveTintColor: "opacity",
           tabBarInactiveTintColor: "#222",
           headerShown: false,
+          
           tabBarStyle: {
-            height: 60,
+            height: BAR_HEIGHT,
             shadowColor: "#000",
-            paddingBottom: 5,
             borderRadius: 30,
-            bottom: 10,
-            position: "absolute",
+            marginHorizontal: 20,
+            marginBottom: 20,
+            paddingBottom: 0,
+            
+            // bottom: 10,
+            // position: "absolute",
           },
-          tabBarLabelStyle: { opacity: 0, },
-          tabBarIconStyle: { marginBottom: -5, },
+          tabBarLabelStyle: { opacity: 0, height: 0},
+          // tabBarIconStyle: { marginBottom: -5, },
           tabBarHideOnKeyboard: true,
           tabBarLabelPosition: "below-icon",
         }}

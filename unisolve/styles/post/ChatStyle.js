@@ -9,11 +9,8 @@ export const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     flexDirection: "row",
-    bottom: 0,
-    position: "absolute",
     width: "100%",
     gap: 10,
-    backgroundColor: "white",
   },
   textInput: {
     flex: 1,
