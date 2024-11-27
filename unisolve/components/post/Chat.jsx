@@ -203,7 +203,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   }
 
   return (
-    <>
+    <View style={{height: "100%"}}>
       {String(post) === "0" ? (
         <View style={{ alignItems: "center", zIndex: 99 }}>
           <View style={{ width: "93%" }}>
@@ -223,72 +223,70 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
           </View>
         </View>
       ) : null}
-      <View style={{height: "100%"}}>
-        <View style={{ 
-          flex: 1,
-        }}>
-          <FlatList
-            ref={flatListRef} // FlatList 참조 추가
-            data={chatData}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString() || "0"}
-            contentContainerStyle={styles.container}
-            // onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
-            inverted
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          {!ban && isPrivate ? (
-            <>
-              <TouchableOpacity
-                style={{
-                  height: 30,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                }}
-                hitSlop={4}
-                onPress={() => {
-                  setIsAI(!isAI);
-                }}
-              >
-                <MaterialCommunityIcons
-                  name={isAI ? "checkbox-marked" : "checkbox-blank-outline"}
-                  size={24}
-                />
-                <View>
-                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
-                    AI와 대화
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </>
-          ) : null}
-          <BottomSheetTextInput
-            style={styles.textInput}
-            disabled={ban || !isPrivate}
-            placeholder={
-              ban
-                ? t("Function.forbidden")
-                : !isPrivate
-                ? "게시글이 비공개인 상태에서만 대화할 수 있습니다."
-                : t("Function.input_content")
-            }
-            value={message}
-            onChangeText={(text) => setMessage(text)}
-          />
-          <TouchableOpacity
-            disabled={ban || !isPrivate}
-            onPress={() => msgSend(true)}
-            style={[
-              styles.sendButton,
-              { backgroundColor: ban || !isPrivate ? "gray" : null },
-            ]}
-          >
-            <Text style={{ fontWeight: 600 }}>{t("Function.send")}</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={{ 
+        flex: 1,
+      }}>
+        <FlatList
+          ref={flatListRef} // FlatList 참조 추가
+          data={chatData}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString() || "0"}
+          contentContainerStyle={styles.container}
+          // onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
+          inverted
+        />
       </View>
-    </>
+      <View style={styles.inputContainer}>
+        {!ban && isPrivate ? (
+          <>
+            <TouchableOpacity
+              style={{
+                height: 30,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+              }}
+              hitSlop={4}
+              onPress={() => {
+                setIsAI(!isAI);
+              }}
+            >
+              <MaterialCommunityIcons
+                name={isAI ? "checkbox-marked" : "checkbox-blank-outline"}
+                size={24}
+              />
+              <View>
+                <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                  AI와 대화
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </>
+        ) : null}
+        <BottomSheetTextInput
+          style={styles.textInput}
+          disabled={ban || !isPrivate}
+          placeholder={
+            ban
+              ? t("Function.forbidden")
+              : !isPrivate
+              ? "게시글이 비공개인 상태에서만 대화할 수 있습니다."
+              : t("Function.input_content")
+          }
+          value={message}
+          onChangeText={(text) => setMessage(text)}
+        />
+        <TouchableOpacity
+          disabled={ban || !isPrivate}
+          onPress={() => msgSend(true)}
+          style={[
+            styles.sendButton,
+            { backgroundColor: ban || !isPrivate ? "gray" : null },
+          ]}
+        >
+          <Text style={{ fontWeight: 600 }}>{t("Function.send")}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
