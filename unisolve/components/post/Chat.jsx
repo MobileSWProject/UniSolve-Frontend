@@ -90,19 +90,28 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       console.log("소켓 연결하기3");
 
       socket.current.on("receive_message", (data) => {
-        console.log(data);
+        console.log("Received data:", data);
+
         setChatData((prevData) => {
-          const updatedData = [...prevData];
-          if (updatedData.length > 0) {
-            updatedData[0] = {
-              ...updatedData[0],
-              sent_at: checkDate(data.sent_at) || "",
+          const updatedData = [...prevData]; // 기존 데이터를 복사
+          const existingIndex = updatedData.findIndex(
+            (item) => item.time_id === data.time_id
+          );
+
+          if (existingIndex !== -1) {
+            // 기존 데이터가 존재하면 해당 인덱스의 데이터를 새 데이터로 교체
+            updatedData[existingIndex] = {
+              ...data,
+              is_me: data.sender === userId,
             };
+          } else {
+            // 기존 데이터가 없으면 새 데이터 추가
+            updatedData.unshift({
+              ...data,
+              is_me: data.sender === userId,
+            });
           }
-          if (!(updatedData[0]?.content === data.content)) {
-            const isMe = data.sender === userId;
-            updatedData.unshift({ ...data, is_me: isMe });
-          }
+
           return updatedData;
         });
       });
@@ -162,6 +171,8 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   // 메세지 보내기
   async function msgSend() {
     if (!message || message.length <= 0) return;
+
+    const time_id = `${Date.now()}-${userId}`;
     setMessage("");
     scrollToBottom();
     chatData.unshift({
@@ -169,10 +180,16 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       is_me: true,
       sent_at: t("Function.sending"),
       is_ai: isAI,
+      time_id: time_id,
     });
 
     const token = await AsyncStorage.getItem("token");
-    socket.current.emit("send_message", { room, message, token });
+    socket.current.emit("send_message", {
+      room,
+      message,
+      token,
+      time_id: time_id,
+    });
   }
 
   if (loading) {
