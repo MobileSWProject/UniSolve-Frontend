@@ -140,8 +140,7 @@
         "notice": "通知",
         "operation": "服务条款",
         "privacy": "隐私政策"
-    }
-,
+    },
     "Stage": {
         "success": "✅",
         "warning": "⚠️",
@@ -158,7 +157,6 @@
         "notification_4": "新回复",
         "convert": "更改为",
         "history": "帖子历史",
-        
         "history_empty": "没有可用的历史记录。",
         "sanction": "使用限制历史",
         "sanction_write": "由于违反运营政策，无法编辑帖子。",
@@ -226,6 +224,4 @@
         "input_final": "",
         "input_nofinal": ""
     }
-
-
 }

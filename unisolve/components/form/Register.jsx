@@ -128,7 +128,7 @@ export default function Register({ visible, setVisible }) {
     if (reProcess) return;
     try {
       if (reID.length <= 0 || !reIDCheck || !confirmID(true) || reName.length <= 0 || reEmail.length <= 0 || !reEmailCheck || !reEmailCheckTo || !confirmPW(true) || rePw !== rePwTo || reNickname.length <= 0) {
-        snackBar(`${t("Stage.failed")}${t("User.empty_content")}`);
+        snackBar(`${t("Stage.failed")}${t("Function.empty_content")}`);
         return;
       }
       setReProcess(true);

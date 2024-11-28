@@ -157,7 +157,6 @@
         "notification_4": "New Reply",
         "convert": "Change to",
         "history": "Post History",
-        
         "history_empty": "No history available.",
         "sanction": "Usage Restriction History",
         "sanction_write": "Post editing is not allowed due to a violation of operational policy.",
@@ -225,5 +224,4 @@
         "input_final": "",
         "input_nofinal": ""
     }
-
 }
