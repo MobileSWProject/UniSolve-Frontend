@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { Text } from "react-native";
+import { Text, ScrollView } from "react-native";
 import SnackBar from "../Snackbar";
 import Input from "./Input";
 import InputProcess from "./InputProcess";
@@ -50,21 +50,23 @@ export default function Delete({ visible, setVisible }) {
     <>
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("User.delete")}</Text>
       <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>{t("User.delete_notice")}</Text>
-      <Input
-        title={t("User.current_password")}
-        content={password}
-        onChangeText={(text) => setPassword(text)}
-        secure={true}
-      />
-      <InputProcess
-        visible={visible}
-        setVisible={setVisible}
-        onPress={() => { DeletedProcess(); }}
-        type="delete"
-        content={t("User.delete_go")}
-        cancel={deleting}
-        disabled={deleting}
-      />
+      <ScrollView>
+        <Input
+          title={t("User.current_password")}
+          content={password}
+          onChangeText={(text) => setPassword(text)}
+          secure={true}
+        />
+        <InputProcess
+          visible={visible}
+          setVisible={setVisible}
+          onPress={() => { DeletedProcess(); }}
+          type="delete"
+          content={t("User.delete_go")}
+          cancel={deleting}
+          disabled={deleting}
+        />
+      </ScrollView>
       <SnackBar
         visible={snackbarVisible}
         message={snackbarMessage}

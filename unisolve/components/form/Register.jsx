@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import { styles } from "../../styles/form/FormStyle";
 import { styles as FlatStyles } from "../../styles/tabs/List/ListStyles";
 import { accountCheck } from "../../utils/accountCheck";
@@ -157,38 +157,23 @@ export default function Register({ visible, setVisible }) {
   return (
     <>
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("User.regist")}</Text>
-      <Input
-        title={t("User.id")}
-        subTitle={confirmID()}
-        subTitleConfirm={reIDCheck}
-        content={reID}
-        onChangeText={(text) => inputReID(text)}
-        buttonDisabled={reIDCheck || !confirmID(true)}
-        buttonOnPress={async () => { if (confirmID(true)) { setReIDCheck(await accountCheck({ user_id: reID }, snackBar, t)); }}}
-      />
-      <Input
-        title={t("User.name")}
-        content={reName}
-        onChangeText={setReName}
-      />
-      <Input
-        title={t("User.email")}
-        subTitle=
-        {
-          reEmailCheck && reEmailCheckTo ?
-          t("User.email_confirm_success") :
-          t("User.email_confirm_failed")
-        }
-        subTitleConfirm={reEmailCheck && reEmailCheckTo}
-        content={reEmail}
-        onChangeText={(text) => inputEmail(text)}
-        buttonDisabled={reEmailCheck || !confirmEmail()}
-        buttonOnPress={() => { if (confirmEmail()) CheckProcessEmail(); }}
-      />
-      {
-      reEmailCheck ?
+      <ScrollView>
         <Input
-          title={t("User.email_number")}
+          title={t("User.id")}
+          subTitle={confirmID()}
+          subTitleConfirm={reIDCheck}
+          content={reID}
+          onChangeText={(text) => inputReID(text)}
+          buttonDisabled={reIDCheck || !confirmID(true)}
+          buttonOnPress={async () => { if (confirmID(true)) { setReIDCheck(await accountCheck({ user_id: reID }, snackBar, t)); }}}
+        />
+        <Input
+          title={t("User.name")}
+          content={reName}
+          onChangeText={setReName}
+        />
+        <Input
+          title={t("User.email")}
           subTitle=
           {
             reEmailCheck && reEmailCheckTo ?
@@ -196,73 +181,90 @@ export default function Register({ visible, setVisible }) {
             t("User.email_confirm_failed")
           }
           subTitleConfirm={reEmailCheck && reEmailCheckTo}
-          content={reEmailTo}
-          disabled={reEmailCheckTo}
-          maxLength={8}
-          onChangeText={(text) => setReEmailTo(text.replace(/[^0-9]/g, ""))}
-          buttonDisabled={reEmailCheckTo || !confirmEmail(true)}
-          buttonOnPress={() => { CheckProcessEmailTo(); }}
-        /> :
-        null
-      }
-      <Input
-        title={t("User.password")}
-        subTitle={confirmPW()}
-        subTitleConfirm={confirmPW(true)}
-        content={rePw}
-        onChangeText={(text) => inputPW(text)}
-        secure={true}
-      />
-      {
-      confirmPW(false) ?
+          content={reEmail}
+          onChangeText={(text) => inputEmail(text)}
+          buttonDisabled={reEmailCheck || !confirmEmail()}
+          buttonOnPress={() => { if (confirmEmail()) CheckProcessEmail(); }}
+        />
+        {
+        reEmailCheck ?
+          <Input
+            title={t("User.email_number")}
+            subTitle=
+            {
+              reEmailCheck && reEmailCheckTo ?
+              t("User.email_confirm_success") :
+              t("User.email_confirm_failed")
+            }
+            subTitleConfirm={reEmailCheck && reEmailCheckTo}
+            content={reEmailTo}
+            disabled={reEmailCheckTo}
+            maxLength={8}
+            onChangeText={(text) => setReEmailTo(text.replace(/[^0-9]/g, ""))}
+            buttonDisabled={reEmailCheckTo || !confirmEmail(true)}
+            buttonOnPress={() => { CheckProcessEmailTo(); }}
+          /> :
+          null
+        }
         <Input
-          title={t("User.password_confirm")}
-          placeholder={t("User.password_confirm_please")}
+          title={t("User.password")}
           subTitle={confirmPW()}
           subTitleConfirm={confirmPW(true)}
-          content={rePwTo}
-          onChangeText={setRePwTo}
+          content={rePw}
+          onChangeText={(text) => inputPW(text)}
           secure={true}
-        /> :
-        null
-      }
-      <Input
-        title={t("User.nickname")}
-        subTitle=
+        />
         {
-          reNicknameCheck ?
-          t("User.confirm_please_success") :
-          t("User.confirm_please")
+        confirmPW(false) ?
+          <Input
+            title={t("User.password_confirm")}
+            placeholder={t("User.password_confirm_please")}
+            subTitle={confirmPW()}
+            subTitleConfirm={confirmPW(true)}
+            content={rePwTo}
+            onChangeText={setRePwTo}
+            secure={true}
+          /> :
+          null
         }
-        subTitleConfirm={reNicknameCheck}
-        content={reNickname}
-        onChangeText={(text) => inputReNickname(text)}
-        buttonDisabled={reNicknameCheck || reNickname.length <= 0}
-        buttonOnPress={async () => setReNicknameCheck( await accountCheck({ nickname: reNickname }, snackBar))}
-      />
-      <Input
-        title={t("User.school")}
-        placeholder={t("User.school_confirm")}
-        content={reSchool}
-        onChangeText={(text) => setReSchool(text)}
-      />
-      {
-        searchSchool().length > 0 ?
-        <View style={FlatStyles.flatList}>
-          <FlatList
-            style={{ margin: 5, marginRight: 0 }}
-            data={searchSchool()}
-            keyExtractor={(item) => item.univ_id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => setReSchool(item.univ_name)}>
-                <Text style={styles.item}>{item.univ_name}</Text>
-              </TouchableOpacity>
-            )}
-            ListEmptyComponent={<Text style={styles.empty}></Text>}
-          />
-        </View> :
-        null
-      }
+        <Input
+          title={t("User.nickname")}
+          subTitle=
+          {
+            reNicknameCheck ?
+            t("User.confirm_please_success") :
+            t("User.confirm_please")
+          }
+          subTitleConfirm={reNicknameCheck}
+          content={reNickname}
+          onChangeText={(text) => inputReNickname(text)}
+          buttonDisabled={reNicknameCheck || reNickname.length <= 0}
+          buttonOnPress={async () => setReNicknameCheck( await accountCheck({ nickname: reNickname }, snackBar))}
+        />
+        <Input
+          title={t("User.school")}
+          placeholder={t("User.school_confirm")}
+          content={reSchool}
+          onChangeText={(text) => setReSchool(text)}
+        />
+        {
+          searchSchool().length > 0 ?
+          <View style={FlatStyles.flatList}>
+            <FlatList
+              style={{ margin: 5, marginRight: 0 }}
+              data={searchSchool()}
+              keyExtractor={(item) => item.univ_id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => setReSchool(item.univ_name)}>
+                  <Text style={styles.item}>{item.univ_name}</Text>
+                </TouchableOpacity>
+              )}
+              ListEmptyComponent={<Text style={styles.empty}></Text>}
+            />
+          </View> :
+          null
+        }
+      </ScrollView>
       <InputProcess
         visible={visible}
         setVisible={setVisible}

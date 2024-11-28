@@ -3,7 +3,7 @@ import InputProcess from "./InputProcess";
 import SnackBar from "../Snackbar";
 import { mainColor } from "../../constants/Colors";
 import { useState } from "react";
-import { Text } from "react-native";
+import { Text, ScrollView } from "react-native";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 import _axios from "../../api";
@@ -47,13 +47,15 @@ export default function Report({visible, setVisible, post, comment, setComment})
         onDismiss={() => setSnackbarVisible(false)}
       />
       <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{comment ? `${t("Function.comment")} ${t("Function.btn_report")}` : `${t("Function.post")} ${t("Function.btn_report")}`}</Text>
-      <Input
-        title={`${t("Function.report")} ${t("Function.content")}`}
-        placeholder={t("Function.report_please")}
-        content={reportReason}
-        onChangeText={setReportReason}
-        disabled={process}
-      />
+      <ScrollView>
+        <Input
+          title={`${t("Function.report")} ${t("Function.content")}`}
+          placeholder={t("Function.report_please")}
+          content={reportReason}
+          onChangeText={setReportReason}
+          disabled={process}
+        />
+      </ScrollView>
       <InputProcess
         visible={visible}
         setVisible={setVisible}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Text } from "react-native";
+import { Text, ScrollView } from "react-native";
 import SnackBar from "../Snackbar";
 import Input from "./Input";
 import InputProcess from "./InputProcess";
@@ -48,29 +48,31 @@ export default function FindAccount({ visible, setVisible }) {
       />
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("User.search_account")}</Text>
       <Text style={{ fontSize: 12, marginBottom: 10 }}>{t("User.search_account_subtitle")}</Text>
-      <Input
-        title={t("User.name")}
-        content={findName}
-        onChangeText={setFindName}
-        disabled={findSending}
-      />
-      <Input
-        title={t("User.email")}
-        content={findEmail}
-        onChangeText={setFindEmail}
-        disabled={findSending}
-      />
-      {
-        findName && findEmail ?
+      <ScrollView>
         <Input
-          title={`${t("User.id")}(${t("User.search_account_password_please")})`}
-          placeholder={t("User.id_please")}
-          content={findID}
-          onChangeText={setFindID}
+          title={t("User.name")}
+          content={findName}
+          onChangeText={setFindName}
           disabled={findSending}
-        /> :
-        null
-      }
+        />
+        <Input
+          title={t("User.email")}
+          content={findEmail}
+          onChangeText={setFindEmail}
+          disabled={findSending}
+        />
+        {
+          findName && findEmail ?
+          <Input
+            title={`${t("User.id")}(${t("User.search_account_password_please")})`}
+            placeholder={t("User.id_please")}
+            content={findID}
+            onChangeText={setFindID}
+            disabled={findSending}
+          /> :
+          null
+        }
+      </ScrollView>
       <InputProcess
         visible={visible}
         setVisible={setVisible}

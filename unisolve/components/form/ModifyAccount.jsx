@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Text } from "react-native";
+import { Text, ScrollView } from "react-native";
 import { accountCheck } from "../../utils/accountCheck";
 import { mainColor } from "../../constants/Colors";
 import SnackBar from "../Snackbar";
@@ -136,24 +136,9 @@ export default function Modify({ visible, setVisible, userData }) {
     <>
       <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)} />
       <Text style={{  fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{t("User.edit")}</Text>
-      <Input
-        title={t("User.email")}
-        subTitle=
-        {
-          emailCheck && emailChecks ?
-          t("User.email_confirm_success") :
-          t("User.email_confirm_failed")
-        }
-        subTitleConfirm={emailCheck && emailChecks}
-        content={email}
-        onChangeText={(text) => inputEmail(text)}
-        buttonDisabled={emailCheck || !confirmEmail(true) || emailProcess}
-        buttonOnPress={() => { if (confirmEmail(true)) CheckProcessEmail(); }}
-        disabled={editing}
-      />
-      {
-        !(user.email === email) && emailCheck ?
-        <Input title={t("User.email_number")}
+      <ScrollView>
+        <Input
+          title={t("User.email")}
           subTitle=
           {
             emailCheck && emailChecks ?
@@ -161,61 +146,78 @@ export default function Modify({ visible, setVisible, userData }) {
             t("User.email_confirm_failed")
           }
           subTitleConfirm={emailCheck && emailChecks}
-          content={emailConfirm}
-          maxLength={8}
-          disabled={emailChecks || editing}
-          onChangeText={(text) => setEmailConfirm(text.replace(/[^0-9]/g, ""))}
-          buttonDisabled={emailChecks || !confirmEmail(true)}
-          buttonOnPress={() => { CheckProcessEmailTo(); }}
-        /> :
-        null
-      }
-      <Input
-        title={t("User.password")}
-        placeholder={t("User.password_modify_please")}
-        subTitle={confirmPW()}
-        subTitleConfirm={confirmPW(true)}
-        content={newPassword}
-        onChangeText={(text) => inputPW(text)}
-        secure={true}
-        disabled={editing}
-      />
-      {
-        confirmPW(false) ?
+          content={email}
+          onChangeText={(text) => inputEmail(text)}
+          buttonDisabled={emailCheck || !confirmEmail(true) || emailProcess}
+          buttonOnPress={() => { if (confirmEmail(true)) CheckProcessEmail(); }}
+          disabled={editing}
+        />
+        {
+          !(user.email === email) && emailCheck ?
+          <Input title={t("User.email_number")}
+            subTitle=
+            {
+              emailCheck && emailChecks ?
+              t("User.email_confirm_success") :
+              t("User.email_confirm_failed")
+            }
+            subTitleConfirm={emailCheck && emailChecks}
+            content={emailConfirm}
+            maxLength={8}
+            disabled={emailChecks || editing}
+            onChangeText={(text) => setEmailConfirm(text.replace(/[^0-9]/g, ""))}
+            buttonDisabled={emailChecks || !confirmEmail(true)}
+            buttonOnPress={() => { CheckProcessEmailTo(); }}
+          /> :
+          null
+        }
         <Input
-          title={t("User.password_confirm")}
-          placeholder={t("User.password_modify_confirm_please")}
+          title={t("User.password")}
+          placeholder={t("User.password_modify_please")}
           subTitle={confirmPW()}
           subTitleConfirm={confirmPW(true)}
-          content={subPassword}
-          onChangeText={setSubPassword}
+          content={newPassword}
+          onChangeText={(text) => inputPW(text)}
           secure={true}
           disabled={editing}
-        /> :
-        null
-      }
-      <Input
-        title={t("User.nickname")}
-        subTitle=
+        />
         {
-          nicknameCheck ?
-          t("User.confirm_please_success") :
-          t("User.confirm_please")
+          confirmPW(false) ?
+          <Input
+            title={t("User.password_confirm")}
+            placeholder={t("User.password_modify_confirm_please")}
+            subTitle={confirmPW()}
+            subTitleConfirm={confirmPW(true)}
+            content={subPassword}
+            onChangeText={setSubPassword}
+            secure={true}
+            disabled={editing}
+          /> :
+          null
         }
-        subTitleConfirm={nicknameCheck}
-        content={nickname}
-        onChangeText={(text) => inputNickname(text)}
-        buttonDisabled={nicknameCheck || nickname.length <= 0}
-        buttonOnPress={async () => setNicknameCheck( await accountCheck({ nickname: nickname }, snackBar, t))}
-        disabled={editing}
-      />
-      <Input
-        title={t("User.current_password")}
-        content={password}
-        onChangeText={(text) => setPassword(text)}
-        secure={true}
-        disabled={editing}
-      />
+        <Input
+          title={t("User.nickname")}
+          subTitle=
+          {
+            nicknameCheck ?
+            t("User.confirm_please_success") :
+            t("User.confirm_please")
+          }
+          subTitleConfirm={nicknameCheck}
+          content={nickname}
+          onChangeText={(text) => inputNickname(text)}
+          buttonDisabled={nicknameCheck || nickname.length <= 0}
+          buttonOnPress={async () => setNicknameCheck( await accountCheck({ nickname: nickname }, snackBar, t))}
+          disabled={editing}
+        />
+        <Input
+          title={t("User.current_password")}
+          content={password}
+          onChangeText={(text) => setPassword(text)}
+          secure={true}
+          disabled={editing}
+        />
+      </ScrollView>
       <InputProcess
         visible={visible}
         setVisible={setVisible}

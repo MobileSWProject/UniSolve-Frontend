@@ -4,7 +4,7 @@ import InputProcess from "./InputProcess";
 import SnackBar from "../Snackbar";
 import { mainColor } from "../../constants/Colors";
 import { useState, useCallback } from "react";
-import { Text } from "react-native";
+import { Text, ScrollView } from "react-native";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 import _axios from "../../api";
@@ -60,13 +60,15 @@ export default function Report({visible, setVisible, comment, setComment}) {
         onDismiss={() => setSnackbarVisible(false)}
       />
       <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>댓글 수정하기</Text>
-      <Input
-        title={`${t("Function.comment")} ${t("Function.edited")}`}
-        placeholder={t("Function.input_content")}
-        content={commentContent}
-        onChangeText={setCommentContent}
-        disabled={process}
-      />
+      <ScrollView>
+        <Input
+          title={`${t("Function.comment")} ${t("Function.edited")}`}
+          placeholder={t("Function.input_content")}
+          content={commentContent}
+          onChangeText={setCommentContent}
+          disabled={process}
+        />
+      </ScrollView>
       <InputProcess
         visible={visible}
         setVisible={setVisible}
