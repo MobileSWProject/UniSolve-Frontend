@@ -158,7 +158,7 @@ export default function Register({ visible, setVisible }) {
     <>
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("User.regist")}</Text>
       <Input
-        title={t("User.regist")}
+        title={t("User.id")}
         subTitle={confirmID()}
         subTitleConfirm={reIDCheck}
         content={reID}
