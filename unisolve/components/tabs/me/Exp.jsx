@@ -1,5 +1,5 @@
 import { useFocusEffect } from "expo-router";
-import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useState, useCallback } from "react";
 import _axios from "../../../api";
 import { styles } from "../../../styles/tabs/me/ExpStyle";
@@ -63,8 +63,11 @@ export function ExpPage({setVisible}) {
   };
 
   useFocusEffect(
-    useCallback(async () => {
-      await getList();
+    useCallback(() => {
+      const getListCallback = async () => {
+        await getList();
+      };
+      getListCallback();
     }, [])
   );
 
@@ -83,9 +86,13 @@ export function ExpPage({setVisible}) {
           <Row data={listHeader} style={styles.head} textStyle={styles.headText}/>
           <Rows data={list} textStyle={styles.text}></Rows>
         </Table>
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: 10 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold"}}>{page}/{TotalPage}</Text>
-        </View>
+        {
+          process ?
+          <ActivityIndicator size="large" color={mainColor}/> :
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginTop: 10 }}>
+            <Text style={{ fontSize: 20, fontWeight: "bold"}}>{page}/{TotalPage}</Text>
+          </View>
+        }
         <View style={{ flexDirection: "row" }}>
           <TouchableOpacity
             disabled={process || page <= 1}
