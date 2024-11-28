@@ -1,5 +1,5 @@
 import { useRouter, useFocusEffect } from "expo-router";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 import styles from "../../styles/form/PostCreateStyle";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -25,12 +25,16 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
   const [isPrivate, setIsPrivate] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState();
-  const [items, setItems] = useState(categorys);
+  const [items, setItems] = useState([]);
   const [category, setCategory] = useState("");
   const [image, setImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
   const router = useRouter();
+
+  useEffect(()=>{
+    setItems([...categorys])
+  },[categorys])
 
   useFocusEffect(
     useCallback(() => {

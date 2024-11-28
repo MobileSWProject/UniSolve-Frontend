@@ -110,6 +110,8 @@ export default function Community() {
     }
   };
 
+
+  
   // 서버에서 데이터 가져오기
   const getList = async (tempPage, timestamp, postId, isForce = false, tempCategory = null) => {
     // isForce true인 경우 강제 새로고침
