@@ -31,12 +31,12 @@ export default function Modify({ visible, setVisible, userData }) {
 
   const EditProcess = async () => {
     if (editing || password.length <= 0 || !emailChecks || (newPassword.length > 0 && newPassword !== subPassword) || nickname.length <= 0) {
-      snackBar(`${t("Stage.failed")}${t("Function.empty_content")}`);
+      snackBar(`${t("Stage.failed")} ${t("Function.empty_content")}`);
       return;
     }
     try {
       setEditing(true);
-      snackBar(`${t("Stage.process")}${t("Function.edit_account_process")}`);
+      snackBar(`${t("Stage.process")} ${t("Function.edit_account_process")}`);
       const response = await _axios.put("/accounts", {
         current_password: password,
         email: email,
@@ -44,13 +44,13 @@ export default function Modify({ visible, setVisible, userData }) {
         user_nickname: nickname,
       });
       if (response.data.updated === true) {
-        snackBar(`${t("Stage.success")}${t("Function.edit_account_success")}`);
+        snackBar(`${t("Stage.success")} ${t("Function.edit_account_success")}`);
       }
       else {
-        snackBar(`${t("Stage.failed")}${t("Function.edit_account_failed")}`);
+        snackBar(`${t("Stage.failed")} ${t("Function.edit_account_failed")}`);
       }
     } catch {
-      snackBar(`${t("Stage.failed")}${t("User.error")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.error")}`);
     } finally {
       setTimeout(async () => { setVisible(false); setEditing(false); }, 2000);
     }
@@ -70,16 +70,16 @@ export default function Modify({ visible, setVisible, userData }) {
       if (emailProcess) return;
       setEmailProcess(true);
       const response = await accountCheck({ email: email }, snackBar, t);
-      snackBar(`${t("Stage.process")}${t("User.email_number_process")}`);
+      snackBar(`${t("Stage.process")} ${t("User.email_number_process")}`);
       if (response) {
         const responseTo = await _axios.post("/auth/send-code", { email: email });
         setEmailCheck(responseTo.data.isSent || false);
-        snackBar(`${t("Stage.success")}${t("User.email_number_success")}`);
+        snackBar(`${t("Stage.success")} ${t("User.email_number_success")}`);
       }
       setEmailProcess(false);
     } catch {
       setEmailCheck(false);
-      snackBar(`${t("Stage.failed")}${t("User.email_number_failed")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.email_number_failed")}`);
       setEmailProcess(false);
     }
   };
@@ -87,14 +87,14 @@ export default function Modify({ visible, setVisible, userData }) {
   const CheckProcessEmailTo = async () => {
     try {
       if (emailProcessTo) return;
-      snackBar(`${t("Stage.process")}${t("User.email_number_check")}`);
+      snackBar(`${t("Stage.process")} ${t("User.email_number_check")}`);
       setEmailProcessTo(true);
       const response = await _axios.post("/auth/verify-code", { email: email, code: emailConfirm });
-      snackBar(`${t("Stage.success")}${t("User.email_number_check_success")}`);
+      snackBar(`${t("Stage.success")} ${t("User.email_number_check_success")}`);
       setEmailChecks(response.data.isVerified || false);
       setEmailProcessTo(false);
     } catch {
-      snackBar(`${t("Stage.failed")}${t("User.email_number_check_failed")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.email_number_check_failed")}`);
       setEmailChecks(false);
       setEmailProcessTo(false);
     }

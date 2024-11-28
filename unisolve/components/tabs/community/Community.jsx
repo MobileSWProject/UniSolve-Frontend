@@ -36,7 +36,6 @@ export default function Community() {
   const [isRemain, setIsRemain] = useState(true); // 총 페이지 수 관리
   const [searchText, setSearchText] = useState("");
   const [process, setProcess] = useState(false); // 데이터 요청 중 여부
-  const [lastTimestamp, setLastTimestamp] = useState(null);
   const [lastPostId, setLastPostId] = useState(null);
   const [hasMore, setHasMore] = useState(true); // 더 가져올 데이터가 있는지 여부
   const [isSearching, setIsSearching] = useState(false);
@@ -113,7 +112,7 @@ export default function Community() {
 
   
   // 서버에서 데이터 가져오기
-  const getList = async (tempPage, timestamp, postId, isForce = false, tempCategory = null) => {
+  const getList = async (tempPage, postId, isForce = false, tempCategory = null) => {
     // isForce true인 경우 강제 새로고침
     // 단, isForce true로 요청될 때는 반드시 tempPage=1, timestamp=null, postId=null 로 요청되어야 합니다.
     if (isForce === false) {
@@ -122,12 +121,12 @@ export default function Community() {
     setProcess(true);
     setIsSearching(false);
     try {
-      const response = await _axios.get(`/posts?page=${tempPage}&last_timestamp=${timestamp || ""}&last_post_id=${postId || ""}&search=${searchText}&category_filter=${tempCategory || category}`);
+      const response = await _axios.get(`/posts?page=${tempPage}&last_post_id=${postId || ""}&search=${searchText}&category_filter=${tempCategory || category}`);
       setBan(response.data.ban);
 
       const newData = response.data.data || [];
       if (category && newData.length <= 0) {
-        snackBar(t("Function.post_empty"));
+        snackBar(`${t("Stage.warning")} ${t("Function.post_empty")}`);
       }
       setIsRemain(response.data.is_remain); // 총 페이지 수 설정
 
@@ -146,7 +145,6 @@ export default function Community() {
       // 마지막 게시글의 시간과 ID 저장
       const lastItem = newData[newData.length - 1];
       if (lastItem) {
-        setLastTimestamp(lastItem.timestamp);
         setLastPostId(lastItem.id);
         setHasMore(true);
       } else {
@@ -175,12 +173,12 @@ export default function Community() {
     if (process || !hasMore || !isRemain) return; // 중복 요청, 데이터 없음, 페이지 초과 방지
 
     setPage(nextPage); // 페이지 증가
-    await getList(nextPage, lastTimestamp, lastPostId); // 다음 페이지 데이터 요청
+    await getList(nextPage, lastPostId); // 다음 페이지 데이터 요청
   };
 
   // 0.5초 debounce
   const debouncedSearch = debounce(() => {
-    getList(1, null, null, true);
+    getList(1, null, true);
   }, 500);
 
   // 키워드 변경시
@@ -214,7 +212,7 @@ export default function Community() {
   const getRefreshData = async () => {
     // 명시적으로 기다리게 하기 => 새로고침 되도록 느끼도록
     await new Promise((resolve) => setTimeout(resolve, 1200));
-    await getList(1, null, null, true); // 첫 페이지 데이터 가져오기
+    await getList(1, null, true); // 첫 페이지 데이터 가져오기
   };
 
   // 새로고침
@@ -340,7 +338,7 @@ export default function Community() {
                 onPress={() => {
                   setCommunitys([]);
                   setCategory(item.value);
-                  getList(1, null, null, true, item.value);
+                  getList(1, null, true, item.value);
                 }}
               >
                 <Text style={{ color: "#fff", fontSize: 18, }}>{item.label}</Text>
@@ -403,7 +401,7 @@ export default function Community() {
                     <RefreshControl
                       refreshing={isRefreshing}
                       onRefresh={() => {
-                        getList(1, null, null, true);
+                        getList(1, null, true);
                       }}
                     />
                   ) : null

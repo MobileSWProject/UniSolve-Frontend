@@ -19,14 +19,14 @@ export default function Report({visible, setVisible, post, comment, setComment})
 
   const handleReport = async () => {
     if (reportReason.length < 1 || process) {
-      snackBar(t("Function.input_content"));
+      snackBar(`${t("Stage.warning")} ${t("Function.input_content")}`);
       return;
     }
     try {
       setProcess(true);
       const response = await _axios.post(`/reports`, { post_id: post, comment_id: comment || null, reason: reportReason });
       if (response.data.status === "success") {
-        snackBar(t("Function.report_success"));
+        snackBar(`${t("Stage.success")} ${t("Function.report_success")}`);
         setTimeout(() => { 
           setVisible(false);
           setProcess(false);
@@ -36,7 +36,7 @@ export default function Report({visible, setVisible, post, comment, setComment})
       }
     } catch {
       setProcess(false);
-      snackBar(t("Function.report_failed"));
+      snackBar(`${t("Stage.failed")} ${t("Function.report_failed")}`);
     }
   };
   return (

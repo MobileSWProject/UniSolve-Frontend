@@ -38,17 +38,17 @@ export default function Report({visible, setVisible, comment, setComment}) {
     try {
       if (process || commentContent.trim().length <= 0) {
         setCommentContent("");
-        snackBar(`${t("Stage.failed")}${t("Function.empty")}`);
+        snackBar(`${t("Stage.failed")} ${t("Function.empty")}`);
         return;
       }
       setProcess(true);
       const response = await _axios.put(`/comments/${comment}`, {content: commentContent});
       if (response.data.status === "success") {
-        snackBar(t("Function.edit"));
+        snackBar(`${t("Stage.success")} ${t("Function.edit")}`);
         setTimeout(() => { setVisible(false); setComment(null); setCommentContent(""); }, 2000);
       }
     } catch {
-      snackBar(t("Function.edit_failed"));
+      snackBar(`${t("Stage.failed")} ${t("Function.edit_failed")}`);
     }
   };
 

@@ -80,7 +80,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
     if (!commentContent || process) return;
     try {
       setProcess(true);
-      snackBar(t("Function.registering"));
+      snackBar(`${t("Stage.process")} ${t("Function.registering")}`);
       let data = JSON.stringify({
         post_id: post,
         content: commentContent,
@@ -95,9 +95,9 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
         commentsCount: updatedPost.data.data.comments_count,
       }));
       setProcess(false);
-      snackBar(t("Function.register_success"));
+      snackBar(`${t("Stage.success")} ${t("Function.register_success")}`);
     } catch {
-      snackBar(t("Function.register_failed"));
+      snackBar(`${t("Stage.failed")} ${t("Function.register_failed")}`);
       setProcess(false);
     } finally {
       setNewComment("");
@@ -110,7 +110,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
     try {
       if (process) return;
       setProcess(true);
-      snackBar(t("Function.deleting"));
+      snackBar(`${t("Stage.process")} ${t("Function.deleting")}`);
       await _axios.delete(`/comments/${targetCommentId}`);
       // 댓글 삭제 후 댓글 목록만 다시 불러옴
       const updatedPost = await _axios.get(`/posts/${post}`);
@@ -121,9 +121,9 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
         matched: {nickname: updatedPost.data.data.matched_nickname, status: updatedPost.data.data.matched_status}
       }));
       setProcess(false);
-      snackBar(t("Function.delete_success"));
+      snackBar(`${t("Stage.success")} ${t("Function.delete_success")}`);
     } catch {
-      snackBar(t("Function.delete_failed"));
+      snackBar(`${t("Stage.failed")} ${t("Function.delete_failed")}`);
       setProcess(false);
     }
   };
@@ -141,14 +141,14 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
       setProcess(false);
       if (response) {
         sheetRef.current?.close();
-        snackBar(t("Function.delete_success"));
+        snackBar(`${t("Stage.success")} ${t("Function.delete_success")}`);
         getList(1, null, null);
       } else {
-        snackBar(t("Function.delete_failed"));
+        snackBar(`${t("Stage.failed")} ${t("Function.delete_failed")}`);
       }
     } catch {
       setProcess(false);
-      snackBar(t("Function.delete_failed"));
+      snackBar(`${t("Stage.failed")} ${t("Function.delete_failed")}`);
     }
   };
 
@@ -189,7 +189,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
                   hitSlop={8}
                   onPress={() => {
                     if (ban) {
-                      snackBar(t("Function.sanction_write"));
+                      snackBar(`${t("Stage.failed")} ${t("Function.sanction_write")}`);
                     }
                     else {
                       setMode("edit");

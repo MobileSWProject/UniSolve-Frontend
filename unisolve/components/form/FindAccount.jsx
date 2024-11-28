@@ -23,17 +23,17 @@ export default function FindAccount({ visible, setVisible }) {
       if (findSending) return;
       let response;
       setFindSending(true);
-      snackBar(`${t("Stage.process")}${t("User.search_account_process")}`);
+      snackBar(`${t("Stage.process")} ${t("User.search_account_process")}`);
       if (findID.length === 0) {
         response = await _axios.post("/accounts/find_user_id", { name: findName, email: findEmail });
       } else if (findID.length > 0) {
         response = await _axios.post("/accounts/reset_password_request", { user_id: findID, username: findName, email: findEmail });
       }
       if (response.data.isSent || response.data.foundpw) {
-        snackBar(`${t("Stage.success")}${t("User.search_account_success")}`);
+        snackBar(`${t("Stage.success")} ${t("User.search_account_success")}`);
       }
     } catch {
-      snackBar(`${t("Stage.failed")}${t("User.search_account_failed")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.search_account_failed")}`);
     } finally {
       setTimeout(() => { setVisible(false); setFindSending(false); }, 2000);
     }

@@ -22,14 +22,14 @@ export default function Delete({ visible, setVisible }) {
   const DeletedProcess = async () => {
     try {
       if (deleting || !password) {
-        snackBar(`${t("Stage.failed")}${t("Function.empty_content")}`);
+        snackBar(`${t("Stage.failed")} ${t("Function.empty_content")}`);
         return;
       }
       setDeleting(true);
-      snackBar(`${t("Stage.process")}${t("User.delete_process")}`);
+      snackBar(`${t("Stage.process")} ${t("User.delete_process")}`);
       const response = await _axios.delete("/accounts", { data: { password } })
       if (response.data.deleted === true) {
-        snackBar(`${t("Stage.success")}${t("User.delete_success")}`);
+        snackBar(`${t("Stage.success")} ${t("User.delete_success")}`);
         setTimeout(async () => {
           setVisible(false);
           await AsyncStorage.clear();
@@ -38,7 +38,7 @@ export default function Delete({ visible, setVisible }) {
         }, 2000);
       }
     } catch {
-      snackBar(`${t("Stage.failed")}${t("User.delete_failed")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.delete_failed")}`);
       setTimeout(async () => {
         setDeleting(false);
         setVisible(false);
@@ -57,6 +57,7 @@ export default function Delete({ visible, setVisible }) {
           onChangeText={(text) => setPassword(text)}
           secure={true}
         />
+      </ScrollView>
         <InputProcess
           visible={visible}
           setVisible={setVisible}
@@ -66,7 +67,6 @@ export default function Delete({ visible, setVisible }) {
           cancel={deleting}
           disabled={deleting}
         />
-      </ScrollView>
       <SnackBar
         visible={snackbarVisible}
         message={snackbarMessage}

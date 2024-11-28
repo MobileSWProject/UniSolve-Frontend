@@ -48,7 +48,7 @@ export default function Home() {
           throw new Error("Not Login");
         } else { // 토큰 유효
           setCertification(true);
-          snackBar(`${t("Stage.success")}${t("User.already")}`);
+          snackBar(`${t("Stage.success")} ${t("User.already")}`);
           setTimeout(() => { router.replace("/home"); }, 1500);
         }
       } catch (error) {
@@ -72,16 +72,16 @@ export default function Home() {
         Animated.timing(sendOpacity, { toValue: 0, duration: 500, useNativeDriver: true }) // 비행기가 오른쪽으로 이동
       ]).start();
       if (checkID) {
-        snackBar(`${t("Stage.process")}${t("User.login_process")}`);
+        snackBar(`${t("Stage.process")} ${t("User.login_process")}`);
         const response = await _axios.post("/auth/login", JSON.stringify({ user_id: id, password: pw })); // 로그인 프로세스
         const token = response.data.token;
         if (token) {
           await AsyncStorage.setItem("token", token); // 토큰 저장
-          snackBar(`${t("Stage.success")}${t("User.login_success")}`);
+          snackBar(`${t("Stage.success")} ${t("User.login_success")}`);
           setLoginCheck(true);
           setTimeout(() => { router.replace("/(app)/(tabs)/home"); }, 1000);
         } else {
-          snackBar(`${t("Stage.failed")}${t("User.login_failed")}`);
+          snackBar(`${t("Stage.failed")} ${t("User.login_failed")}`);
         }
         setSending(false);
       } else {
@@ -94,7 +94,7 @@ export default function Home() {
             Animated.timing(pwPosition, { toValue: 0, duration: 500, useNativeDriver: true }) // 아이디가 유효하면, 비밀번호 입력란 정위치
           ]).start();
         } else {
-          snackBar(`${t("Stage.failed")}${t("User.account_notfound")}`);
+          snackBar(`${t("Stage.failed")} ${t("User.account_notfound")}`);
         }
       }
     } catch {

@@ -49,26 +49,26 @@ export default function Register({ visible, setVisible }) {
       setReEmailProcess(true);
       const response = await accountCheck({ email: reEmail }, snackBar, t);
       if (response) {
-        snackBar(`${t("Stage.process")}${t("User.email_number_process")}`);
+        snackBar(`${t("Stage.process")} ${t("User.email_number_process")}`);
         const responseTo = await _axios.post("/auth/send-code", { email: reEmail });
         setReEmailCheck(responseTo.data.isSent || false);
         setReEmailProcess(false);
-        snackBar(`${t("Stage.success")}${t("User.email_number_success")}`);
+        snackBar(`${t("Stage.success")} ${t("User.email_number_success")}`);
       }
     } catch {
       setReEmailCheck(false);
       setReEmailProcess(false);
-      snackBar(`${t("Stage.failed")}${t("User.email_number_failed")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.email_number_failed")}`);
     }
   };
 
   const CheckProcessEmailTo = async () => {
     try {
-      snackBar(`${t("Stage.process")}${t("User.email_number_check")}`);
+      snackBar(`${t("Stage.process")} ${t("User.email_number_check")}`);
       const response = await _axios.post("/auth/verify-code", { email: reEmail, code: reEmailTo });
       setReEmailCheckTo(response.data.isVerified || false);
     } catch {
-      snackBar(`${t("Stage.failed")}${t("User.email_number_check_failed")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.email_number_check_failed")}`);
       setReEmailCheckTo(false);
     }
   };
@@ -128,18 +128,18 @@ export default function Register({ visible, setVisible }) {
     if (reProcess) return;
     try {
       if (reID.length <= 0 || !reIDCheck || !confirmID(true) || reName.length <= 0 || reEmail.length <= 0 || !reEmailCheck || !reEmailCheckTo || !confirmPW(true) || rePw !== rePwTo || reNickname.length <= 0) {
-        snackBar(`${t("Stage.failed")}${t("Function.empty_content")}`);
+        snackBar(`${t("Stage.failed")} ${t("Function.empty_content")}`);
         return;
       }
       setReProcess(true);
-      snackBar(`${t("Stage.process")}${t("User.regist_process")}`);
+      snackBar(`${t("Stage.process")} ${t("User.regist_process")}`);
       const response = await _axios.post("/auth/register", { user_id: reID, username: reName, email: reEmail, password: rePw, user_nickname: reNickname,school: reSchool });
       if (response.data.status === "success") {
-        snackBar(`${t("Stage.success")}${t("User.regist_success")}`);
+        snackBar(`${t("Stage.success")} ${t("User.regist_success")}`);
         setTimeout(() => { setVisible(false); setReProcess(false); }, 2000);
       }
     } catch {
-      snackBar(`${t("Stage.failed")}${t("User.regist_failed")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.regist_failed")}`);
       setReProcess(false);
     }
   };

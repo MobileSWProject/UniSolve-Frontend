@@ -8,13 +8,11 @@ export const styles = StyleSheet.create({
     width: "100%",
   },
   inputTo: {
-    width: "100%",
     height: 44,
     borderColor: "#fff",
     borderWidth: 1.4,
     borderRadius: 6,
     paddingHorizontal: 10,
-    color: "#fff",
     borderColor: "#000",
     color: "#000",
     marginTop: 5,

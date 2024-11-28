@@ -67,14 +67,14 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
       });
       setProcess(false);
       if (response.data.status === "success") {
-        snackBar(t("Function.edit"));
+        snackBar(`${t("Stage.process")} ${t("Function.edit")}`);
         setMode("post");
       } else {
-        snackBar(t("Function.edit_failed"));
+        snackBar(`${t("Stage.failed")} ${t("Function.edit_failed")}`);
         setProcess(false);
       }
     } catch (error) {
-      snackBar(t("Function.edit_failed"));
+      snackBar(`${t("Stage.failed")} ${t("Function.edit_failed")}`);
       setProcess(false);
     }
   };
@@ -85,7 +85,7 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
     takePhoto: async () => {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
-        snackBar(t("Function.permission_camera"));
+        snackBar(`${t("Stage.failed")} ${t("Function.permission_camera")}`);
         return;
       }
       const result = await ImagePicker.launchCameraAsync({
@@ -102,7 +102,7 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
     attachPhoto: async () => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        snackBar(t("Function.permission_image"));
+        snackBar(`${t("Stage.failed")} ${t("Function.permission_image")}`);
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -124,11 +124,11 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
   // 이미지 및 폼 데이터 전송
   const handleSubmit = async () => {
     if (!value || value <= 0) {
-      snackBar(`${t("Stage.failed")}${t("Function.empty_category")}`);
+      snackBar(`${t("Stage.failed")} ${t("Function.empty_category")}`);
       return;
     }
     if (title.trim() === "" || content.trim() === "") {
-      snackBar(`${t("Stage.failed")}${t("Function.empty")}`);
+      snackBar(`${t("Stage.failed")} ${t("Function.empty")}`);
       return;
     }
     const data = new FormData();
@@ -145,15 +145,15 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
       }
     }
 
-    snackBar(`${t("Stage.process")}${t("Function.registering")}`);
+    snackBar(`${t("Stage.process")} ${t("Function.registering")}`);
     setProcess(true);
     try {
       const response = await formFetch("/posts", data);
       const postId = response.postId;
-      snackBar(`${t("Stage.success")}${t("Function.register_success")}`);
+      snackBar(`${t("Stage.success")} ${t("Function.register_success")}`);
       setTimeout(() => { setPost(postId); setMode("post"); setProcess(false); }, 2000);
     } catch {
-      snackBar(t("User.error"));
+      snackBar(`${t("Stage.failed")} ${t("User.error")}`);
       if (error.response && (error.response.status === 400 || error.response.status === 401)) {
         router.replace("/notfound");
       }
