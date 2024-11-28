@@ -42,7 +42,7 @@ export const styles = StyleSheet.create({
   flatList: {
     width: "93%",
     maxHeight: 100,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: "black",
     borderTopWidth: 0,
   },
