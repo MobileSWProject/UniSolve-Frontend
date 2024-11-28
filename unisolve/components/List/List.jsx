@@ -7,11 +7,9 @@ import formatAuthor from "../../utils/formatAuthor";
 import _axios from "../../api";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
-import { router } from "expo-router";
 import { mainColor } from "../../constants/Colors";
 
 export default function PostListItem({ item, type, bottomView, setVisible, setUser, getList }) {
- 
 
   const { t } = useTranslation();
   const router = useRouter();
@@ -31,6 +29,7 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
 
   return (
     <TouchableOpacity
+      disabled={type === "notification" && item.type === 0}
       style={[
         styles.main,
         (type === "history" && item.private) || (type === "notification" && !item.check) || (type === "users") ?
@@ -45,6 +44,7 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
         if (type === "sanction") {
         }
         else if (type === "notification") {
+          if (type === "notification" && item.type === 0) return;
           await updateNotification(item.not_id);
           router.push(`community?post=${item.id}&history=True`);
         }

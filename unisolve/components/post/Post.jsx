@@ -2,7 +2,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useRouter } from "expo-router";
 import Input from "../../components/form/Input";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View, RefreshControl} from "react-native";
 import styles from "../../styles/post/PostStyles";
 import { useCallback, useState, useEffect } from "react";
 import _axios from "../../api";
@@ -27,6 +27,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
   const [editComment, setEditComment] = useState("");
   const { userId } = useUserId(); // 커스텀 훅으로 userId 불러오기
   const { selectedComment, setSelectedComment } = useReplyCommentId();
+  const [isRefreshing, setIsRefreshing] = useState(false); // 새로고침 상태 관리
   const router = useRouter();
   // selectedComment가 변경될 때마다 replyComment 초기화
   useEffect(() => {
@@ -36,42 +37,42 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
   }, [selectedComment]);
 
   useEffect(() => {
-    const getData = async () => {
-      if (process) return;
-      setProcess(true);
-  
-      try {
-        const response = await _axios.get(`/posts/${post}`);
-        setProcess(false);
-        setBan(response.data.data.ban);
-        setData({
-          id: response.data.data.id,
-          exp: response.data.data.exp,
-          private: Boolean(response.data.data.is_private),
-          authorId: formatAuthor(response.data.data.author_id || null),
-          nickname: formatAuthor(response.data.data.author_nickname || `@undefined`),
-          authorExp: response.data.data.author_exp,
-          private: response.data.data.is_private,
-          category: response.data.data.category,
-          title: response.data.data.title,
-          content: response.data.data.description,
-          timestamp: response.data.data.timestamp,
-          image: response.data.data.image,
-          comments: response.data.data.comments,
-          commentsCount: response.data.data.comments_count,
-          matched: {
-            nickname: response.data.data.matched_nickname,
-            status: response.data.data.matched_status,
-          },
-        });
-      } catch (error) {
-        setProcess(false);
-        router.replace("community");
-      }
-    };
-  
     getData();
   }, [post]);
+
+  const getData = async () => {
+    if (process) return;
+    setProcess(true);
+
+    try {
+      const response = await _axios.get(`/posts/${post}`);
+      setProcess(false);
+      setBan(response.data.data.ban);
+      setData({
+        id: response.data.data.id,
+        exp: response.data.data.exp,
+        private: Boolean(response.data.data.is_private),
+        authorId: formatAuthor(response.data.data.author_id || null),
+        nickname: formatAuthor(response.data.data.author_nickname || `@undefined`),
+        authorExp: response.data.data.author_exp,
+        private: response.data.data.is_private,
+        category: response.data.data.category,
+        title: response.data.data.title,
+        content: response.data.data.description,
+        timestamp: response.data.data.timestamp,
+        image: response.data.data.image,
+        comments: response.data.data.comments,
+        commentsCount: response.data.data.comments_count,
+        matched: {
+          nickname: response.data.data.matched_nickname,
+          status: response.data.data.matched_status,
+        },
+      });
+    } catch (error) {
+      setProcess(false);
+      router.replace("community");
+    }
+  };
 
   // 댓글 또는 대댓글 추가 로직
   const handleAddComment = async (isReply) => {
@@ -156,7 +157,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
   }
 
   return (
-    <KeyboardAwareScrollView style={styles.container}>
+    <KeyboardAwareScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={getData} />}>
       <View style={styles.contentContainer}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
           <View style={{ flexDirection: "row" }}>
