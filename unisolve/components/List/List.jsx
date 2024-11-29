@@ -32,8 +32,10 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
       disabled={type === "notification" && item.type === 0}
       style={[
         styles.main,
-        (type === "history" && item.private) || (type === "notification" && !item.check) || (type === "users") ?
+        (type === "history" && item.private) || (type === "notification" && !item.check) ?
         { backgroundColor: "#BABABA" } :
+        type === "users" ?
+        { backgroundColor: "#EEEEEE" } :
         null,
       ]}
       onPress={async () => {

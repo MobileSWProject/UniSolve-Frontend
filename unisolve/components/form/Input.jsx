@@ -17,7 +17,8 @@ export default function Input({
   buttonDisabled,
   buttonOnPress,
   buttonText,
-  textArea
+  textArea,
+  comment,
 }) {
   const { t } = useTranslation();
 
@@ -41,7 +42,7 @@ export default function Input({
       </Text>
       <View style={styles.view}>
         <TextInput
-          style={[styles.inputTo, title && textArea ? { height: 280 } : null, {width: buttonOnPress ? "80%" : "100%"}]}
+          style={[styles.inputTo, title && textArea ? { height: 280 } : null, {width: comment ? "94%" : buttonOnPress ? "80%" : "100%"}]}
           placeholder={placeholder ? placeholder : `${title}${lastConvert(title)} ${t("Function.input")}`}
           value={content}
           onChangeText={onChangeText}

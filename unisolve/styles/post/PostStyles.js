@@ -100,7 +100,8 @@ const styles = StyleSheet.create({
   // 댓글 입력 필드 스타일
   commentInputContainer: {
     flexDirection: "row",
-    padding: 15,
+    marginBottom: 15,
+    width: "100%",
     backgroundColor: "#f8f8f8",
     alignItems: "center",
   },

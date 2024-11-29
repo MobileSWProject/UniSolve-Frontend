@@ -1,27 +1,71 @@
-import { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
+import { View } from "react-native";
 import { Tabs } from "expo-router";
 import { TabBarIcon } from "../../../components/navigation/TabBarIcon";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useSharedValue, useAnimatedStyle, withTiming, interpolateColor  } from "react-native-reanimated";
 import { useFocusEffect } from "@react-navigation/native";
-import { View, TouchableOpacity } from "react-native";
 import { mainColor } from "../../../constants/Colors";
 
 function AnimatedIcon({ name, color, focused }) {
-  const scale = useSharedValue(1);
+  const scale = useSharedValue(focused ? 1.2 : 1); // 아이콘 크기
+  const translateY = useSharedValue(0); // 원형 배경 위치 (Y축)
+  const backgroundColor = useSharedValue(mainColor); // 배경 색상 애니메이션 값
+
+  // 아이콘 크기 및 원형 배경 애니메이션
   useFocusEffect(
     useCallback(() => {
-      scale.value = withTiming(focused ? 1.35 : 1, { duration: 200 }); // 아이콘을 누르면 점점 커짐
-    }, [focused])
+      // `focused` 값이 변경될 때마다 애니메이션 실행
+      scale.value = withTiming(focused ? 1.35 : 1, { 
+        duration: 300, 
+        easing: Easing.out(Easing.ease),
+      });
+
+      // 원형 배경의 위치 애니메이션
+      translateY.value = withTiming(focused ? -3 : 0, { duration: 200 });
+
+      // 초기화하는 애니메이션 (같은 탭을 다시 눌렀을 때)
+      return () => {
+        scale.value = withTiming(1, { duration: 200 });
+        translateY.value = withTiming(0, { duration: 200 });
+
+        backgroundColor.value = withTiming(focused ? mainColor : "white", { duration: 200 });
+      };
+    }, [focused]) // `focused`가 변경될 때마다 애니메이션 실행
   );
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+  // 애니메이션 스타일 정의
+  const animatedBackgroundStyle = useAnimatedStyle(() => ({
+    width: scale.value * 40, // 원형 배경 크기 (아이콘 크기에 비례)
+    height: scale.value * 45,
+    borderRadius: 50, // 원형 모양 (가로/세로 길이가 같아야 원)
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+    transform: [
+      { translateY: translateY.value }
+    ],
+    backgroundColor: interpolateColor(
+      scale.value,   // scale 값에 따라 색상 변화
+      [1, 1.01],     // 1에서 1.35까지 확대될 때
+      ["transparent", mainColor] // 색상 변환: 작은 값은 white, 큰 값은 mainColor
+    ),
+  }));
+
+  const animatedIconStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <Animated.View style={[animatedStyle, {height: BAR_HEIGHT, marginBottom: -7, justifyContent: "center"}]}>
-      <TabBarIcon name={name} color={color}/>
-    </Animated.View>
+    <View style={{ justifyContent: "center", alignItems: "center" }}>
+      <Animated.View style={[animatedBackgroundStyle]} />
+      <Animated.View style={[animatedIconStyle]}>
+        <TabBarIcon name={name} color={color} />
+      </Animated.View>
+    </View>
   );
 }
 
-const BAR_HEIGHT = 54
+const BAR_HEIGHT = 54;
 
 export default function TabsLayout() {
   return (
@@ -29,23 +73,17 @@ export default function TabsLayout() {
       <Tabs
         initialRouteName="home"
         screenOptions={{
-          tabBarActiveTintColor: "opacity",
-          tabBarInactiveTintColor: "#222",
+          tabBarActiveTintColor: "white",
+          tabBarInactiveTintColor: "#CCC",
           headerShown: false,
-          
           tabBarStyle: {
+            backgroundColor: "white",
             height: BAR_HEIGHT,
-            shadowColor: "#000",
             borderRadius: 30,
-            marginHorizontal: 20,
-            marginBottom: 20,
-            paddingBottom: 0,
-            
-            // bottom: 10,
-            // position: "absolute",
+            marginHorizontal: 15,
+            marginBottom: 15,
           },
-          tabBarLabelStyle: { opacity: 0, height: 0},
-          // tabBarIconStyle: { marginBottom: -5, },
+          tabBarLabelStyle: { opacity: 0, fontWeight: "bold", marginTop: 5 },
           tabBarHideOnKeyboard: true,
           tabBarLabelPosition: "below-icon",
         }}
@@ -54,25 +92,27 @@ export default function TabsLayout() {
           name="home"
           options={{
             title: "Home",
-            tabBarIcon: ({ color, focused }) => ( <AnimatedIcon name={focused ? "home-variant" : "home-variant-outline"} color={color} focused={focused} /> ),
-            // tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} />
-            // ),
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedIcon name={focused ? "home-variant" : "home-variant-outline"} color={color} focused={focused} />
+            ),
           }}
         />
         <Tabs.Screen
           name="community"
           options={{
             title: "Community",
-            tabBarIcon: ({ color, focused }) => ( <AnimatedIcon name={focused ? "chat-processing" : "chat-processing-outline"} color={color} focused={focused} /> ),
-            // tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} /> ),
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedIcon name={focused ? "chat-processing" : "chat-processing-outline"} color={color} focused={focused} />
+            ),
           }}
         />
         <Tabs.Screen
           name="me"
           options={{
             title: "Me",
-            tabBarIcon: ({ color, focused }) => ( <AnimatedIcon name={focused ? "account" : "account-outline"} color={color} focused={focused} /> ),
-            // tabBarButton: (props) => ( <TouchableOpacity {...props} onPress={() => { props.onPress(); }} /> ),
+            tabBarIcon: ({ color, focused }) => (
+              <AnimatedIcon name={focused ? "account" : "account-outline"} color={color} focused={focused} />
+            ),
           }}
         />
       </Tabs>

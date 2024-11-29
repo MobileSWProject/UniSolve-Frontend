@@ -16,6 +16,7 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
   );
   return (
     <BottomSheet
+      style={{  position: 'relative',position: 'absolute', zIndex: 99999,}}
       ref={sheetRef}
       snapPoints={["1%", "35%", "95%"]}
       index={-1}
@@ -27,9 +28,9 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
       <TouchableOpacity
         style={{ position: "absolute", zIndex: 999, left: 10 }}
         onPress={() => {
-          if (mode === "chat" || mode === "edit") return setMode("post");
-          setMode("");
+          if ((mode === "chat" && post > 0) || mode === "edit") return setMode("post");
           sheetRef.current?.close();
+          setMode("");
         }}
       >
         <Feather name="x" size={30} color="black" />

@@ -1,8 +1,10 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useRouter } from "expo-router";
+import Markdown from "react-native-markdown-display";
+import SyntaxHighlighter from "react-native-syntax-highlighter";
 import Input from "../../components/form/Input";
-import { Image, Text, TouchableOpacity, View, RefreshControl} from "react-native";
+import { Image, Text, TouchableOpacity, View, RefreshControl, ScrollView } from "react-native";
 import styles from "../../styles/post/PostStyles";
 import { useCallback, useState, useEffect } from "react";
 import _axios from "../../api";
@@ -77,7 +79,11 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
   // 댓글 또는 대댓글 추가 로직
   const handleAddComment = async (isReply) => {
     const commentContent = isReply ? replyComment : newComment;
-    if (!commentContent || process) return;
+    if (process) return;
+    if (!commentContent) {
+      snackBar(`${t("Stage.failed")} ${t("Function.empty")}`);
+      return;
+    }
     try {
       setProcess(true);
       snackBar(`${t("Stage.process")} ${t("Function.registering")}`);
@@ -245,7 +251,45 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{data.title}</Text>
         </View>
-        <Text style={styles.content}>{data.content}</Text>
+        <Markdown style={{ body: { fontSize: 14 }, fence: { backgroundColor: "black", color: "white" }, code_inline: { backgroundColor: "opacity", border: "none", fontWeight: 700, padding: 0 }, }}
+          rules={{
+            fence: (node) => {
+              const language = node.sourceInfo || "text";
+              const content = node.content || "";
+              return (
+                <ScrollView
+                  key={node.key}
+                  horizontal={true}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={true}
+                  style={{ width: "100%" }}
+                  contentContainerStyle={{
+                    flexGrow: 1,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <View style={{ width: "100%", flexDirection: "row" }}>
+                    <SyntaxHighlighter
+                      key={node.key}
+                      language={language}
+                      highlighter={"prism"}
+                      customStyle={{
+                        width: "100%",
+                        overflowX: "hidden",
+                        overflowY: "hidden",
+                      }}
+                      pointerEvents="none"
+                    >
+                      {content}
+                    </SyntaxHighlighter>
+                  </View>
+                </ScrollView>
+              );
+            },
+          }}
+        >
+          {data.content}
+      </Markdown>
         {data.image && (
           <Image source={{ uri: data.image }} style={styles.image} />
         )}
@@ -267,6 +311,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
             buttonOnPress={() => handleAddComment(false)}
             disabled={ban || process}
             textArea={true}
+            comment={true}
           />
         </View>
         {data.comments.map((commentData, index) => (

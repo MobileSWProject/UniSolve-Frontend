@@ -131,6 +131,7 @@ const CommentSection = ({
             buttonOnPress={() => handleAddComment(true)}
             disabled={ban}
             textArea={true}
+            comment={true}
           />
         </View>
       )}

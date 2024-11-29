@@ -42,8 +42,8 @@ export default function SelectUser({ visible, setVisible, post }) {
       {
         users && users.length > 0 ?
         <>
-        <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold" }}>{t("Function.matching_alert")}</Text>
-        <Text style={{ textAlign: "center", fontSize: 25, fontWeight: "bold" }}>{`${t("Function.matching_select")}: ${user}\n`}</Text>
+        <Text style={{ textAlign: "center", color: "#ff0000", fontWeight: "bold", marginTop: 5 }}>{t("Function.matching_alert")}</Text>
+        <Text style={{ textAlign: "center", fontSize: 25, fontWeight: "bold", marginTop: 10, marginBottom: 10 }}>{`${t("Function.matching_select")}: ${user}\n`}</Text>
         <FlatList
           style={{width: "100%"}}
           ref={flatListRef}

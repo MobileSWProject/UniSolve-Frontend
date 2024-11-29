@@ -1,7 +1,7 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import { useFocusEffect } from '@react-navigation/native';
 import { useLocalSearchParams } from "expo-router";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FlatList, StyleSheet, Text, TextInput, View, TouchableOpacity, RefreshControl, Platform } from "react-native";
 import _axios from "../../../api";
 import List from "../../../components/List/List";
@@ -109,8 +109,6 @@ export default function Community() {
     }
   };
 
-
-  
   // 서버에서 데이터 가져오기
   const getList = async (tempPage, postId, isForce = false, tempCategory = null) => {
     // isForce true인 경우 강제 새로고침
@@ -328,7 +326,7 @@ export default function Community() {
         <FlatList
           ref={flatListRef}
           data={items}
-          style={{marginBottom: 14, borderBottomWidth: 2, borderBottomColor: "white", borderRadius: 6}}
+          style={{marginBottom: 14 }}
           keyExtractor={(item) => item.value.toString()}  
           renderItem={({ item }) => {
             return (
