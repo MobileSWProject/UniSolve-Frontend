@@ -204,12 +204,9 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       message: message.startsWith("data:image/png") ? "" : message,
       token,
       time_id: time_id,
-<<<<<<< HEAD
-      image: message.startsWith("data:image/png") ? message : ""
-=======
       is_ai: isAI,
-      be_ip: process.env.EXPO_PUBLIC_SERVER_BASE_URL
->>>>>>> 4dcf2049bcde2052713dd5f77140c2d34de2d52c
+      be_ip: process.env.EXPO_PUBLIC_SERVER_BASE_URL,
+      image: message.startsWith("data:image/png") ? message : ""
     });
   }
 
