@@ -44,6 +44,7 @@ export default function Community() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const lastPostRef = useRef(null); // 이전 post ID를 저장하는 useRef
   const [viewMessage, setViewMessage] = useState("");
+  const [lagacy, setLagacy] = useState(false);
 
   const firstRender = useRef(true)
 
@@ -411,22 +412,24 @@ export default function Community() {
         </>
       </AnimatedView>
       <BottomView
-          sheetRef={sheetRef}
-          ban={ban}
-          mode={mode}
-          setMode={setMode}
-          post={postID}
-          setPost={setPostID}
-          snackBar={snackBar}
-          getList={getList}
-          categorys={items}
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-          modalType={modalType}
-          setModalType={setModalType}
-          setComment={setCommentID}
-          setViewMessage={setViewMessage}
-        />
+        sheetRef={sheetRef}
+        ban={ban}
+        mode={mode}
+        setMode={setMode}
+        post={postID}
+        setPost={setPostID}
+        snackBar={snackBar}
+        getList={getList}
+        categorys={items}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        modalType={modalType}
+        setModalType={setModalType}
+        setComment={setCommentID}
+        setViewMessage={setViewMessage}
+        lagacy={lagacy}
+        setLagacy={setLagacy}
+      />
       <View>
         <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} post={postID} comment={commentID} setComment={setCommentID} viewMessage={viewMessage}/>
       </View>

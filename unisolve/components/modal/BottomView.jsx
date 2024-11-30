@@ -8,7 +8,7 @@ import Post from "../post/Post";
 import Chat from "../post/Chat";
 import Feather from "@expo/vector-icons/Feather";
 
-export default function BottomView({ sheetRef, mode, setMode, post, setPost, snackBar, getList, categorys, modalVisible, setModalVisible, modalType, setModalType, setComment, setViewMessage }) {
+export default function BottomView({ sheetRef, mode, setMode, post, setPost, snackBar, getList, categorys, modalVisible, setModalVisible, modalType, setModalType, setComment, setViewMessage, lagacy, setLagacy }) {
   useFocusEffect(
     useCallback(() => {
       if (!mode) sheetRef.current?.close();
@@ -31,7 +31,15 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
       <TouchableOpacity
         style={{ position: "absolute", zIndex: 999, left: 10 }}
         onPress={() => {
-          if ((mode === "chat" && post > 0) || mode === "edit") return setMode("post");
+          if (lagacy) {
+            setMode("chat")
+            setPost(0);
+            setLagacy(false);
+            return;
+          }
+          if ((mode === "chat" && post > 0) || mode === "edit") {
+            return setMode("post");
+          }
           sheetRef.current?.close();
           setMode("");
         }}
@@ -67,11 +75,13 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
             sheetRef={sheetRef}
             setMode={setMode}
             post={post}
+            setPost={setPost}
             mode={mode}
             snackBar={snackBar}
             setModalVisible={setModalVisible}
             setModalType={setModalType}
             setViewMessage={setViewMessage}
+            setLagacy={setLagacy}
           /> :
           null
         }

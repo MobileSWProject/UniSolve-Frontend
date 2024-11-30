@@ -14,7 +14,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { mainColor } from "../../constants/Colors";
 
-export default function CommunityChat({ sheetRef, setMode, post, snackBar, setModalVisible, setModalType, setViewMessage }) {
+export default function CommunityChat({ sheetRef, setMode, post, setPost, snackBar, setModalVisible, setModalType, setViewMessage, setLagacy }) {
   const { t } = useTranslation();
   const { userId, loading } = useUserId();
   const [chatData, setChatData] = useState([]);
@@ -216,7 +216,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar, setMo
               value > 1 ?
               <TouchableOpacity
                 style={{ backgroundColor: mainColor, marginBottom: 5, borderRadius: 5 }}
-                onPress={() => { setModalType("post"); setModalVisible(true); }}
+                onPress={() => { setPost(value); setLagacy(true); setMode("post"); }}
               >
                 <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold", textAlign: "center", marginVertical: 3 }}>게시글 보기</Text>
               </TouchableOpacity> :

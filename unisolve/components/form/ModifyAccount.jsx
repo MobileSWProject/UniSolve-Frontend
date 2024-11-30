@@ -31,12 +31,12 @@ export default function Modify({ visible, setVisible, userData }) {
 
   const EditProcess = async () => {
     if (editing || password.length <= 0 || !emailChecks || (newPassword.length > 0 && newPassword !== subPassword) || nickname.length <= 0) {
-      snackBar(`${t("Stage.failed")} ${t("Function.empty_content")}`);
+      snackBar(`${t("Stage.failed")} ${t("User.empty_content")}`);
       return;
     }
     try {
       setEditing(true);
-      snackBar(`${t("Stage.process")} ${t("Function.edit_account_process")}`);
+      snackBar(`${t("Stage.process")} ${t("User.edit_account_process")}`);
       const response = await _axios.put("/accounts", {
         current_password: password,
         email: email,
@@ -44,10 +44,10 @@ export default function Modify({ visible, setVisible, userData }) {
         user_nickname: nickname,
       });
       if (response.data.updated === true) {
-        snackBar(`${t("Stage.success")} ${t("Function.edit_account_success")}`);
+        snackBar(`${t("Stage.success")} ${t("User.edit_account_success")}`);
       }
       else {
-        snackBar(`${t("Stage.failed")} ${t("Function.edit_account_failed")}`);
+        snackBar(`${t("Stage.failed")} ${t("User.edit_account_failed")}`);
       }
     } catch {
       snackBar(`${t("Stage.failed")} ${t("User.error")}`);
