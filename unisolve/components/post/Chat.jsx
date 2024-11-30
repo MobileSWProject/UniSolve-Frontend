@@ -202,7 +202,8 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       message,
       token,
       time_id: time_id,
-      is_ai: isAI
+      is_ai: isAI,
+      be_ip: process.env.EXPO_PUBLIC_SERVER_BASE_URL
     });
   }
 
