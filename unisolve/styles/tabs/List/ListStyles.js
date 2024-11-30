@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 5,
     color: "#999",
-    marginRight: 1,
+    maxWidth: 220,
   },
   footer: {
     fontSize: 12,

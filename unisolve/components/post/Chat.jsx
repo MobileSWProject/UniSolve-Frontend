@@ -12,7 +12,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { FlatList } from "react-native-gesture-handler";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import mainColor from "../../constants/Colors";
+import { mainColor } from "../../constants/Colors";
 
 export default function CommunityChat({ sheetRef, setMode, post, snackBar, setModalVisible, setModalType, setViewMessage }) {
   const { t } = useTranslation();
@@ -212,6 +212,16 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar, setMo
         String(post) === "0" ?
         <View style={{ alignItems: "center", zIndex: 99, minHeight: open ? 250 : 60}}>
           <View style={{ width: "98%" }}>
+            {
+              value > 1 ?
+              <TouchableOpacity
+                style={{ backgroundColor: mainColor, marginBottom: 5, borderRadius: 5 }}
+                onPress={() => { setModalType("post"); setModalVisible(true); }}
+              >
+                <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold", textAlign: "center", marginVertical: 3 }}>게시글 보기</Text>
+              </TouchableOpacity> :
+              null
+            }
             <DropDownPicker
               style={{ borderWidth: 1.4 }}
               open={open}

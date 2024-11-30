@@ -1,5 +1,5 @@
 import { ScrollView, Text } from "react-native";
-import mainColor from "../../constants/Colors";
+import { mainColor } from "../../constants/Colors";
 import InputProcess from "../../components/form/InputProcess";
 import { useTranslation } from "react-i18next";
 import "../../i18n";

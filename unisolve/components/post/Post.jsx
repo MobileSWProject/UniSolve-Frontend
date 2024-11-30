@@ -289,10 +289,10 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModa
           }}
         >
           {data.content}
-      </Markdown>
-        {data.image && (
-          <Image source={{ uri: data.image }} style={styles.image} />
-        )}
+        </Markdown>
+          {data.image && (
+            <Image source={{ uri: data.image }} style={styles.image} />
+          )}
       </View>
 
       {/* 댓글 렌더링 */}
