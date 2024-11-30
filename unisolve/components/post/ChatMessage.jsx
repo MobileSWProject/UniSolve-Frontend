@@ -52,9 +52,9 @@ const ChatMessage = ({ me, sender, content, sent_at, exp, setModalVisible, setMo
       <View style={{maxWidth: "64%", top: 4, gap: 8, alignItems: me ? "flex-end" : "flex-start" }}>
         {!me && <Text style={{ fontWeight: "600", fontSize: 16 }}>{sender}</Text>}
         <View style={{ backgroundColor: me ? "#fffacd" : "white", borderRadius: 12, marginLeft: 5 }}>
-          <View style={styles.messageContent}>
+          <ScrollView style={styles.messageContent}>
             {markDown(content)}
-          </View>
+          </ScrollView>
           {
             content.length >= 300 ?
             <TouchableOpacity
