@@ -205,7 +205,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   return (
     <View style={{height: "100%"}}>
       {String(post) === "0" ? (
-        <View style={{ alignItems: "center", zIndex: 99 }}>
+        <View style={{ alignItems: "center", zIndex: 99, minHeight: open ? 250 : 60}}>
           <View style={{ width: "93%" }}>
             <DropDownPicker
               style={{ borderWidth: 1.4 }}
