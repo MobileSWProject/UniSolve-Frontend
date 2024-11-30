@@ -6,13 +6,14 @@ import Modify from "../form/ModifyAccount";
 import Delete from "../form/DeleteAccount";
 import SelectUser from "../form/SelectUser";
 import CommentModify from "../form/CommentModify";
+import ViewMessage from "../post/ViewMessage";
 import ModalList from "./ModalList";
 import Image from "../Image";
 import { ExpPage } from "../tabs/me/Exp";
 import Report from "../form/Report";
 import { useEffect } from "react";
 
-export default function ModalView({ type, visible, setVisible, userData, image, post, comment, setComment, setUser }) {
+export default function ModalView({ type, visible, setVisible, userData, image, post, comment, setComment, setUser, viewMessage }) {
   // type이 falsy일 때 모달을 닫기 위해 setVisible(false)를 호출
   useEffect(() => {
     if (!type) {
@@ -36,8 +37,9 @@ export default function ModalView({ type, visible, setVisible, userData, image, 
                   type === "image" ? <Image setVisible={setVisible} image={image} /> :
                   type === "user" ? <SelectUser visible={visible} setVisible={setVisible} post={post} setUser={setUser} /> :
                   type === "exp" ? <ExpPage setVisible={setVisible} /> :
-                  type === "report" ? <Report visible={visible} setVisible={setVisible} post={post} comment={comment} setComment={setComment}/> :
-                  type === "comment" ? <CommentModify visible={visible} setVisible={setVisible} comment={comment} setComment={setComment}/> :
+                  type === "report" ? <Report visible={visible} setVisible={setVisible} post={post} comment={comment} setComment={setComment} /> :
+                  type === "comment" ? <CommentModify visible={visible} setVisible={setVisible} comment={comment} setComment={setComment} /> :
+                  type === "message" ? <ViewMessage setVisible={setVisible} viewMessage={viewMessage} /> :
                   null
                 }
               </View>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { styles } from "../../styles/post/ChatStyle";
 import ChatMessage from "./ChatMessage";
 import { io } from "socket.io-client";
@@ -12,8 +12,9 @@ import DropDownPicker from "react-native-dropdown-picker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { FlatList } from "react-native-gesture-handler";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import mainColor from "../../constants/Colors";
 
-export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
+export default function CommunityChat({ sheetRef, setMode, post, snackBar, setModalVisible, setModalType, setViewMessage }) {
   const { t } = useTranslation();
   const { userId, loading } = useUserId();
   const [chatData, setChatData] = useState([]);
@@ -23,7 +24,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   const flatListRef = useRef(null); // FlatList 참조 생성
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
-  const [items, setItems] = useState([{ label: "선택안함", value: 0 }]);
+  const [items, setItems] = useState([{ label: t("Function.noSelect"), value: 0 }]);
   const [ban, setBan] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isAI, setIsAI] = useState(true);
@@ -51,7 +52,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       const response = await _axios.get(`/chat/messages?post_id=${0}`);
       setBan(response.data.ban || false);
       setIsPrivate(response.data.is_private || false);
-      setItems(response.data.data);
+      setItems([{ label: t("Function.noSelect"), value: 0 }, ...response.data.data]);
     };
 
     if (String(post) === "0") loadCategory();
@@ -133,7 +134,7 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
     }
   }, [room, loading]);
 
-  // 데이터 포맷?
+  // 날짜 및 시간 변환
   function checkDate(sentDt) {
     if (!sentDt || isNaN(new Date(sentDt))) return sentDt;
     sentDt = new Date(sentDt);
@@ -146,13 +147,9 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       resultDate += `${sentDt.getFullYear()}`;
     }
     if (nowDt.getDate() !== sentDt.getDate()) {
-      resultDate += `${resultDate.length ? "-" : ""}${pad(
-        Number(sentDt.getMonth()) + 1
-      )}-${pad(sentDt.getDate())}`;
+      resultDate += `${resultDate.length ? "-" : ""}${pad(Number(sentDt.getMonth()) + 1)}-${pad(sentDt.getDate())}`;
     }
-    resultDate += `${resultDate.length ? " " : ""}${pad(
-      sentDt.getHours()
-    )}:${pad(sentDt.getMinutes())}`;
+    resultDate += `${resultDate.length ? " " : ""}${pad(sentDt.getHours())}:${pad(sentDt.getMinutes())}`;
     return resultDate;
   }
 
@@ -167,12 +164,19 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
       sender={item.sender || "NULL"}
       content={item.content}
       sent_at={checkDate(item.sent_at) || ""}
+      exp={item.exp}
+      setModalVisible={setModalVisible}
+      setModalType={setModalType}
+      setViewMessage={setViewMessage}
     />
   );
 
   // 메세지 보내기
   async function msgSend() {
-    if (!message || message.length <= 0) return;
+    if (!message || message.length <= 0) {
+      snackBar(`${t("Stage.failed")} ${t("Function.empty")}`);
+      return;
+    }
 
     const time_id = `${Date.now()}-${userId}`;
     setMessage("");
@@ -197,16 +201,17 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color={mainColor}/>
       </View>
     );
   }
 
   return (
-    <View style={{height: "100%"}}>
-      {String(post) === "0" ? (
+    <View style={{height: "95%"}}>
+      {
+        String(post) === "0" ?
         <View style={{ alignItems: "center", zIndex: 99, minHeight: open ? 250 : 60}}>
-          <View style={{ width: "93%" }}>
+          <View style={{ width: "98%" }}>
             <DropDownPicker
               style={{ borderWidth: 1.4 }}
               open={open}
@@ -221,11 +226,10 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
               // listMode="SCROLLVIEW"
             />
           </View>
-        </View>
-      ) : null}
-      <View style={{ 
-        flex: 1,
-      }}>
+        </View> :
+        null
+      }
+      <View style={{ flex: 1 }}>
         <FlatList
           ref={flatListRef} // FlatList 참조 추가
           data={chatData}
@@ -237,52 +241,41 @@ export default function CommunityChat({ sheetRef, setMode, post, snackBar }) {
         />
       </View>
       <View style={styles.inputContainer}>
-        {!ban && isPrivate ? (
+        {
+          !ban && isPrivate ?
           <>
             <TouchableOpacity
-              style={{
-                height: 30,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-              }}
+              style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
               hitSlop={4}
-              onPress={() => {
-                setIsAI(!isAI);
-              }}
+              onPress={() => { setIsAI(!isAI); }}
             >
-              <MaterialCommunityIcons
-                name={isAI ? "checkbox-marked" : "checkbox-blank-outline"}
-                size={24}
-              />
+              <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
               <View>
-                <Text style={{ fontSize: 14, fontWeight: "bold" }}>
-                  AI와 대화
-                </Text>
+                <Text style={{ fontSize: 14, fontWeight: "bold" }}>{t("Function.AI")}</Text>
               </View>
             </TouchableOpacity>
-          </>
-        ) : null}
+          </> :
+          null
+        }
         <BottomSheetTextInput
           style={styles.textInput}
           disabled={ban || !isPrivate}
-          placeholder={
-            ban
-              ? t("Function.forbidden")
-              : !isPrivate
-              ? "게시글이 비공개인 상태에서만 대화할 수 있습니다."
-              : t("Function.input_content")
+          placeholder=
+          {
+            ban ?
+            t("Function.forbidden") :
+            !isPrivate ?
+            t("Function.post_private") :
+            t("Function.input_content")
           }
           value={message}
           onChangeText={(text) => setMessage(text)}
+          multiline={true}
         />
         <TouchableOpacity
           disabled={ban || !isPrivate}
           onPress={() => msgSend(true)}
-          style={[
-            styles.sendButton,
-            { backgroundColor: ban || !isPrivate ? "gray" : null },
-          ]}
+          style={[styles.sendButton, { backgroundColor: ban || !isPrivate ? "gray" : null }]}
         >
           <Text style={{ fontWeight: 600 }}>{t("Function.send")}</Text>
         </TouchableOpacity>

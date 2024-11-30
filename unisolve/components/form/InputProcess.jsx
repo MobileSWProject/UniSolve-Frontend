@@ -4,7 +4,7 @@ import { styles } from "../../styles/form/FormStyle";
 import { useTranslation } from 'react-i18next';
 import "../../i18n";
 
-export default function InputProcess({ setVisible, type, onPress, content, cancel, disabled }) {
+export default function InputProcess({ setVisible, type, onPress, content, cancel, disabled, noConfirm }) {
   const { t } = useTranslation();
   
   return (
@@ -14,15 +14,19 @@ export default function InputProcess({ setVisible, type, onPress, content, cance
         style={[styles.buttonSmall, { backgroundColor: cancel ? "gray" : mainColor }]}
         onPress={() => { setVisible(false); }}
       >
-        <Text style={styles.buttonTextSmall}>{t("Function.cancel")}</Text>
+        <Text style={styles.buttonTextSmall}>{noConfirm ? t("Function.confirm") : t("Function.cancel")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        disabled={disabled ? disabled : false}
-        style={[styles.buttonSmall, { backgroundColor: disabled ? "gray" : type ? "#FF0000" : mainColor }]}
-        onPress={onPress}
-      >
-        <Text style={styles.buttonTextSmall}>{content}</Text>
-      </TouchableOpacity>
+      {
+        !noConfirm ?
+        <TouchableOpacity
+          disabled={disabled ? disabled : false}
+          style={[styles.buttonSmall, { backgroundColor: disabled ? "gray" : type ? "#FF0000" : mainColor }]}
+          onPress={onPress}
+        >
+          <Text style={styles.buttonTextSmall}>{content}</Text>
+        </TouchableOpacity> :
+        null
+      }
     </View>
   );
 }

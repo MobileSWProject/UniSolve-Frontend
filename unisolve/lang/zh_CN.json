@@ -198,6 +198,7 @@
         "regist": "注册",
         "post": "帖子",
         "post_empty": "没有可用的帖子！",
+        "post_private": "只有在帖子为私密状态时，才能进行对话。",
         "send": "发送",
         "reply": "回复",
         "count": "计数",
@@ -222,6 +223,10 @@
         "accept": "接受",
         "refuse": "拒绝",
         "input_final": "",
-        "input_nofinal": ""
+        "input_nofinal": "",
+        "AI": "与AI对话",
+        "noSelect": "未选择",
+        "message_view_btn": "查看全部消息",
+        "message_view": "查看所有消息"
     }
 }

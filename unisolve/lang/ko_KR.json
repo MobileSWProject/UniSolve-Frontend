@@ -198,6 +198,7 @@
         "regist": "등록",
         "post": "게시글",
         "post_empty": "게시글이 없습니다!",
+        "post_private": "게시글이 비공개인 상태에서만 대화할 수 있습니다.",
         "send": "전송",
         "reply": "답글",
         "count": "개",
@@ -222,6 +223,10 @@
         "accept": "수락",
         "refuse": "거절",
         "input_final": "을",
-        "input_nofinal": "를"
+        "input_nofinal": "를",
+        "AI": "AI와 대화",
+        "noSelect": "선택 안함",
+        "message_view_btn": "전체보기",
+        "message_view": "메시지 전체 보기"
     }
 }

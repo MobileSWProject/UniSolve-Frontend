@@ -11,11 +11,12 @@ const images = [
   require(`../../../assets/icons/lv7.png`),
   require(`../../../assets/icons/lv8.png`),
   require(`../../../assets/icons/lv9.png`),
+  require(`../../../assets/icons/lvAI.png`),
 ];
 export default function LevelImage({ exp, size = 120 }) {
   return (
     <Image
-      source={images[getLevel(exp)]}
+      source={images[exp === -1 ? 10 : getLevel(exp)]}
       style={{ width: size, height: size }}
     />
   );

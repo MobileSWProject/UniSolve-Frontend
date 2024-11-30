@@ -45,9 +45,9 @@ function AnimatedIcon({ name, color, focused }) {
       { translateY: translateY.value }
     ],
     backgroundColor: interpolateColor(
-      scale.value,   // scale 값에 따라 색상 변화
-      [1, 1.01],     // 1에서 1.35까지 확대될 때
-      ["transparent", mainColor] // 색상 변환: 작은 값은 white, 큰 값은 mainColor
+      scale.value,   // scale 값에 따른 색상 변화
+      [1, 1.01],     // 1 → 1.01
+      ["transparent", mainColor] // transparent → mainColor
     ),
   }));
 
@@ -81,7 +81,7 @@ export default function TabsLayout() {
             height: BAR_HEIGHT,
             borderRadius: 30,
             marginHorizontal: 15,
-            marginBottom: 15,
+            marginBottom: 10,
           },
           tabBarLabelStyle: { opacity: 0, fontWeight: "bold", marginTop: 5 },
           tabBarHideOnKeyboard: true,

@@ -8,7 +8,7 @@ import Post from "../post/Post";
 import Chat from "../post/Chat";
 import Feather from "@expo/vector-icons/Feather";
 
-export default function BottomView({ sheetRef, mode, setMode, post, setPost, snackBar, getList, categorys, modalVisible, setModalVisible, modalType, setModalType, setComment}) {
+export default function BottomView({ sheetRef, mode, setMode, post, setPost, snackBar, getList, categorys, modalVisible, setModalVisible, modalType, setModalType, setComment, setViewMessage }) {
   useFocusEffect(
     useCallback(() => {
       if (!mode) sheetRef.current?.close();
@@ -69,6 +69,9 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
             post={post}
             mode={mode}
             snackBar={snackBar}
+            setModalVisible={setModalVisible}
+            setModalType={setModalType}
+            setViewMessage={setViewMessage}
           /> :
           null
         }

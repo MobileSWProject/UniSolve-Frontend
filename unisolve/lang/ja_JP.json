@@ -198,6 +198,7 @@
         "regist": "登録",
         "post": "投稿",
         "post_empty": "投稿はありません！",
+        "post_private": "投稿が非公開状態のときのみ、会話が可能です。",
         "send": "送信",
         "reply": "返信",
         "count": "カウント",
@@ -222,6 +223,10 @@
         "accept": "承認",
         "refuse": "拒否",
         "input_final": "",
-        "input_nofinal": ""
+        "input_nofinal": "",
+        "AI": "AIと会話",
+        "noSelect": "選択なし",
+        "message_view_btn": "メッセージ全体を見る",
+        "message_view": "メッセージ全体を見る"
     }
 }

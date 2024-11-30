@@ -198,6 +198,7 @@
         "regist": "Register",
         "post": "Post",
         "post_empty": "No posts available!",
+        "post_private": "You can only communicate when the post is in private mode.",
         "send": "Send",
         "reply": "Reply",
         "count": "Count",
@@ -222,6 +223,10 @@
         "accept": "Accept",
         "refuse": "Decline",
         "input_final": "",
-        "input_nofinal": ""
+        "input_nofinal": "",
+        "AI": "Chat with AI",
+        "noSelect": "Not Selected",
+        "message_view_btn": "View All",
+        "message_view": "View All Messages"
     }
 }
