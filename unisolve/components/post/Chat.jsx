@@ -27,7 +27,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
   const [items, setItems] = useState([{ label: t("Function.noSelect"), value: 0 }]);
   const [ban, setBan] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
-  const [isAI, setIsAI] = useState(true);
+  const [isAI, setIsAI] = useState(false);
   const [room, setRoom] = useState("0");
 
   
@@ -132,6 +132,13 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       // 소켓 연결하기
       initializeSocket();
     }
+
+    return () => {
+      if (socket.current) {
+        socket.current.disconnect();
+      }
+    }
+
   }, [room, loading]);
 
   // 날짜 및 시간 변환
@@ -195,6 +202,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       message,
       token,
       time_id: time_id,
+      is_ai: isAI
     });
   }
 
@@ -257,7 +265,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
             <TouchableOpacity
               style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
               hitSlop={4}
-              onPress={() => { setIsAI(!isAI); }}
+              onPress={() => { setIsAI((prev)=>!prev); }}
             >
               <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
               <View>
