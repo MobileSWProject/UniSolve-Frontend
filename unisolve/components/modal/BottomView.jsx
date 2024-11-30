@@ -24,6 +24,9 @@ export default function BottomView({ sheetRef, mode, setMode, post, setPost, sna
       animateOnMount={false}
       enableDynamicSizing={false}
       enableContentPanningGesture={false}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
+      android_keyboardInputMode="adjustResize"
     >
       <TouchableOpacity
         style={{ position: "absolute", zIndex: 999, left: 10 }}
