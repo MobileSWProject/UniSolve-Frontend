@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, ScrollView, TouchableOpacity } from "react-native";
+import { Text, View, ScrollView, TouchableOpacity, Image } from "react-native";
 import Markdown from "react-native-markdown-display";
 import SyntaxHighlighter from "react-native-syntax-highlighter";
 import LevelImage from "../../components/tabs/me/LevelImage";
@@ -52,22 +52,28 @@ const ChatMessage = ({ me, sender, content, sent_at, exp, setModalVisible, setMo
       <View style={{maxWidth: "64%", top: 4, gap: 8, alignItems: me ? "flex-end" : "flex-start" }}>
         {!me && <Text style={{ fontWeight: "600", fontSize: 16 }}>{sender}</Text>}
         <View style={{ backgroundColor: me ? "#fffacd" : "white", marginLeft: 5 }}>
-          <ScrollView style={styles.messageContent}>
-            {markDown(content)}
-          </ScrollView>
           {
-            content.length >= 300 ?
-            <TouchableOpacity
-              style={styles.messageContent}
-              onPress={() => { setViewMessage(markDown(content)); setModalType("message"); setModalVisible(true); }}
-            >
-              <Text>{t("Function.message_view_btn")}</Text>
-            </TouchableOpacity> :
-            null
+            String(content).startsWith("http://icehome.hopto.org") ?
+            <Image source={{ uri: content }} style={{ width: 200, height: 200 }}  /> :
+             <>
+              <ScrollView style={styles.messageContent}>
+                {markDown(content)}
+              </ScrollView>
+              {
+                content.length >= 300 ?
+                <TouchableOpacity
+                  style={styles.messageContent}
+                  onPress={() => { setViewMessage(markDown(content)); setModalType("message"); setModalVisible(true); }}
+                >
+                  <Text>{t("Function.message_view_btn")}</Text>
+                </TouchableOpacity> :
+                null
+              }
+              <View>
+                <Text style={{ color: "#AAA", backgroundColor: me ? "#FFF" : null, display: "flex", marginLeft: !me ? "auto" : null}}>{sent_at}</Text>
+              </View>
+           </>
           }
-          <View>
-            <Text style={{ color: "#AAA", backgroundColor: me ? "#FFF" : null, display: "flex", marginLeft: !me ? "auto" : null}}>{sent_at}</Text>
-          </View>
         </View>
       </View>
     </View>

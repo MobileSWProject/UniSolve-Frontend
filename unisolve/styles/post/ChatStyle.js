@@ -41,5 +41,9 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     maxWidth: 450,
     maxHeight: 300,
-  }
+  },
+  image: {
+    width: 50,
+    height: 50
+  },
 });

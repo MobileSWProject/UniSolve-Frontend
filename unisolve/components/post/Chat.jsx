@@ -13,6 +13,8 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { FlatList } from "react-native-gesture-handler";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { mainColor } from "../../constants/Colors";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import * as ImagePicker from "expo-image-picker";
 
 export default function CommunityChat({ sheetRef, setMode, post, setPost, snackBar, setModalVisible, setModalType, setViewMessage, setLagacy }) {
   const { t } = useTranslation();
@@ -182,7 +184,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
     setMessage("");
     scrollToBottom();
     chatData.unshift({
-      content: message,
+      content: message.startsWith("data:image/png") ? "이미지 파일" : message,
       is_me: true,
       sent_at: t("Function.sending"),
       is_ai: isAI,
@@ -192,9 +194,10 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
     const token = await AsyncStorage.getItem("token");
     socket.current.emit("send_message", {
       room,
-      message,
+      message: message.startsWith("data:image/png") ? "" : message,
       token,
       time_id: time_id,
+      image: message.startsWith("data:image/png") ? message : ""
     });
   }
 
@@ -205,6 +208,43 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       </View>
     );
   }
+
+  const BtnHandleFunctions = {
+    // 사진 촬영하기
+    takePhoto: async () => {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        snackBar(`${t("Stage.failed")} ${t("Function.permission_camera")}`);
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        setMessage(result.assets[0].uri);
+      }
+    },
+    // 사진 첨부하기
+    attachPhoto: async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        snackBar(`${t("Stage.failed")} ${t("Function.permission_image")}`);
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        setMessage(result.assets[0].uri);
+      }
+    },
+  };
 
   return (
     <View style={{height: "95%"}}>
@@ -252,7 +292,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       </View>
       <View style={styles.inputContainer}>
         {
-          !ban && isPrivate ?
+          !ban && isPrivate && !message.startsWith("data:image/png")?
           <>
             <TouchableOpacity
               style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
@@ -269,7 +309,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         }
         <BottomSheetTextInput
           style={styles.textInput}
-          disabled={ban || !isPrivate}
+          disabled={ban || !isPrivate || message.startsWith("data:image/png")}
           placeholder=
           {
             ban ?
@@ -278,10 +318,33 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
             t("Function.post_private") :
             t("Function.input_content")
           }
-          value={message}
+          value={message.startsWith("data:image/png") ? "이미지 첨부됨 (첨부된 이미지를 삭제하거나 전송 버튼을 눌러주세요)" : message}
           onChangeText={(text) => setMessage(text)}
           multiline={true}
         />
+        {
+          !ban && isPrivate && !message.startsWith("data:image/png") ?
+          <>
+            <TouchableOpacity style={[styles.submitButton, { height: 30, width: 30 }]} onPress={BtnHandleFunctions.takePhoto}>
+              <Text style={styles.submitButtonText}>
+                <FontAwesome name="camera" size={24} color={mainColor}/>
+              </Text>
+            </TouchableOpacity>
+            {/* 사진 버튼 */}
+            <TouchableOpacity style={[styles.submitButton, { height: 30, width: 30 }]} onPress={BtnHandleFunctions.attachPhoto} >
+              <Text style={styles.submitButtonText}>
+                <FontAwesome name="photo" size={24} color={mainColor}/>
+              </Text>
+            </TouchableOpacity>
+          </> :
+          !ban && isPrivate && message.startsWith("data:image/png") ?
+          <TouchableOpacity style={[styles.submitButton, { height: 30, width: 30 }]} onPress={() => {setMessage("")}} >
+            <Text style={styles.submitButtonText}>
+              <FontAwesome name="remove" size={24} color={mainColor}/>
+            </Text>
+          </TouchableOpacity> :
+          null
+        }
         <TouchableOpacity
           disabled={ban || !isPrivate}
           onPress={() => msgSend(true)}
