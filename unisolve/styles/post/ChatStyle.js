@@ -27,6 +27,7 @@ export const styles = StyleSheet.create({
     borderRadius: 6,
   },
   messageContent: {
+    flexGrow: 0,
     padding: 5,
     paddingLeft: 15,
     paddingRight: 15,
