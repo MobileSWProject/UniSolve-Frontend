@@ -270,7 +270,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1,
+        quality: 0.5,
       });
       if (!result.canceled) {
         setMessage(result.assets[0].uri);
@@ -287,7 +287,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1,
+        quality: 0.5,
       });
       if (!result.canceled) {
         setMessage(result.assets[0].uri);
