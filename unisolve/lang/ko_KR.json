@@ -226,6 +226,7 @@
         "input_nofinal": "를",
         "AI": "AI와 대화",
         "AI_failed": "사용불가",
+        "AI_count": "회 남음",
         "noSelect": "선택 안함",
         "message_view_btn": "전체보기",
         "message_view": "메시지 전체 보기"

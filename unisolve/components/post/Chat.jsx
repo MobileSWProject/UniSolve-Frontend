@@ -33,6 +33,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
   const [isAI, setIsAI] = useState(false);
   const [room, setRoom] = useState("0");
   const [AICheck, setAICheck] = useState(false);
+  const [AICount, setAICount] = useState(0);
   
 
   // 스크롤 아래로 내리기
@@ -186,6 +187,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
     const response = await _axios.get(`chat/can_ai_chat?post_id=${room}`)
     if (response) {
       setAICheck(response.data.can_request || false);
+      setAICount(response.data.aicount || 15);
     } else return setAICheck(false);
   }
 
@@ -230,6 +232,12 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       image: checkFile(true) ? await convertBase64(message) : "",
     });
 
+    if (isAI) {
+      setAICount(AICount + 1);
+      if (AICount + 1 >= 15) {
+        setIsAI(false);
+      }
+    }
     const token = await AsyncStorage.getItem("token");
     socket.current.emit("send_message", {
       room,
@@ -336,17 +344,19 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
           !ban && isPrivate && checkFile("!") ?
           <>
             <TouchableOpacity
-              disabled={!AICheck}
+              disabled={!AICheck || AICount >= 15}
               style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
               hitSlop={4}
               onPress={() => { setIsAI((prev)=>!prev); }}
             >
               <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
               <View>
-                <Text style={{ fontSize: 14, fontWeight: "bold", color: !AICheck ? "#BBBBBB" : "#000" }}>{t("Function.AI")}</Text>
+                <Text style={{ fontSize: 14, fontWeight: "bold", color: !AICheck || AICount >= 15 ? "#BBBBBB" : "#000" }}>{t("Function.AI")}</Text>
                 {
-                  !AICheck && <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>({t("Function.AI_failed")})</Text>
+                  !AICheck ? <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>({t("Function.AI_failed")})</Text> :
+                  <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>{`${15-AICount < 0 ? 0 : 15-AICount}`}회 남음</Text>
                 }
+                
               </View>
             </TouchableOpacity>
           </> :

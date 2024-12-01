@@ -226,6 +226,7 @@
         "input_nofinal": "",
         "AI": "与AI对话",
         "AI_failed": "不可使用",
+        "AI_count": "剩余次数",
         "noSelect": "未选择",
         "message_view_btn": "查看全部消息",
         "message_view": "查看所有消息"

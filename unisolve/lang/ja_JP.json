@@ -226,6 +226,7 @@
         "input_nofinal": "",
         "AI": "AIと会話",
         "AI_failed": "使用不可",
+        "AI_count": "回数残り",
         "noSelect": "選択なし",
         "message_view_btn": "メッセージ全体を見る",
         "message_view": "メッセージ全体を見る"
