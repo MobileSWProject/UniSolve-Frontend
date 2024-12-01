@@ -186,8 +186,8 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
   async function aiCheck () {
     const response = await _axios.get(`chat/can_ai_chat?post_id=${room}`)
     if (response) {
-      setAICheck(response.data.can_request || false);
-      setAICount(response.data.aicount || 15);
+      setAICheck(response.data.can_request ?? false);
+      setAICount(response.data.aicount ?? 15);
     } else return setAICheck(false);
   }
 
