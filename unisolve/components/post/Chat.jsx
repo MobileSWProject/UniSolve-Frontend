@@ -250,7 +250,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         return;
       }
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: [ImagePicker.MediaType.IMAGE],
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
@@ -267,7 +267,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: [ImagePicker.MediaType.IMAGE],
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
