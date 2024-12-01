@@ -250,7 +250,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         return;
       }
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: [ImagePicker.MediaType.IMAGE],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
@@ -267,7 +267,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: [ImagePicker.MediaType.IMAGE],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
@@ -351,7 +351,12 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
             t("Function.input_content")
           }
           value={checkFile(true) ? "이미지 첨부됨 (첨부된 이미지를 삭제하거나 전송 버튼을 눌러주세요)" : message}
-          onChangeText={(text) => setMessage(text)}
+          onChangeText={(text) => { 
+            if (ban || !isPrivate || checkFile(true)) return;
+            else {
+              setMessage(text);
+            }
+          }}
           multiline={true}
         />
         {
