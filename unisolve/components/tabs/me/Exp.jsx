@@ -81,7 +81,7 @@ export function ExpPage({setVisible}) {
       <View style={styles.me}>
         <Text style={styles.meText}><LevelImage exp={meExp} size={42} /> {numConvert(meExp)}</Text>
       </View>
-      <ScrollView style={{ width: "100%" }}>
+      <View style={{ width: "100%" }}>
         <Table borderStyle={{ borderWidth: 0, borderColor: "#C1C0B9" }}>
           <Row data={listHeader} style={styles.head} textStyle={styles.headText}/>
           <Rows data={list} textStyle={styles.text}></Rows>
@@ -122,7 +122,7 @@ export function ExpPage({setVisible}) {
         >
           <Text style={styles.buttonTextSmall}>{t("Function.confirm")}</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </>
   );
 }
