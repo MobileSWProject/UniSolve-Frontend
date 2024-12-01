@@ -43,7 +43,11 @@ export const styles = StyleSheet.create({
     maxHeight: 300,
   },
   image: {
-    width: 50,
-    height: 50
+    width: 250,
+    height: 250,
+    aspectRatio: 1,
+    maxWidth: 400,
+    maxHeight: 400,
+    alignSelf: "center",
   },
 });

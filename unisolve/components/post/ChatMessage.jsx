@@ -51,10 +51,10 @@ const ChatMessage = ({ me, sender, content, sent_at, exp, setModalVisible, setMo
       {!me && <LevelImage exp={sender === "ai-bot" ? -1 : exp} size={42} />}
       <View style={{maxWidth: "64%", top: 4, gap: 8, alignItems: me ? "flex-end" : "flex-start" }}>
         {!me && <Text style={{ fontWeight: "600", fontSize: 16 }}>{sender}</Text>}
-        <View style={{ backgroundColor: me ? "#fffacd" : "white", marginLeft: 5 }}>
+        <View style={{ backgroundColor: me ? String(content).startsWith("http://icehome.hopto.org") ? "" : "#fffacd" : "white", marginLeft: 5 }}>
           {
             String(content).startsWith("http://icehome.hopto.org") ?
-            <Image source={{ uri: content }} style={{ width: 200, height: 200 }}  /> :
+            <Image source={{ uri: content }} style={styles.image} /> :
              <>
               <ScrollView style={styles.messageContent}>
                 {markDown(content)}
@@ -69,11 +69,11 @@ const ChatMessage = ({ me, sender, content, sent_at, exp, setModalVisible, setMo
                 </TouchableOpacity> :
                 null
               }
-              <View>
-                <Text style={{ color: "#AAA", backgroundColor: me ? "#FFF" : null, display: "flex", marginLeft: !me ? "auto" : null}}>{sent_at}</Text>
-              </View>
            </>
           }
+          <View>
+            <Text style={{ color: "#AAA", backgroundColor: me ? "#FFF" : null, display: "flex", marginLeft: !me ? "auto" : null}}>{sent_at}</Text>
+          </View>
         </View>
       </View>
     </View>

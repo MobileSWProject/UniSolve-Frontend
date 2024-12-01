@@ -76,7 +76,7 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
                 type === "notification" ?
                 t(`Function.notification_${item.type}`) :
                   type === "sanction" ?
-                  `${t(`User.sanction_${item.type}`)}\n${t("User.sanction_start")}: ${item.created_at}\n${t("User.sanction_end")}: ${item.end_at}\n${t("User.sanction_content")}: ${item.content || t("User.sanction_empty")}` :
+                  `${t(`User.sanction_${item.type}`)}\n${t("User.sanction_start")}: ${item.created_at}\n${t("User.sanction_end")}: ${item.end_at}\n${t("User.sanction_content")}: ${`${item.content}\n` || t("User.sanction_empty")}` :
                   null
           }
         </Text>

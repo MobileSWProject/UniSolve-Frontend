@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, Platform } from "react-native";
 import { styles } from "../../styles/post/ChatStyle";
 import ChatMessage from "./ChatMessage";
 import { io } from "socket.io-client";
@@ -15,6 +15,7 @@ import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { mainColor } from "../../constants/Colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from 'expo-file-system';
 
 export default function CommunityChat({ sheetRef, setMode, post, setPost, snackBar, setModalVisible, setModalType, setViewMessage, setLagacy }) {
   const { t } = useTranslation();
@@ -141,7 +142,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       }
     }
 
-  }, [room, loading]);
+  }, [room, loading]);  
 
   // 날짜 및 시간 변환
   function checkDate(sentDt) {
@@ -180,33 +181,55 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
     />
   );
 
+  function checkFile(type) {
+    if (type === "!") {
+      if (!(message.startsWith("data:image/png") || message.startsWith("file:///"))) {
+        return true;
+      }
+    }
+    else if (type) {
+      if (message.startsWith("data:image/png") || message.startsWith("file:///")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async function convertBase64(message) {
+    if (Platform.OS === "web") return message;
+    if (checkFile(true)) {
+      return `data:image/png;base64,${await FileSystem.readAsStringAsync(message, { encoding: FileSystem.EncodingType.Base64 })}`
+    }
+  };
+
   // 메세지 보내기
   async function msgSend() {
     if (!message || message.length <= 0) {
       snackBar(`${t("Stage.failed")} ${t("Function.empty")}`);
       return;
     }
-
     const time_id = `${Date.now()}-${userId}`;
     setMessage("");
     scrollToBottom();
+
     chatData.unshift({
-      content: message.startsWith("data:image/png") ? "이미지 파일" : message,
+      content: checkFile(true) ? "이미지 파일" : message,
       is_me: true,
       sent_at: t("Function.sending"),
       is_ai: isAI,
       time_id: time_id,
+      image: checkFile(true) ? await convertBase64(message) : "",
     });
 
     const token = await AsyncStorage.getItem("token");
     socket.current.emit("send_message", {
       room,
-      message: message.startsWith("data:image/png") ? "" : message,
+      message: checkFile(true) ? "" : message,
       token,
       time_id: time_id,
       is_ai: isAI,
       be_ip: process.env.EXPO_PUBLIC_SERVER_BASE_URL,
-      image: message.startsWith("data:image/png") ? message : ""
+      image: checkFile(true) ? await convertBase64(message) : "",
     });
   }
 
@@ -301,7 +324,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       </View>
       <View style={styles.inputContainer}>
         {
-          !ban && isPrivate && !message.startsWith("data:image/png")?
+          !ban && isPrivate && checkFile("!") ?
           <>
             <TouchableOpacity
               style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
@@ -318,7 +341,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         }
         <BottomSheetTextInput
           style={styles.textInput}
-          disabled={ban || !isPrivate || message.startsWith("data:image/png")}
+          disabled={ban || !isPrivate || checkFile(true)}
           placeholder=
           {
             ban ?
@@ -327,12 +350,12 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
             t("Function.post_private") :
             t("Function.input_content")
           }
-          value={message.startsWith("data:image/png") ? "이미지 첨부됨 (첨부된 이미지를 삭제하거나 전송 버튼을 눌러주세요)" : message}
+          value={checkFile(true) ? "이미지 첨부됨 (첨부된 이미지를 삭제하거나 전송 버튼을 눌러주세요)" : message}
           onChangeText={(text) => setMessage(text)}
           multiline={true}
         />
         {
-          !ban && isPrivate && !message.startsWith("data:image/png") ?
+          !ban && isPrivate && checkFile("!") ?
           <>
             <TouchableOpacity style={[styles.submitButton, { height: 30, width: 30 }]} onPress={BtnHandleFunctions.takePhoto}>
               <Text style={styles.submitButtonText}>
@@ -346,7 +369,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
               </Text>
             </TouchableOpacity>
           </> :
-          !ban && isPrivate && message.startsWith("data:image/png") ?
+          !ban && isPrivate && checkFile(true) ?
           <TouchableOpacity style={[styles.submitButton, { height: 30, width: 30 }]} onPress={() => {setMessage("")}} >
             <Text style={styles.submitButtonText}>
               <FontAwesome name="remove" size={24} color={mainColor}/>
