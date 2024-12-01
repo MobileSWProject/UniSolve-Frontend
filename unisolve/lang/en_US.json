@@ -225,6 +225,7 @@
         "input_final": "",
         "input_nofinal": "",
         "AI": "Chat with AI",
+        "AI_failed": "Unavailable",
         "noSelect": "Not Selected",
         "message_view_btn": "View All",
         "message_view": "View All Messages"
