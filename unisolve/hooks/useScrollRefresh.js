@@ -19,6 +19,7 @@ const useScrollRefresh = (fetchData) => {
       setIsRefreshing(true);
       await fetchData(); // 데이터 로드가 끝날 때까지 기다림
       setIsRefreshing(false); // 새로고침 상태 해제
+      setCanRefresh(false)
     }
   };
 
