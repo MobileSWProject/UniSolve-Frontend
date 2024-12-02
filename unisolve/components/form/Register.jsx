@@ -10,6 +10,9 @@ import _axios from "../../api";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+
 export default function Register({ visible, setVisible }) {
   const { t } = useTranslation();
   const [effect, setEffect] = useState(false);
@@ -260,6 +263,7 @@ export default function Register({ visible, setVisible }) {
                 </TouchableOpacity>
               )}
               ListEmptyComponent={<Text style={styles.empty}></Text>}
+              nestedScrollEnabled={true}
             />
           </View> :
           null
