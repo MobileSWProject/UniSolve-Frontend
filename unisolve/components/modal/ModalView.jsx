@@ -1,4 +1,4 @@
-import { View, Modal } from "react-native";
+import { View, Modal, Pressable, Keyboard } from "react-native";
 import { styles } from "../../styles/form/ModalStyle";
 import Register from "../form/Register";
 import FindAccount from "../form/FindAccount";
@@ -29,8 +29,8 @@ export default function ModalView({ type, visible, setVisible, userData, image, 
       {
         type ? (
           <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={() => setVisible(false)} >
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
+            <Pressable style={styles.centeredView} onPress={()=>Keyboard.dismiss()}>
+              <Pressable style={styles.modalView} onPress={()=>Keyboard.dismiss()}>
                 {
                   type === "register" ? <Register visible={visible} setVisible={setVisible} /> :
                   type === "find" ? <FindAccount visible={visible} setVisible={setVisible} /> :
@@ -50,8 +50,8 @@ export default function ModalView({ type, visible, setVisible, userData, image, 
                   type === "terms" || type === "privacy" ? <ViewPolicy setVisible={setVisible} type={type} /> :
                   null
                 }
-              </View>
-            </View>
+              </Pressable>
+            </Pressable>
           </Modal>
         ) : null // type이 falsy일 때는 아무것도 렌더링하지 않음
       }
