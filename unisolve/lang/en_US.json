@@ -229,6 +229,9 @@
         "AI_count": "Times Left",
         "noSelect": "Not Selected",
         "message_view_btn": "View All",
-        "message_view": "View All Messages"
+        "message_view": "View All Messages",
+        "version_check": "Checking version...",
+        "version_go": "A new version is available!",
+        "version_release": "You have the latest version!"
     }
 }

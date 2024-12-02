@@ -229,6 +229,9 @@
         "AI_count": "剩余次数",
         "noSelect": "未选择",
         "message_view_btn": "查看全部消息",
-        "message_view": "查看所有消息"
+        "message_view": "查看所有消息",
+        "version_check": "正在检查版本...",
+        "version_go": "有新版本!",
+        "version_release": "这是最新版本!"
     }
 }

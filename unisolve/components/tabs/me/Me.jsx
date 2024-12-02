@@ -9,6 +9,7 @@ import { mainColor } from "../../../constants/Colors";
 import ModalView from "../../../components/modal/ModalView";
 import SnackBar from "../../../components/Snackbar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Application from 'expo-application';
 import _axios from "../../../api";
 import { useTranslation } from "react-i18next";
 import "../../../i18n";
@@ -17,7 +18,7 @@ export default function Me() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const [user, setUser] = useState({});
-  const [userProcess, setUserProcess] = useState(false);
+  const [process, setProcess] = useState(false);
   const [exp, setExp] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -29,9 +30,9 @@ export default function Me() {
   const snackBar = (message) => { setSnackbarMessage(message); setSnackbarVisible(true); };
 
   async function getUser() {
-    if (userProcess) return;
+    if (process) return;
     try {
-      setUserProcess(true);
+      setProcess(true);
       const response = await _axios.get("/accounts/mine");
       if (!response.data.data.username) {
         await AsyncStorage.clear();
@@ -40,9 +41,28 @@ export default function Me() {
       }
       setUser(response.data.data);
       setExp(response.data.data.exp || 0);
-      setUserProcess(false);
+      setProcess(false);
     } catch {
       router.replace("/");
+    }
+  }
+
+  async function getVersion() {
+    if (process) return;
+    try {
+      setProcess(true);
+      snackBar(`${t("Stage.process")}${t("Function.version_check")}`);
+      const response = await _axios.get("/app/version");
+      if (response) {
+        if (response.data.data.version !== Application.nativeApplicationVersion) {
+          snackBar(`${t("Stage.success")} ${t("Function.version_go")} (${response.data.data.version ?? 0})`);
+        } else {
+          snackBar(`${t("Stage.success")} ${t("Function.version_release")} (${response.data.data.version ?? 0})`);
+        }
+      }
+      setProcess(false);
+    } catch {
+      setProcess(false);  
     }
   }
 
@@ -103,7 +123,7 @@ export default function Me() {
       </TouchableOpacity>
 
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}>{t("Menu.use")}</Text>
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity onPress={() => { getVersion(); }}>
         <Text style={styles.buttonText}>{t("Menu.version")}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {}}>

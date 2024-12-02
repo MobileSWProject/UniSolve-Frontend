@@ -229,6 +229,9 @@
         "AI_count": "回数残り",
         "noSelect": "選択なし",
         "message_view_btn": "メッセージ全体を見る",
-        "message_view": "メッセージ全体を見る"
+        "message_view": "メッセージ全体を見る",
+        "version_check": "バージョンを確認しています...",
+        "version_go": "新しいバージョンがあります!",
+        "version_release": "最新バージョンです!"
     }
 }
