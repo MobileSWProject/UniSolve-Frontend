@@ -150,10 +150,20 @@ export default function Me() {
       >
         <Text style={styles.buttonText}>{t("Menu.support")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => {}}>
-        <Text style={styles.buttonText}>{t("Menu.operation")}</Text>
+      <TouchableOpacity
+        onPress={() => {
+          setModalType("terms");
+          setModalVisible(true);
+        }}
+      >
+        <Text style={styles.buttonText}>{t("Menu.terms")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity
+        onPress={() => {
+          setModalType("privacy");
+          setModalVisible(true);
+        }}
+      >
         <Text style={styles.buttonText}>{t("Menu.privacy")}</Text>
       </TouchableOpacity>
 

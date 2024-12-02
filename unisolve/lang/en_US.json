@@ -137,7 +137,7 @@
         "notification": "Notification Settings",
         "version": "App Version",
         "support": "Send feedback",
-        "operation": "Terms of Service",
+        "terms": "Terms of Service",
         "privacy": "Privacy Policy"
     },
     "Stage": {
