@@ -1,6 +1,4 @@
 import _axios from "../api";
-import { useTranslation } from "react-i18next";
-import "../i18n";
 
 export const accountCheck = async (value, snackBar, t, type) => {
   try {

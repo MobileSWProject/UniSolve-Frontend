@@ -239,7 +239,7 @@ export default function Register({ visible, setVisible }) {
           content={reNickname}
           onChangeText={(text) => inputReNickname(text)}
           buttonDisabled={reNicknameCheck || reNickname.length <= 0}
-          buttonOnPress={async () => setReNicknameCheck( await accountCheck({ nickname: reNickname }, snackBar))}
+          buttonOnPress={async () => setReNicknameCheck( await accountCheck({ nickname: reNickname }, snackBar, t))}
         />
         <Input
           title={t("User.school")}
