@@ -22,7 +22,7 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
   const { userId, loading } = useUserId();
   const [chatData, setChatData] = useState([]);
   const [message, setMessage] = useState("");
-  const [categoryLoad, setCategoryLoad] = useState(false);
+  const [chatLoad, setChatLoad] = useState(false);
   const socket = useRef(null);
   const flatListRef = useRef(null); // FlatList 참조 생성
   const [open, setOpen] = useState(false);
@@ -35,6 +35,7 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
   const [AICheck, setAICheck] = useState(false);
   const [AICount, setAICount] = useState(0);
   const [sendProcess, setSendProcess] = useState(false);
+  const [lastMessage, setLastMessage] = useState(false);
   
 
   // 스크롤 아래로 내리기
@@ -48,7 +49,7 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
   const selectValue = async (value) => {
     setRoom(String(value));
     setChatData([]);
-    setCategoryLoad(false);
+    setChatLoad(false);
   };
 
   // post 상태에 따라 카테고리를 로드할 것인지, Room 을 세팅할 것인지
@@ -58,6 +59,7 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
       setBan(response.data.ban || false);
       setIsPrivate(response.data.is_private || false);
       setItems([{ label: t("Function.noSelect"), value: 0 }, ...response.data.data]);
+      setLastMessage(false);
     };
 
     if (String(post) === "0") loadCategory();
@@ -70,10 +72,12 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
       try {
         await aiCheck();
         const response = await _axios.get(`/chat/messages?post_id=${room}`);
-        setChatData(response.data.data.reverse());
+        setChatData(response.data.data);
         setBan(response.data.ban || false);
         setIsPrivate(response.data.is_private || false);
-        scrollToBottom();
+        if (!lastMessage) {
+          setLastMessage(response.data.last);
+        }
       } catch (error) {
         snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
       }
@@ -156,11 +160,6 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
     resultDate += `${resultDate.length ? " " : ""}${pad(sentDt.getHours())}:${pad(sentDt.getMinutes())}`;
     return resultDate;
   }
-
-  // chatData가 변경될 때마다 스크롤을 아래로 이동
-  useEffect(() => {
-    scrollToBottom();
-  }, [chatData]);
 
   const renderItem = ({ item }) => (
     <ChatMessage
@@ -290,6 +289,26 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
     },
   };
 
+  const loadMoreMessages = async () => {
+    if (sendProcess || chatLoad) return;
+    if (lastMessage) {
+      snackBar("마지막 메시지 입니다");
+      return;
+    }
+    setChatLoad(true);
+    try {
+      const response = await _axios.get(`/chat/messages?post_id=${room}&last_message_id=${chatData[chatData.length-1]?.id || 0}`);
+      if (response.data.data.length > 0) {
+        setLastMessage(response.data.last);
+        setChatData((prevData) => [...prevData, ...response.data.data]);
+      }
+    } catch (error) {
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
+    } finally {
+      setChatLoad(false);
+    }
+  };
+
   return (
     <View style={{height: "95%"}}>
       {
@@ -324,14 +343,20 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
         null
       }
       <View style={{ flex: 1 }}>
+        {chatLoad && <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}><ActivityIndicator size="large" color={mainColor}/></View>}
         <FlatList
           ref={flatListRef} // FlatList 참조 추가
           data={chatData}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString() || "0"}
           contentContainerStyle={styles.container}
-          // onContentSizeChange={scrollToBottom} // 메시지 수가 변경되면 스크롤 이동
           inverted
+          onEndReachedThreshold={0.1} // 스크롤 끝에 도달 시점 설정
+          onEndReached={() => {
+            if (!sendProcess && room !== "0") {
+              loadMoreMessages(); // 이전 메시지 불러오기
+            }
+          }}
         />
       </View>
       <View style={styles.inputContainer}>
