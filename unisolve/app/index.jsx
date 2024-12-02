@@ -129,7 +129,7 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Pressable style={styles.container} onPress={()=>Keyboard.dismiss()}>
+      <Pressable style={[styles.container, {marginBottom: 120}]} onPress={()=>Keyboard.dismiss()}>
         <Animated.Image source={require("../assets/logo.png")} style={[styles.logo, { transform: [{ translateY: logoPosition }] }]} />
         {
           certification ?
@@ -163,7 +163,7 @@ export default function Home() {
           </Animated.View> :
           null
         }
-        <Animated.View style={{ opacity: inputOpacity, marginTop: 5 }}>
+        <Animated.View style={{ opacity: inputOpacity, marginTop: 35 }}>
           <TouchableOpacity onPress={() => { setModalType("find"); setModalVisible(true); }} >
             <Text style={styles.text}>{t("User.account_forget")}</Text>
           </TouchableOpacity>
