@@ -29,26 +29,24 @@ export function getPercent(exp) {
 
 export function getLevel(exp) {
   return (
-    Math.floor(
-      exp < 101
-        ? 1
-        : exp < 301
-        ? 1 + (exp - 100) / 200
-        : exp < 501
-        ? 2 + (exp - 300) / 200
-        : exp < 701
-        ? 3 + (exp - 500) / 200
-        : exp < 1001
-        ? 4 + (exp - 700) / 300
-        : exp < 1501
-        ? 5 + (exp - 1000) / 500
-        : exp < 2001
-        ? 6 + (exp - 1500) / 500
-        : exp < 3001
-        ? 7 + (exp - 2000) / 1000
-        : exp < 5001
-        ? 8 + (exp - 3000) / 2000
-        : 10
-    ) - 1
-  );
+    exp < 101 ?
+    1 :
+    exp < 301 ?
+    2 :
+    exp < 501 ?
+    3 :
+    exp < 701 ?
+    4 :
+    exp < 1001 ?
+    5 :
+    exp < 1501 ?
+    6 :
+    exp < 2001 ?
+    7 :
+    exp < 3001 ?
+    8 :
+    exp < 5001 ?
+    9 :
+    10
+  )-1;
 }
