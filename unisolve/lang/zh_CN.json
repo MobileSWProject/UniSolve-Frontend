@@ -241,6 +241,7 @@
         "view": "查看",
         "message_view_btn": "查看全部消息",
         "message_view": "查看所有消息",
+        "message_last": "这是最后一条消息!",
         "version_check": "正在检查版本...",
         "version_go": "有新版本!",
         "version_release": "这是最新版本!",

@@ -241,6 +241,7 @@
         "select": "選択",
         "message_view_btn": "メッセージ全体を見る",
         "message_view": "メッセージ全体を見る",
+        "message_last": "最後のメッセージです!",
         "version_check": "バージョンを確認しています...",
         "version_go": "新しいバージョンがあります!",
         "version_release": "最新バージョンです!",

@@ -241,6 +241,7 @@
         "view": "보기",
         "message_view_btn": "전체보기",
         "message_view": "메시지 전체 보기",
+        "message_last": "마지막 메시지입니다!",
         "version_check": "확인하고 있습니다..",
         "version_go": "새로운 버전이 있습니다!",
         "version_release": "최신 버전 입니다!",

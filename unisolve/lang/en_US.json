@@ -241,6 +241,7 @@
         "view": "View",
         "message_view_btn": "View All",
         "message_view": "View All Messages",
+        "message_last": "This is the last message!",
         "version_check": "Checking version...",
         "version_go": "A new version is available!",
         "version_release": "You have the latest version!",

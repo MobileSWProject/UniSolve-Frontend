@@ -14,6 +14,7 @@ import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { mainColor } from "../../constants/Colors";
 import SwitchBtn from "../form/Switch";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from 'expo-file-system';
 
@@ -36,6 +37,8 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
   const [AICount, setAICount] = useState(0);
   const [sendProcess, setSendProcess] = useState(false);
   const [lastMessage, setLastMessage] = useState(false);
+  const [lastMessageFirstLoad, setLastMessageFirstLoad] = useState(true);
+  const [scrollPosition, setScrollPosition] = useState(0);
   
 
   // 스크롤 아래로 내리기
@@ -60,6 +63,7 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
       setIsPrivate(response.data.is_private || false);
       setItems([{ label: t("Function.noSelect"), value: 0 }, ...response.data.data]);
       setLastMessage(false);
+      setLastMessageFirstLoad(true);
     };
 
     if (String(post) === "0") loadCategory();
@@ -75,9 +79,8 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
         setChatData(response.data.data);
         setBan(response.data.ban || false);
         setIsPrivate(response.data.is_private || false);
-        if (!lastMessage) {
-          setLastMessage(response.data.last);
-        }
+        setLastMessage(response.data.last);
+        setLastMessageFirstLoad(true);
       } catch (error) {
         snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
       }
@@ -290,9 +293,13 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
   };
 
   const loadMoreMessages = async () => {
-    if (sendProcess || chatLoad) return;
-    if (lastMessage) {
-      snackBar("마지막 메시지 입니다");
+    if (sendProcess || chatLoad || room === "0") return;
+    if (lastMessage && lastMessageFirstLoad) {
+      setLastMessageFirstLoad(false);
+      return;
+    }
+    if (lastMessage && !lastMessageFirstLoad) {
+      snackBar(`${t("Stage.success")} ${t("Function.message_last")}`);
       return;
     }
     setChatLoad(true);
@@ -342,7 +349,7 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
         </View> :
         null
       }
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, position: "relative" }}>
         {chatLoad && <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}><ActivityIndicator size="large" color={mainColor}/></View>}
         <FlatList
           ref={flatListRef} // FlatList 참조 추가
@@ -351,13 +358,19 @@ export default function CommunityChat({ setMode, post, setPost, snackBar, setMod
           keyExtractor={(item, index) => index.toString() || "0"}
           contentContainerStyle={styles.container}
           inverted
-          onEndReachedThreshold={0.1} // 스크롤 끝에 도달 시점 설정
-          onEndReached={() => {
-            if (!sendProcess && room !== "0") {
-              loadMoreMessages(); // 이전 메시지 불러오기
-            }
-          }}
+          onEndReachedThreshold={0.1}
+          onEndReached={() => { loadMoreMessages(); }}
+          onScroll={(event) => {setScrollPosition(event.nativeEvent.contentOffset.y)}}
         />
+        {
+          scrollPosition >= 2000 &&
+          <TouchableOpacity
+            style={{ backgroundColor: mainColor, opacity: 0.5, position: "absolute", width: "100%", bottom: 0, alignItems: "center" }}
+            onPress={scrollToBottom}
+          >
+            <MaterialCommunityIcons name="format-align-bottom" size={35} color="white" />
+          </TouchableOpacity>
+      }
       </View>
       <View style={styles.inputContainer}>
       {
