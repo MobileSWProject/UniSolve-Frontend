@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
+import { SafeAreaView, View, Text, TouchableOpacity, Platform } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { ProgressBar } from "react-native-paper";
-import { getExpToLevel, getLevel, getPercent,} from "../../../utils/expUtils";
+import { getExpToLevel, getLevel, getPercent } from "../../../utils/expUtils";
 import LevelImage from "../../../components/tabs/me/LevelImage"
 import { styles } from "../../../styles/tabs/me/MeStyle";
 import { mainColor } from "../../../constants/Colors";
@@ -50,9 +50,12 @@ export default function Me() {
   async function getVersion() {
     if (process) return;
     try {
+      if (Platform.OS === "web") {
+        return snackBar(`${t("Stage.failed")} ${t("Function.version_web")}`);
+      }
       setProcess(true);
       snackBar(`${t("Stage.process")}${t("Function.version_check")}`);
-      const response = await _axios.get("/app/version");
+      const response = await _axios.get(`/app/version?platform=${Platform.OS}`);
       if (response) {
         if (response.data.data.version !== Application.nativeApplicationVersion) {
           snackBar(`${t("Stage.success")} ${t("Function.version_go")} (${response.data.data.version ?? "0"})`);

@@ -235,6 +235,9 @@
         "message_view": "메시지 전체 보기",
         "version_check": "확인하고 있습니다..",
         "version_go": "새로운 버전이 있습니다!",
-        "version_release": "최신 버전 입니다!"
+        "version_release": "최신 버전 입니다!",
+        "version_web": "웹에서는 버전을 확인할 수 없습니다.",
+        "support_good": "좋아요",
+        "support_bad": "싫어요"
     }
 }

@@ -162,7 +162,7 @@
         "sanction_write": "Post editing is not allowed due to a violation of operational policy.",
         "sanction_chat": "Post editing is not allowed due to a violation of operational policy.",
         "waiting": "Please wait a moment...",
-        "notpage": "It seems you’re in the wrong place...?",
+        "notpage": "It seems you're in the wrong place...?",
         "notpagego": "You will be redirected in a few seconds.",
         "empty": "Content is empty.",
         "empty_content": "Some information is missing or unchecked.",
@@ -170,6 +170,7 @@
         "sending": "Sending...",
         "editing": "Editing content...",
         "sent": "Sent",
+        "sent_failed": "Sending failed",
         "edit": "Content has been edited.",
         "registering": "Registering...",
         "register_success": "Registered!",
@@ -227,11 +228,16 @@
         "AI": "Chat with AI",
         "AI_failed": "Unavailable",
         "AI_count": "Times Left",
+        "support": "Send feedback",
+        "select": "Select",
         "noSelect": "Not Selected",
         "message_view_btn": "View All",
         "message_view": "View All Messages",
         "version_check": "Checking version...",
         "version_go": "A new version is available!",
-        "version_release": "You have the latest version!"
+        "version_release": "You have the latest version!",
+        "version_web": "Cannot check version on the web.",
+        "support_good": "Like",
+        "support_bad": "Dislike"
     }
 }

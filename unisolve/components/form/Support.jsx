@@ -28,16 +28,16 @@ export default function Support({ setVisible }) {
       setProcess(true);
       snackBar(`${t("Stage.process")} ${t("Function.sending")}`);
       const response = await _axios.put("/app/support", { status, content });
-      setProcess(false);
-      if (response.data.success) {
+      if (response.data.status === "success") {
         snackBar(`${t("Stage.success")} ${t("Function.sent")}`);
+        setTimeout(async () => { setVisible(false); setProcess(false); }, 2000);
       } else {
         snackBar(`${t("Stage.failed")} ${t("Function.sent_failed")}`);
+        setProcess(false);
       }
     } catch {
       snackBar(`${t("Stage.failed")} ${t("User.error")}`);
-    } finally {
-      setTimeout(async () => { setVisible(false); setProcess(false); }, 2000);
+      setProcess(false);
     }
   };
 
@@ -45,36 +45,40 @@ export default function Support({ setVisible }) {
     <>
       <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)} />
       <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{t("Function.support")}</Text>
-      <View style={{ alignContent: "center" }}>
-        <TouchableOpacity
-          style={{ backgroundColor: status === "good" ? "#666" : "" }}
-          onPress={() => {
-            if (status !== "good") {
-              setStatus("good");
-            } else {
-              setStatus("");
-            }
-          }}>
-          <FontAwesome name="thumbs-o-up" size={24} color={mainColor} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ backgroundColor: status === "bad" ? "#666" : "" }}
-          onPress={() => {
-            if (status !== "bad") {
-              setStatus("bad");
-            } else {
-              setStatus("");
-            }
-          }}>
-          <FontAwesome name="thumbs-o-down" size={24} color={mainColor} />
-        </TouchableOpacity>
+      <View style={{ display: "flex", flexDirection: "row" }}>
+        <View style={{ alignItems: "center", marginRight: 30 }}>
+          <TouchableOpacity
+            style={{ backgroundColor: status === "good" ? "#DDD" : "white", borderRadius: 50, padding: 10 }}
+            onPress={() => {
+              if (status !== "good") {
+                setStatus("good");
+              } else {
+                setStatus("");
+              }
+            }}>
+            <FontAwesome name="thumbs-o-up" size={42} color={mainColor} />
+            </TouchableOpacity>
+            <Text>{t("Function.support_good")}</Text>
+          </View>
+          <View style={{ alignItems: "center" }}>
+          <TouchableOpacity
+            style={{ backgroundColor: status === "bad" ? "#DDD" : "white", borderRadius: 50, padding: 10 }}
+            onPress={() => {
+              if (status !== "bad") {
+                setStatus("bad");
+              } else {
+                setStatus("");
+              }
+            }}>
+            <FontAwesome name="thumbs-o-down" size={42} color={mainColor} />
+            </TouchableOpacity>
+            <Text>{t("Function.support_bad")}</Text>
+          </View>
       </View>
       <Input
         title={t("Function.content")}
         content={content}
         onChangeText={(text) => setContent(text)}
-        buttonDisabled={process || !content || content.length <= 0}
-        buttonOnPress={() => { setVisible(false); setProcess(false); }}
         disabled={process}
       />
       <InputProcess
@@ -82,7 +86,7 @@ export default function Support({ setVisible }) {
         onPress={() => { sendProcess(); }}
         content={t("Function.regist")}
         cancel={process}
-        disabled={process}
+        disabled={process || !content || content.length <= 0}
       />
     </>
   );
