@@ -66,6 +66,7 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setM
         comments: response.data.data.comments,
         commentsCount: response.data.data.comments_count,
         matched: {
+          matched: response.data.data.matched,
           nickname: response.data.data.matched_nickname,
           status: response.data.data.matched_status,
         },
@@ -213,13 +214,17 @@ const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setM
               </>
             ) : (
               <>
-                <TouchableOpacity
-                  style={{ marginLeft: 8 }}
-                  onPress={() => { setMode("chat"); }}
-                  hitSlop={4}
-                >
-                  <Entypo name="chat" size={30} color={mainColor} />
-                </TouchableOpacity>
+                {
+                  data.matched.matched ?
+                  <TouchableOpacity
+                    style={{ marginLeft: 8 }}
+                    onPress={() => { setMode("chat"); }}
+                    hitSlop={4}
+                  >
+                    <Entypo name="chat" size={30} color={mainColor} />
+                  </TouchableOpacity> :
+                  null
+                }
                 <TouchableOpacity
                   hitSlop={8}
                   onPress={() => {
