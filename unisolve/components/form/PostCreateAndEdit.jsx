@@ -10,11 +10,11 @@ import ModalView from "../modal/ModalView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import DropDownPicker from "react-native-dropdown-picker";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTranslation } from "react-i18next";
 import _axios from "../../api";
 import "../../i18n";
 import { mainColor } from "../../constants/Colors";
+import SwitchBtn from "./Switch";
 
 export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackBar, categorys }) {
   const { t } = useTranslation();
@@ -227,17 +227,17 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
             {/* 공개 비공개 토글 버튼 */}
             {
               mode !== "edit" || mode === "edit" && Private ?
-              <TouchableOpacity
-                style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
-                hitSlop={4}
-                onPress={() => { setIsPrivate(!isPrivate); }}
-              >
-              <MaterialCommunityIcons name={isPrivate ? "checkbox-marked" : "checkbox-blank-outline"} size={24} color={isPrivate && mode === "edit" ? "red" : "black"} />
-              <View>
-                <Text style={{fontSize: 20, fontWeight: "bold", color: isPrivate && mode === "edit" ? "red" : "black"}}>{mode === "edit" ? `${t("Function.public_convert")}` : `${t("Function.private_convert")}`}</Text>
-                {mode === "edit" ? <Text style={{color: isPrivate ? "red" : "black"}}>{t("Function.public_convert_alert")}</Text> : null}
-              </View>
-              </TouchableOpacity> :
+              <View style={{ display: "flex", flexDirection: "row"}}>
+                <SwitchBtn
+                  trueColor={isPrivate && mode === "edit" ? "red" : mainColor}
+                  setValue={setIsPrivate}
+                  value={isPrivate}
+                />
+                <View>
+                  <Text style={{fontSize: 20, fontWeight: "bold", color: isPrivate && mode === "edit" ? "red" : isPrivate ? mainColor : "black"}}>{mode === "edit" ? `${t("Function.public_convert")}` : `${t("Function.private_convert")}`}</Text>
+                  {mode === "edit" ? <Text style={{color: isPrivate ? "red" : "black"}}>{t("Function.public_convert_alert")}</Text> : null}
+                </View>
+              </View> :
               null
             }
             <View style={{ marginTop: 10 }} />

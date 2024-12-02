@@ -136,8 +136,7 @@
         "lightmode": "라이트 모드",
         "notification": "알림 설정",
         "version": "앱 버전",
-        "support": "고객지원",
-        "notice": "공지사항",
+        "support": "의견 보내기",
         "operation": "서비스 이용약관",
         "privacy": "개인정보 처리방침"
     },
@@ -228,7 +227,6 @@
         "AI": "AI와 대화",
         "AI_failed": "사용불가",
         "AI_count": "회 남음",
-        "support": "의견 보내기",
         "select": "선택",
         "noSelect": "선택 안함",
         "message_view_btn": "전체보기",

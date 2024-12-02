@@ -136,8 +136,7 @@
         "lightmode": "ライトモード",
         "notification": "通知設定",
         "version": "アプリバージョン",
-        "support": "カスタマーサポート",
-        "notice": "お知らせ",
+        "support": "フィードバックを送る",
         "operation": "利用規約",
         "privacy": "プライバシーポリシー"
     },
@@ -229,7 +228,6 @@
         "AI_failed": "使用不可",
         "AI_count": "回数残り",
         "noSelect": "選択なし",
-        "support": "フィードバックを送る",
         "select": "選択",
         "message_view_btn": "メッセージ全体を見る",
         "message_view": "メッセージ全体を見る",

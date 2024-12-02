@@ -44,7 +44,7 @@ export default function Support({ setVisible }) {
   return (
     <>
       <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)} />
-      <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{t("Function.support")}</Text>
+      <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{t("Menu.support")}</Text>
       <View style={{ display: "flex", flexDirection: "row" }}>
         <View style={{ alignItems: "center", marginRight: 30 }}>
           <TouchableOpacity

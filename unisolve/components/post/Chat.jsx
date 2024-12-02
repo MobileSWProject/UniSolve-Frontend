@@ -9,10 +9,10 @@ import { useTranslation } from "react-i18next";
 import "../../i18n";
 import useUserId from "../../hooks/useUserId";
 import DropDownPicker from "react-native-dropdown-picker";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { FlatList } from "react-native-gesture-handler";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { mainColor } from "../../constants/Colors";
+import SwitchBtn from "../form/Switch";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from 'expo-file-system';
@@ -34,6 +34,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
   const [room, setRoom] = useState("0");
   const [AICheck, setAICheck] = useState(false);
   const [AICount, setAICount] = useState(0);
+  const [sendProcess, setSendProcess] = useState(false);
   
 
   // 스크롤 아래로 내리기
@@ -214,10 +215,12 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
 
   // 메세지 보내기
   async function msgSend() {
+    if (sendProcess) return;
     if (!message || message.length <= 0) {
       snackBar(`${t("Stage.failed")} ${t("Function.empty")}`);
       return;
     }
+    setSendProcess(true);
     await aiCheck();
     const time_id = `${Date.now()}-${userId}`;
     setMessage("");
@@ -248,6 +251,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
       be_ip: process.env.EXPO_PUBLIC_SERVER_BASE_URL,
       image: checkFile(true) ? await convertBase64(message) : "",
     });
+    setSendProcess(false);
   }
 
   if (loading) {
@@ -340,31 +344,27 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         />
       </View>
       <View style={styles.inputContainer}>
-        {
-          !ban && isPrivate && checkFile("!") ?
-          <>
-            <TouchableOpacity
-              disabled={!AICheck || AICount >= 15}
-              style={{ height: 30, flexDirection: "row", alignItems: "center", gap: 4 }}
-              hitSlop={4}
-              onPress={() => { setIsAI((prev)=>!prev); }}
-            >
-              <MaterialCommunityIcons name={isAI ? "checkbox-marked" : "checkbox-blank-outline"} size={24} />
-              <View>
-                <Text style={{ fontSize: 14, fontWeight: "bold", color: !AICheck || AICount >= 15 ? "#BBBBBB" : "#000" }}>{t("Function.AI")}</Text>
-                {
-                  !AICheck ? <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>({t("Function.AI_failed")})</Text> :
-                  <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>{`${15-AICount < 0 ? 0 : 15-AICount}`}회 남음</Text>
-                }
-                
-              </View>
-            </TouchableOpacity>
-          </> :
-          null
-        }
+      {
+        !ban && isPrivate && checkFile("!") ?
+        <View style={{ display: "flex", flexDirection: "row"}}>
+          <SwitchBtn
+            disabled={sendProcess || !AICheck || AICount >= 15}
+            setValue={setIsAI}
+            value={isAI}
+          />
+          <View>
+            <Text style={{ fontSize: 14, fontWeight: "bold", color: !AICheck || AICount >= 15 ? "#BBBBBB" : isAI ? mainColor : "#000" }}>{t("Function.AI")}</Text>
+            {
+              !AICheck ? <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>({t("Function.AI_failed")})</Text> :
+              <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>{`${15-AICount < 0 ? 0 : 15-AICount}`}회 남음</Text>
+            }
+          </View>
+        </View> :
+        null
+      }
         <BottomSheetTextInput
           style={styles.textInput}
-          disabled={ban || !isPrivate || checkFile(true)}
+          disabled={sendProcess || ban || !isPrivate || checkFile(true)}
           placeholder=
           {
             ban ?

@@ -47,6 +47,29 @@ export default function Me() {
     }
   }
 
+  async function language() {
+    if (process) return;
+    setProcess(true);
+    if (i18n.language === "ko") {
+      try { await _axios.put(`/app/language?lang=${"en"}`); } catch {}
+      i18n.changeLanguage("en");
+      snackBar(`${t("Stage.success")} ${t("Menu.en")}${t("Function.convert")}`);
+    } else if (i18n.language === "en") {
+      try { await _axios.put(`/app/language?lang=${"ja"}`); } catch {}
+      i18n.changeLanguage("ja");
+      snackBar(`${t("Stage.success")} ${t("Menu.ja")}${t("Function.convert")}`);
+    } else if (i18n.language === "ja") {
+      try { await _axios.put(`/app/language?lang=${"zh"}`); } catch {}
+      i18n.changeLanguage("zh");
+      snackBar(`${t("Stage.success")} ${t("Menu.zh")}${t("Function.convert")}`);
+    } else {
+      try { await _axios.put(`/app/language?lang=${"ko"}`); } catch {}
+      i18n.changeLanguage("ko");
+      snackBar(`${t("Stage.success")} ${t("Menu.ko")}${t("Function.convert")}`);
+    }
+    setProcess(false);
+  }
+
   async function getVersion() {
     if (process) return;
     try {
@@ -103,25 +126,15 @@ export default function Me() {
 
       <Text style={[styles.buttonText, { fontWeight: "bold", marginTop: 20 }]}> {t("Menu.settings")} </Text>
       <TouchableOpacity
-        onPress={() => {
-          if (i18n.language === "ko") {
-            i18n.changeLanguage("en");
-            snackBar(`${t("Stage.success")} ${t("Menu.en")}${t("Function.convert")}`);
-          } else if (i18n.language === "en") {
-            i18n.changeLanguage("ja");
-            snackBar(`${t("Stage.success")} ${t("Menu.ja")}${t("Function.convert")}`);
-          } else if (i18n.language === "ja") {
-            i18n.changeLanguage("zh");
-            snackBar(`${t("Stage.success")} ${t("Menu.zh")}${t("Function.convert")}`);
-          } else {
-            i18n.changeLanguage("ko");
-            snackBar(`${t("Stage.success")} ${t("Menu.ko")}${t("Function.convert")}`);
-          }
-        }}
+        onPress={() => { language(); }}
       >
         <Text style={styles.buttonText}>{`${t("Menu.lang")}(${t(i18n.language === "ko" ? "Menu.en" : i18n.language === "en" ? "Menu.ja" : i18n.language === "ja" ? "Menu.zh" : "Menu.ko")})`}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity 
+        onPress={() => {
+          setModalType("alert");
+          setModalVisible(true);
+        }}>
         <Text style={styles.buttonText}>{t("Menu.notification")}</Text>
       </TouchableOpacity>
 
@@ -129,14 +142,13 @@ export default function Me() {
       <TouchableOpacity onPress={() => { getVersion(); }}>
         <Text style={styles.buttonText}>{t("Menu.version")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => {
-        setModalType("support");
-        setModalVisible(true);
-      }}>
+      <TouchableOpacity
+        onPress={() => {
+          setModalType("support");
+          setModalVisible(true);
+        }}
+      >
         <Text style={styles.buttonText}>{t("Menu.support")}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => {}}>
-        <Text style={styles.buttonText}>{t("Menu.notice")}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {}}>
         <Text style={styles.buttonText}>{t("Menu.operation")}</Text>

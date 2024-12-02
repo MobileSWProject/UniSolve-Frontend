@@ -136,8 +136,7 @@
         "lightmode": "Light Mode",
         "notification": "Notification Settings",
         "version": "App Version",
-        "support": "Customer Support",
-        "notice": "Notice",
+        "support": "Send feedback",
         "operation": "Terms of Service",
         "privacy": "Privacy Policy"
     },
@@ -228,7 +227,6 @@
         "AI": "Chat with AI",
         "AI_failed": "Unavailable",
         "AI_count": "Times Left",
-        "support": "Send feedback",
         "select": "Select",
         "noSelect": "Not Selected",
         "message_view_btn": "View All",

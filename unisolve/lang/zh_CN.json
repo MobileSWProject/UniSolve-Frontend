@@ -136,8 +136,7 @@
         "lightmode": "浅色模式",
         "notification": "通知设置",
         "version": "应用版本",
-        "support": "客户支持",
-        "notice": "通知",
+        "support": "发送反馈",
         "operation": "服务条款",
         "privacy": "隐私政策"
     },
@@ -228,7 +227,6 @@
         "AI": "与AI对话",
         "AI_failed": "不可使用",
         "AI_count": "剩余次数",
-        "support": "发送反馈",
         "select": "选择",
         "noSelect": "未选择",
         "message_view_btn": "查看全部消息",
