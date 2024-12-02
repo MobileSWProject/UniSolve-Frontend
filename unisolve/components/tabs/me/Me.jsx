@@ -55,9 +55,9 @@ export default function Me() {
       const response = await _axios.get("/app/version");
       if (response) {
         if (response.data.data.version !== Application.nativeApplicationVersion) {
-          snackBar(`${t("Stage.success")} ${t("Function.version_go")} (${response.data.data.version ?? 0})`);
+          snackBar(`${t("Stage.success")} ${t("Function.version_go")} (${response.data.data.version ?? "0"})`);
         } else {
-          snackBar(`${t("Stage.success")} ${t("Function.version_release")} (${response.data.data.version ?? 0})`);
+          snackBar(`${t("Stage.success")} ${t("Function.version_release")} (${response.data.data.version ?? "0"})`);
         }
       }
       setProcess(false);
@@ -126,7 +126,10 @@ export default function Me() {
       <TouchableOpacity onPress={() => { getVersion(); }}>
         <Text style={styles.buttonText}>{t("Menu.version")}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity onPress={() => {
+        setModalType("support");
+        setModalVisible(true);
+      }}>
         <Text style={styles.buttonText}>{t("Menu.support")}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {}}>

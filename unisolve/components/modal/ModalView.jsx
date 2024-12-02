@@ -8,6 +8,7 @@ import SelectUser from "../form/SelectUser";
 import CommentModify from "../form/CommentModify";
 import ViewMessage from "../post/ViewMessage";
 import Post from "../post/Post";
+import Support from "../form/Support";
 import ModalList from "./ModalList";
 import Image from "../Image";
 import { ExpPage } from "../tabs/me/Exp";
@@ -42,6 +43,7 @@ export default function ModalView({ type, visible, setVisible, userData, image, 
                   type === "comment" ? <CommentModify visible={visible} setVisible={setVisible} comment={comment} setComment={setComment} /> :
                   type === "message" ? <ViewMessage setVisible={setVisible} viewMessage={viewMessage} /> :
                   type === "post" ? <Post post={post} /> :
+                  type === "support" ? <Support setVisible={setVisible} /> :
                   null
                 }
               </View>
