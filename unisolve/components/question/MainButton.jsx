@@ -7,10 +7,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
  */
 
 export default function IndexButton({ text, onPress }) {
-  // 로직들
-  // const [state, setState] = useState("");
-
-  // return jsx
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.container}>

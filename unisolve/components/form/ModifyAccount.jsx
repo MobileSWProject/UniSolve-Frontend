@@ -49,8 +49,8 @@ export default function Modify({ visible, setVisible, userData }) {
       else {
         snackBar(`${t("Stage.failed")} ${t("User.edit_account_failed")}`);
       }
-    } catch {
-      snackBar(`${t("Stage.failed")} ${t("User.error")}`);
+    } catch (error) {
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
     } finally {
       setTimeout(async () => { setVisible(false); setEditing(false); }, 2000);
     }

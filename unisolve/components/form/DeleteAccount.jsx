@@ -37,8 +37,8 @@ export default function Delete({ visible, setVisible }) {
           return;
         }, 2000);
       }
-    } catch {
-      snackBar(`${t("Stage.failed")} ${t("User.delete_failed")}`);
+    } catch (error) {
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
       setTimeout(async () => {
         setDeleting(false);
         setVisible(false);

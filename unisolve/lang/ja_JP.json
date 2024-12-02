@@ -199,6 +199,11 @@
         "post": "投稿",
         "post_empty": "投稿はありません!",
         "post_private": "投稿が非公開状態のときのみ、会話が可能です。",
+        "setting": "設定",
+        "setting_go": "設定中です。",
+        "setting_success": "設定が完了しました!",
+        "setting_failed": "設定できませんでした!",
+        "search": "検索",
         "send": "送信",
         "reply": "返信",
         "count": "カウント",
@@ -219,7 +224,9 @@
         "delete": "削除",
         "input": "入力してください。",
         "image": "画像",
+        "file": "ファイル",
         "chat": "チャット",
+        "chat_image": "画像が添付されました(添付された画像を削除するか送信ボタンを押してください)",
         "accept": "承認",
         "refuse": "拒否",
         "input_final": "",
@@ -228,6 +235,7 @@
         "AI_failed": "使用不可",
         "AI_count": "回数残り",
         "noSelect": "選択なし",
+        "view": "表示",
         "select": "選択",
         "message_view_btn": "メッセージ全体を見る",
         "message_view": "メッセージ全体を見る",
@@ -236,6 +244,10 @@
         "version_release": "最新バージョンです!",
         "version_web": "ウェブではバージョンを確認できません。",
         "support_good": "いいね",
-        "support_bad": "よくない"
+        "support_bad": "よくない",
+        "alert_check": "通知受信の同意",
+        "alert_week": "毎週",
+        "alert_night": "夜間",
+        "alert_marketing": "マーケティング"
     }
 }

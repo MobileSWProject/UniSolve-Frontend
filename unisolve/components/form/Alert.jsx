@@ -31,7 +31,8 @@ export default function Alert({ setVisible }) {
         return setType(response.data.data);
       }
       setProcess(false);
-    } catch {
+    } catch (error) {
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
       setProcess(false);
     }
   }
@@ -40,17 +41,17 @@ export default function Alert({ setVisible }) {
     if (process) return;
     try {
       setProcess(true);
-      snackBar(`${t("Stage.process")} ${t("Function.sending")}`);
+      snackBar(`${t("Stage.process")} ${t("Function.setting_go")}`);
       const response = await _axios.put("/app/alert", { type });
       if (response.data.status === "success") {
-        snackBar(`${t("Stage.success")} ${t("Function.sent")}`);
+        snackBar(`${t("Stage.success")} ${t("Function.setting_success")}`);
         setTimeout(async () => { setVisible(false); setProcess(false); }, 2000);
       } else {
-        snackBar(`${t("Stage.failed")} ${t("Function.sent_failed")}`);
+        snackBar(`${t("Stage.failed")} ${t("Function.setting_failed")}`);
         setProcess(false);
       }
-    } catch {
-      snackBar(`${t("Stage.failed")} ${t("User.error")}`);
+    } catch (error) {
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
       setProcess(false);
     }
   };
@@ -61,29 +62,32 @@ export default function Alert({ setVisible }) {
       <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{t("Menu.notification")}</Text>
       <View style={{ display: "flex", flexDirection: "row"}}>
         <View style={{marginRight: 5}}>
-          <Text style={{fontSize: 20, fontWeight: "bold", color: type.week ? mainColor : "black"}}>{"주간 수신동의"}</Text>
+          <Text style={{fontSize: 20, fontWeight: "bold", color: type.week ? mainColor : "black"}}>{`${t("Function.alert_week")} ${t("Function.alert_check")}`}</Text>
           <Text style={{fontSize: 12, fontWeight: "bold", color: type.week ? mainColor : "black", alignItems: "center"}}>{"06:00 ~ 22:00"}</Text>
         </View>
         <SwitchBtn
+          disabled={process}
           setValue={() => setType((prevType) => ({ ...prevType, week: !type.week }))}
           value={type.week}
         />
       </View>
       <View style={{ display: "flex", flexDirection: "row", marginTop: 20}}>
         <View style={{marginRight: 5}}>
-          <Text style={{fontSize: 20, fontWeight: "bold", color: type.night ? mainColor : "black"}}>{"야간 수신동의"}</Text>
+          <Text style={{fontSize: 20, fontWeight: "bold", color: type.night ? mainColor : "black"}}>{`${t("Function.alert_night")} ${t("Function.alert_check")}`}</Text>
           <Text style={{fontSize: 12, fontWeight: "bold", color: type.night ? mainColor : "black", alignItems: "center"}}>{"22:00 ~ 06:00"}</Text>
         </View>
         <SwitchBtn
+          disabled={process}
           setValue={() => setType((prevType) => ({ ...prevType, night: !type.night }))}
           value={type.night}
         />
       </View>
       <View style={{ display: "flex", flexDirection: "row", marginTop: 20}}>
       <View style={{marginRight: 5}}>
-          <Text style={{fontSize: 20, fontWeight: "bold", color: type.marketing ? mainColor : "black"}}>{"마케팅 수신동의"}</Text>
+          <Text style={{fontSize: 20, fontWeight: "bold", color: type.marketing ? mainColor : "black"}}>{`${t("Function.alert_marketing")} ${t("Function.alert_check")}`}</Text>
         </View>
         <SwitchBtn
+          disabled={process}
           setValue={() => setType((prevType) => ({ ...prevType, marketing: !type.marketing }))}
           value={type.marketing}
         />
@@ -91,7 +95,7 @@ export default function Alert({ setVisible }) {
       <InputProcess
         setVisible={setVisible}
         onPress={() => { sendProcess(); }}
-        content={t("Function.regist")}
+        content={t("Function.setting")}
         cancel={process}
         disabled={process}
       />

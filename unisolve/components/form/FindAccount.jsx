@@ -32,8 +32,8 @@ export default function FindAccount({ visible, setVisible }) {
       if (response.data.isSent || response.data.foundpw) {
         snackBar(`${t("Stage.success")} ${t("User.search_account_success")}`);
       }
-    } catch {
-      snackBar(`${t("Stage.failed")} ${t("User.search_account_failed")}`);
+    } catch (error) {
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
     } finally {
       setTimeout(() => { setVisible(false); setFindSending(false); }, 2000);
     }

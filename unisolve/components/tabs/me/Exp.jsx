@@ -1,5 +1,5 @@
 import { useFocusEffect } from "expo-router";
-import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useState, useCallback } from "react";
 import _axios from "../../../api";
 import { styles } from "../../../styles/tabs/me/ExpStyle";
@@ -8,7 +8,7 @@ import LevelImage from "../../../components/tabs/me/LevelImage";
 import { Table, Row, Rows } from "react-native-table-component";
 import { useTranslation } from "react-i18next";
 import "../../../i18n";
-import { getExpToLevel, getLevel, getPercent } from "../../../utils/expUtils";
+import { getExpToLevel, getLevel } from "../../../utils/expUtils";
 
 export function ExpPage({setVisible}) {
   const { t } = useTranslation();

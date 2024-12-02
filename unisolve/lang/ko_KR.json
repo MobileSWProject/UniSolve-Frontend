@@ -199,6 +199,11 @@
         "post": "게시글",
         "post_empty": "게시글이 없습니다!",
         "post_private": "게시글이 비공개인 상태에서만 대화할 수 있습니다.",
+        "setting": "설정",
+        "setting_go": "설정하고 있습니다.",
+        "setting_success": "설정되었습니다!",
+        "setting_failed": "설정하지 못했습니다!",
+        "search": "검색어",
         "send": "전송",
         "reply": "답글",
         "count": "개",
@@ -219,7 +224,9 @@
         "delete": "삭제",
         "input": "입력하세요.",
         "image": "이미지",
+        "file": "파일",
         "chat": "대화",
+        "chat_image": "이미지 첨부됨 (첨부된 이미지를 삭제하거나 전송 버튼을 눌러주세요)",
         "accept": "수락",
         "refuse": "거절",
         "input_final": "을",
@@ -229,6 +236,7 @@
         "AI_count": "회 남음",
         "select": "선택",
         "noSelect": "선택 안함",
+        "view": "보기",
         "message_view_btn": "전체보기",
         "message_view": "메시지 전체 보기",
         "version_check": "확인하고 있습니다..",
@@ -236,6 +244,10 @@
         "version_release": "최신 버전 입니다!",
         "version_web": "웹에서는 버전을 확인할 수 없습니다.",
         "support_good": "좋아요",
-        "support_bad": "싫어요"
+        "support_bad": "싫어요",
+        "alert_check": "수신동의",
+        "alert_week": "주간",
+        "alert_night": "야간",
+        "alert_marketing": "마케팅"
     }
 }

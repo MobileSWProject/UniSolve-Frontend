@@ -1,7 +1,4 @@
-// import { useState } from "react";
-
 import { Platform, StyleSheet, TextInput } from "react-native";
-import { mainColor } from "../../constants/Colors";
 
 export default function InputBox({
   width = "full",
@@ -10,10 +7,6 @@ export default function InputBox({
   style = {},
   setState,
 }) {
-  // 로직들
-  // const [state, setState] = useState("");
-
-  // return jsx
   return (
     <TextInput
       style={[styles.contentInput, { width, height }, style]}

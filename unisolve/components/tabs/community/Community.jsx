@@ -86,11 +86,7 @@ export default function Community() {
 
   useEffect(() => {
     if (mode === "") return;
-  
-    console.log("open the door");
-
     if (firstRender.current) {
-      console.log("첫 번째 렌더링");
       setTimeout(()=>{
         sheetRef.current?.expand();
         firstRender.current = false
@@ -161,7 +157,7 @@ export default function Community() {
         }
       }
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
     } finally {
       setProcess(false); // 요청 완료 후 process 상태 해제
     }
@@ -307,7 +303,7 @@ export default function Community() {
             category ?
             <TextInput
               style={styles.searchInput}
-              placeholder="검색어"
+              placeholder={t("Function.search")}
               value={searchText}
               onChangeText={handleChangeText}
               placeholderTextColor={"white"}

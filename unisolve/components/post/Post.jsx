@@ -1,12 +1,12 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import Markdown from "react-native-markdown-display";
 import SyntaxHighlighter from "react-native-syntax-highlighter";
 import Input from "../../components/form/Input";
 import { Image, Text, TouchableOpacity, View, RefreshControl, ScrollView } from "react-native";
 import styles from "../../styles/post/PostStyles";
-import { useCallback, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import _axios from "../../api";
 import LevelImage from "../../components/tabs/me/LevelImage";
 import { ReplyCommentIdProvider, useReplyCommentId } from "../../components/post/ReplyCommentIdContext";
@@ -19,7 +19,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
-const Post = ({sheetRef, setMode, post, snackBar, getList, modalVisible, setModalVisible, setModalType, setComment}) => {
+const Post = ({sheetRef, setMode, post, snackBar, getList, setModalVisible, setModalType, setComment}) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [ban, setBan] = useState(false);

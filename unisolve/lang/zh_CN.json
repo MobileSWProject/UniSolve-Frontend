@@ -199,6 +199,11 @@
         "post": "帖子",
         "post_empty": "没有可用的帖子!",
         "post_private": "只有在帖子为私密状态时,才能进行对话。",
+        "setting": "设置",
+        "setting_go": "正在设置。",
+        "setting_success": "设置成功!",
+        "setting_failed": "设置失败!",
+        "search": "搜索",
         "send": "发送",
         "reply": "回复",
         "count": "计数",
@@ -219,7 +224,9 @@
         "delete": "删除",
         "input": "请输入。",
         "image": "图片",
+        "file": "文件",
         "chat": "聊天",
+        "chat_image": "图片已附加(删除附加图片或点击发送按钮)",
         "accept": "接受",
         "refuse": "拒绝",
         "input_final": "",
@@ -229,6 +236,7 @@
         "AI_count": "剩余次数",
         "select": "选择",
         "noSelect": "未选择",
+        "view": "查看",
         "message_view_btn": "查看全部消息",
         "message_view": "查看所有消息",
         "version_check": "正在检查版本...",
@@ -236,6 +244,10 @@
         "version_release": "这是最新版本!",
         "version_web": "无法在网页上查看版本。",
         "support_good": "喜欢",
-        "support_bad": "不喜欢"
+        "support_bad": "不喜欢",
+        "alert_check": "同意接收通知",
+        "alert_week": "每周",
+        "alert_night": "夜间",
+        "alert_marketing": "营销"
     }
 }

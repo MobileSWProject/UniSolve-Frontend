@@ -17,7 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from 'expo-file-system';
 
-export default function CommunityChat({ sheetRef, setMode, post, setPost, snackBar, setModalVisible, setModalType, setViewMessage, setLagacy }) {
+export default function CommunityChat({ setMode, post, setPost, snackBar, setModalVisible, setModalType, setViewMessage, setLagacy }) {
   const { t } = useTranslation();
   const { userId, loading } = useUserId();
   const [chatData, setChatData] = useState([]);
@@ -67,7 +67,6 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
   // Room이 세팅되면 채팅 불러오고, 소켓 연결하기
   useEffect(() => {
     const loadChatHistory = async () => {
-      console.log("채팅 불러오기");
       try {
         await aiCheck();
         const response = await _axios.get(`/chat/messages?post_id=${room}`);
@@ -76,31 +75,25 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         setIsPrivate(response.data.is_private || false);
         scrollToBottom();
       } catch (error) {
-        console.error("Failed to load existing messages:", error);
+        snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
       }
     };
 
     const initializeSocket = async () => {
       // 기존 소켓 연결 해제
       if (socket.current) {
-        console.log("기존 소켓 연결 끊기");
         const token = await AsyncStorage.getItem("token");
         socket.current.emit("leave", { room, token });
         socket.current.disconnect();
       }
 
-      console.log("소켓 연결하기");
       if (loading) return;
       socket.current = io(process.env.EXPO_PUBLIC_SERVER_BASE_URL);
       const token = await AsyncStorage.getItem("token");
 
-      console.log("소켓 연결하기2");
       socket.current.emit("join", { room, token });
-      console.log("소켓 연결하기3");
 
       socket.current.on("receive_message", (data) => {
-        console.log("Received data:", data);
-
         setChatData((prevData) => {
           const updatedData = [...prevData]; // 기존 데이터를 복사
           const existingIndex = updatedData.findIndex(
@@ -125,9 +118,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
         });
       });
 
-      socket.current.on("error", (data) => {
-        console.error("Error:", data.msg);
-      });
+      socket.current.on("error", (data) => {});
     };
 
     // room 이 세팅되었을 때 and user가 불러와졌을 때
@@ -227,7 +218,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
     scrollToBottom();
 
     chatData.unshift({
-      content: checkFile(true) ? "이미지 파일" : message,
+      content: checkFile(true) ? `${t("Function.image")} ${t("Function.file")}` : message,
       is_me: true,
       sent_at: t("Function.sending"),
       is_ai: isAI,
@@ -311,7 +302,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
                 style={{ backgroundColor: mainColor, marginBottom: 5, borderRadius: 5 }}
                 onPress={() => { setPost(value); setLagacy(true); setMode("post"); }}
               >
-                <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold", textAlign: "center", marginVertical: 3 }}>게시글 보기</Text>
+                <Text style={{ color: "#FFF", fontSize: 20, fontWeight: "bold", textAlign: "center", marginVertical: 3 }}>{`${t("Function.post")} ${t("Function.view")}`}</Text>
               </TouchableOpacity> :
               null
             }
@@ -356,7 +347,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
             <Text style={{ fontSize: 14, fontWeight: "bold", color: !AICheck || AICount >= 15 ? "#BBBBBB" : isAI ? mainColor : "#000" }}>{t("Function.AI")}</Text>
             {
               !AICheck ? <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>({t("Function.AI_failed")})</Text> :
-              <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>{`${15-AICount < 0 ? 0 : 15-AICount}`}회 남음</Text>
+              <Text style={{ fontSize: 12, fontWeight: "bold", color: "#FF0000" }}>{`${15-AICount < 0 ? 0 : 15-AICount}${t("Function.AI_count")}`}</Text>
             }
           </View>
         </View> :
@@ -373,7 +364,7 @@ export default function CommunityChat({ sheetRef, setMode, post, setPost, snackB
             t("Function.post_private") :
             t("Function.input_content")
           }
-          value={checkFile(true) ? "이미지 첨부됨 (첨부된 이미지를 삭제하거나 전송 버튼을 눌러주세요)" : message}
+          value={checkFile(true) ? t("Function.chat_image") : message}
           onChangeText={(text) => { 
             if (ban || !isPrivate || checkFile(true)) return;
             else {

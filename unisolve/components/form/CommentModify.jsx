@@ -27,7 +27,8 @@ export default function Report({visible, setVisible, comment, setComment}) {
           const response = await _axios.get(`/comments/${comment}`);
           setProcess(false);
           setCommentContent(response.data.data.content);
-        } catch {
+        } catch (error) {
+          snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
           setProcess(false);
           setVisible(false);
           setComment(null);
@@ -50,8 +51,8 @@ export default function Report({visible, setVisible, comment, setComment}) {
         snackBar(`${t("Stage.success")} ${t("Function.edit")}`);
         setTimeout(() => { setVisible(false); setComment(null); setCommentContent(""); }, 2000);
       }
-    } catch {
-      snackBar(`${t("Stage.failed")} ${t("Function.edit_failed")}`);
+    } catch (error) {
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
     }
   };
 
@@ -62,7 +63,7 @@ export default function Report({visible, setVisible, comment, setComment}) {
         message={snackbarMessage}
         onDismiss={() => setSnackbarVisible(false)}
       />
-      <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>댓글 수정하기</Text>
+      <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{`${t("Function.comment")} ${"Function.btn_edit"}`}</Text>
       <ScrollView>
         <Input
           title={`${t("Function.comment")} ${t("Function.edited")}`}

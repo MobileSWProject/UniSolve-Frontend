@@ -74,7 +74,7 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
         setProcess(false);
       }
     } catch (error) {
-      snackBar(`${t("Stage.failed")} ${t("Function.edit_failed")}`);
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
       setProcess(false);
     }
   };

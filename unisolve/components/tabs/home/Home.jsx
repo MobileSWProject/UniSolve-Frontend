@@ -2,7 +2,6 @@ import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import { Text, Image, TouchableOpacity } from "react-native";
 import { styles } from "../../../styles/tabs/home/HomeStyle";
-import _axios from "../../../api";
 import { useTranslation } from 'react-i18next';
 import "../../../i18n";
 

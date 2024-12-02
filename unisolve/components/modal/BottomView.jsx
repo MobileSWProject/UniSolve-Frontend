@@ -1,7 +1,6 @@
 import { TouchableOpacity } from "react-native";
-import BottomSheet, { BottomSheetFlatList, BottomSheetView, BottomSheetVirtualizedList } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useCallback } from "react";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useFocusEffect } from "@react-navigation/native";
 import PostCreateAndEdit from "../form/PostCreateAndEdit";
 import Post from "../post/Post";

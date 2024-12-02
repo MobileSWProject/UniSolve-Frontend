@@ -199,6 +199,11 @@
         "post": "Post",
         "post_empty": "No posts available!",
         "post_private": "You can only communicate when the post is in private mode.",
+        "setting": "Setting",
+        "setting_go": "Setting in progress.",
+        "setting_success": "Setting successful!",
+        "setting_failed": "Failed to set!",
+        "search": "Search",
         "send": "Send",
         "reply": "Reply",
         "count": "Count",
@@ -219,7 +224,9 @@
         "delete": "Delete",
         "input": "Please enter.",
         "image": "Image",
+        "file": "File",
         "chat": "Chat",
+        "chat_image": "Image attached (Delete the attached image or press the send button)",
         "accept": "Accept",
         "refuse": "Decline",
         "input_final": "",
@@ -229,6 +236,7 @@
         "AI_count": "Times Left",
         "select": "Select",
         "noSelect": "Not Selected",
+        "view": "View",
         "message_view_btn": "View All",
         "message_view": "View All Messages",
         "version_check": "Checking version...",
@@ -236,6 +244,10 @@
         "version_release": "You have the latest version!",
         "version_web": "Cannot check version on the web.",
         "support_good": "Like",
-        "support_bad": "Dislike"
+        "support_bad": "Dislike",
+        "alert_check": "Consent to receive notifications",
+        "alert_week": "Weekly",
+        "alert_night": "Nightly",
+        "alert_marketing": "Marketing"
     }
 }

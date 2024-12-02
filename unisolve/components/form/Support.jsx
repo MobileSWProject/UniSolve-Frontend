@@ -35,8 +35,8 @@ export default function Support({ setVisible }) {
         snackBar(`${t("Stage.failed")} ${t("Function.sent_failed")}`);
         setProcess(false);
       }
-    } catch {
-      snackBar(`${t("Stage.failed")} ${t("User.error")}`);
+    } catch (error) {
+      snackBar(`${t(`Stage.failed`)} [${error.response.status}] ${t(`Status.${error.response.status}`)}`);
       setProcess(false);
     }
   };
