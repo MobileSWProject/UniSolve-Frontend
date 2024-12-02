@@ -217,14 +217,14 @@ export default function Community() {
   const AnimatedIcons = animated(Icons);
   const AnimatedView = animated(View);
   const [springs, api] = useSpring(() => ({ marginTop: 0, opacity: 0, rotate: 0 }));
-  const [springs2, api2] = useSpring(() => ({ marginTop: 0 }));
+  const [springs2, api2] = useSpring(() => ({ opacity: 1 }));
   // "READY" | "CAN_REFRESH" | "IS_REFRESHING"
   const animationStep = useRef("READY");
 
   useEffect(() => {
     if (canRefresh && animationStep.current === "READY") {
       api.start({ opacity: 1, marginTop: 12, rotate: 360, config: { duration: 300 }});
-      // api2.start({marginTop: 30, config: { duration: 300 }});
+      // api2.start({opacity: 0.5, config: { duration: 300 }});
       animationStep.current = "CAN_REFRESH";
     }
 
@@ -238,13 +238,13 @@ export default function Community() {
     if (!isRefreshing && animationStep.current === "IS_REFRESHING") {
       api.stop(); // 명시적으로 애니메이션 중지
       api.start({ opacity: 0, marginTop: 0, rotate: 0 });
-      // api2.start({ marginTop: 0, duration: 300 });
+      // api2.start({ opacity: 1, duration: 300 });
       animationStep.current = "READY";
     }
 
     if (!canRefresh && animationStep.current === "CAN_REFRESH") {
       api.start({ opacity: 0, marginTop: 0, rotate: 0, config: { duration: 300 }});
-      // api2.start({ marginTop: 0, duration: 300 });
+      // api2.start({ opacity: 1, duration: 300 });
       animationStep.current = "READY";
     }
   }, [canRefresh, isRefreshing]);
@@ -350,7 +350,8 @@ export default function Community() {
       </View>
 
       {/* 커뮤니티 리스트 */}
-      <AnimatedView style={{ ...springs2, flex: 1 }}>
+      <View style={{marginTop: isRefreshing ? 30 : 0}} />
+      <AnimatedView style={{  flex: 1 }}>
         <>
           {
             communitys.length === 0 ?
