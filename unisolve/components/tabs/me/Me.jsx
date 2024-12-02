@@ -43,6 +43,7 @@ export default function Me() {
       setExp(response.data.data.exp || 0);
       setProcess(false);
     } catch {
+      await AsyncStorage.clear();
       router.replace("/");
     }
   }
