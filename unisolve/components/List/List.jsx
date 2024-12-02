@@ -87,7 +87,7 @@ export default function PostListItem({ item, type, bottomView, setVisible, setUs
         {
           item.type === 1 && item.description === "invite" ? 
           null :
-          <Text style={[styles.description, { fontWeight: "bold" }]} numberOfLines={3}>{item.description ? item.description.replace(/\n/g, " ") : ""}</Text>
+          <Text style={[styles.description, { fontWeight: "bold" }]} numberOfLines={3}>{type === "notification" && item.type === 1 && item.description ? t(`Function.matching_${item.description.startsWith("수락") ? "yes" : "no"}`) : item.description ? item.description.replace(/\n/g, " ") : ""}</Text>
         }
         <View style={styles.header}>
           {

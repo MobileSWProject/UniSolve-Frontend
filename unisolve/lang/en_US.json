@@ -195,6 +195,8 @@
         "matching_select": "Selected match",
         "matching_alert": "Once requested and accepted (or not rejected),\nyou cannot change the match!",
         "matching_go": "Request sent to ",
+        "matching_no": "Declined.",
+        "matching_yes": "Accepted.",
         "regist": "Register",
         "post": "Post",
         "post_empty": "No posts available!",

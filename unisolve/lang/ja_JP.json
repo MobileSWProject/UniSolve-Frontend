@@ -195,6 +195,8 @@
         "matching_select": "選択されたマッチ",
         "matching_alert": "リクエストが承認（または拒否されない）と変更できません!",
         "matching_go": "リクエストを送信しました: ",
+        "matching_no": "拒否しました。",
+        "matching_yes": "受け入れました。",
         "regist": "登録",
         "post": "投稿",
         "post_empty": "投稿はありません!",

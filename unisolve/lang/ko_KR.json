@@ -195,6 +195,8 @@
         "matching_select": "선택된 상대",
         "matching_alert": "요청 후 거절하지 않거나\n상대방이 수락하면 변경할 수 없습니다!\n",
         "matching_go": "님에게 요청함",
+        "matching_no": "거절하였습니다.",
+        "matching_yes": "수락하였습니다.",
         "regist": "등록",
         "post": "게시글",
         "post_empty": "게시글이 없습니다!",

@@ -195,6 +195,8 @@
         "matching_select": "已选择匹配对象",
         "matching_alert": "一旦请求被接受(或未被拒绝),\n您将无法更改匹配对象!",
         "matching_go": "请求已发送至 ",
+        "matching_no": "已拒绝。",
+        "matching_yes": "已接受。",
         "regist": "注册",
         "post": "帖子",
         "post_empty": "没有可用的帖子!",
