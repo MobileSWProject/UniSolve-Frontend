@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import "../../i18n";
 
 import { LogBox } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
 export default function Register({ visible, setVisible }) {
@@ -160,7 +161,7 @@ export default function Register({ visible, setVisible }) {
   return (
     <>
       <Text style={{ fontSize: 25, marginBottom: 5, fontWeight: "bold" }}>{t("User.regist")}</Text>
-      <ScrollView>
+      <KeyboardAwareScrollView>
         <Input
           title={t("User.id")}
           subTitle={confirmID()}
@@ -268,15 +269,17 @@ export default function Register({ visible, setVisible }) {
           </View> :
           null
         }
-      </ScrollView>
-      <InputProcess
-        visible={visible}
-        setVisible={setVisible}
-        onPress={() => { registerProcess(); }}
-        content={t("User.regist")}
-        cancel={reProcess}
-        disabled={reProcess}
-      />
+        <View style={{alignItems: "center"}}>
+          <InputProcess
+          visible={visible}
+          setVisible={setVisible}
+          onPress={() => { registerProcess(); }}
+          content={t("User.regist")}
+          cancel={reProcess}
+          disabled={reProcess}
+        />
+        </View>
+      </KeyboardAwareScrollView>
       <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)} />
     </>
   );

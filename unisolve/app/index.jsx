@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { SafeAreaView, Text, ActivityIndicator, Animated, TextInput, TouchableOpacity } from "react-native";
+import { SafeAreaView, Text, ActivityIndicator, Animated, TextInput, TouchableOpacity, Pressable, Keyboard } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { styles } from "../styles/IndexStyle";
@@ -129,64 +129,66 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.Image source={require("../assets/logo.png")} style={[styles.logo, { transform: [{ translateY: logoPosition }] }]} />
-      {
-        certification ?
-        <ActivityIndicator size="large" color="white" /> :
-        null
-      }
-      <Animated.View style={{ opacity: inputOpacity, flexDirection: "column", alignItems: "flex-start", }} >
-        <TextInput
-          style={styles.input}
-          placeholder={t("User.id_please")}
-          placeholderTextColor="#fff"
-          value={id}
-          onChangeText={(text) => { inputID(text); }}
-          onSubmitEditing={handleSend}
-          disabled={loginCheck}
-        />
-      </Animated.View>
-      {
-        checkID ?
-        <Animated.View style={{ opacity: pwOpacity, transform: [{ translateY: pwPosition }], flexDirection: "row", alignItems: "center", marginTop: 10, }}>
+      <Pressable style={[styles.container, {marginBottom: 120}]} onPress={()=>Keyboard.dismiss()}>
+        <Animated.Image source={require("../assets/logo.png")} style={[styles.logo, { transform: [{ translateY: logoPosition }] }]} />
+        {
+          certification ?
+          <ActivityIndicator size="large" color="white" /> :
+          null
+        }
+        <Animated.View style={{ opacity: inputOpacity, flexDirection: "column", alignItems: "flex-start", }} >
           <TextInput
             style={styles.input}
-            placeholder={t("User.password_please")}
+            placeholder={t("User.id_please")}
             placeholderTextColor="#fff"
-            value={pw}
-            onChangeText={setPW}
-            secureTextEntry={true}
+            value={id}
+            onChangeText={(text) => { inputID(text); }}
             onSubmitEditing={handleSend}
             disabled={loginCheck}
           />
-        </Animated.View> :
-        null
-      }
-      <Animated.View style={{ opacity: inputOpacity, marginTop: 5 }}>
-        <TouchableOpacity onPress={() => { setModalType("find"); setModalVisible(true); }} >
-          <Text style={styles.text}>{t("User.account_forget")}</Text>
-        </TouchableOpacity>
-      </Animated.View>
-      <Animated.View style={{ opacity: inputOpacity, marginTop: 15 }}>
-        <TouchableOpacity onPress={() => { setModalType("register"); setModalVisible(true); }} >
-          <Text style={[styles.text, { fontWeight: "bold" }]}> {t("User.account_regist")} </Text>
-        </TouchableOpacity>
-      </Animated.View>
-      {
-        !certification ?
-        <Animated.View style={{ opacity: sendOpacity, transform: [{ translateX: sendPosition }], flexDirection: "row", alignItems: "center", }} >
-          <TouchableOpacity style={styles.sendButton} onPress={handleSend} >
-            <MaterialCommunityIcons name="send" size={24} color="white" />
+        </Animated.View>
+        {
+          checkID ?
+          <Animated.View style={{ opacity: pwOpacity, transform: [{ translateY: pwPosition }], flexDirection: "row", alignItems: "center", marginTop: 10, }}>
+            <TextInput
+              style={styles.input}
+              placeholder={t("User.password_please")}
+              placeholderTextColor="#fff"
+              value={pw}
+              onChangeText={setPW}
+              secureTextEntry={true}
+              onSubmitEditing={handleSend}
+              disabled={loginCheck}
+            />
+          </Animated.View> :
+          null
+        }
+        <Animated.View style={{ opacity: inputOpacity, marginTop: 35 }}>
+          <TouchableOpacity onPress={() => { setModalType("find"); setModalVisible(true); }} >
+            <Text style={styles.text}>{t("User.account_forget")}</Text>
           </TouchableOpacity>
-        </Animated.View> :
-        null
-      }
-      {
-        modalVisible ?
-        <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} /> :
-        null
-      }
-      <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)} />
+        </Animated.View>
+        <Animated.View style={{ opacity: inputOpacity, marginTop: 15 }}>
+          <TouchableOpacity onPress={() => { setModalType("register"); setModalVisible(true); }} >
+            <Text style={[styles.text, { fontWeight: "bold" }]}> {t("User.account_regist")} </Text>
+          </TouchableOpacity>
+        </Animated.View>
+        {
+          !certification ?
+          <Animated.View style={{ opacity: sendOpacity, transform: [{ translateX: sendPosition }], flexDirection: "row", alignItems: "center", }} >
+            <TouchableOpacity style={styles.sendButton} onPress={handleSend} >
+              <MaterialCommunityIcons name="send" size={24} color="white" />
+            </TouchableOpacity>
+          </Animated.View> :
+          null
+        }
+        {
+          modalVisible ?
+          <ModalView type={modalType} visible={modalVisible} setVisible={setModalVisible} /> :
+          null
+        }
+        <SnackBar visible={snackbarVisible} message={snackbarMessage} onDismiss={() => setSnackbarVisible(false)} />
+      </Pressable>
     </SafeAreaView>
   );
 }
