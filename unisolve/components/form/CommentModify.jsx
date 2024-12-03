@@ -63,7 +63,7 @@ export default function Report({visible, setVisible, comment, setComment}) {
         message={snackbarMessage}
         onDismiss={() => setSnackbarVisible(false)}
       />
-      <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{`${t("Function.comment")} ${"Function.btn_edit"}`}</Text>
+      <Text style={{ fontSize: 40, marginBottom: 10, textAlign: "center", fontWeight: "bold", color: mainColor, marginTop: 4 }}>{`${t("Function.comment")} ${t("Function.btn_edit")}`}</Text>
       <ScrollView>
         <Input
           title={`${t("Function.comment")} ${t("Function.edited")}`}
