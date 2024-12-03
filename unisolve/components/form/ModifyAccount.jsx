@@ -31,7 +31,7 @@ export default function Modify({ visible, setVisible, userData }) {
 
   const EditProcess = async () => {
     if (editing || password.length <= 0 || !emailChecks || (newPassword.length > 0 && newPassword !== subPassword) || nickname.length <= 0) {
-      snackBar(`${t("Stage.failed")} ${t("User.empty_content")}`);
+      snackBar(`${t("Stage.failed")} ${t("Function.empty_content")}`);
       return;
     }
     try {
