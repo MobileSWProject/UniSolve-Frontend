@@ -203,7 +203,7 @@ export default function PostCreateAndEdit({ mode, setMode, post, setPost, snackB
           {/* 카테고리 */}
           { 
             mode !== "edit" ? 
-            <View style={{ width: "93%", zIndex: 99 }}>
+            <View style={{ width: "93%", zIndex: 99, minHeight: open ? 250 : 60 }}>
               <DropDownPicker
                 style={{ borderWidth: 1.4 }}
                 open={open}
