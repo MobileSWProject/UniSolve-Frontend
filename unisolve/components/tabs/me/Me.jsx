@@ -109,7 +109,7 @@ export default function Me() {
               <Text style={[ styles.experienceText, { color: getPercent(exp) <= 33 ? mainColor : "#000" } ]}> {getPercent(exp)}% </Text> :
               null
             }
-            <ProgressBar styleAttr="Horizontal" indeterminate={false} progress={Number((getPercent(exp) / 100).toFixed(2))} color={mainColor} style={styles.progressBar} />
+            <ProgressBar styleAttr="Horizontal" indeterminate={false} progress={Number((getPercent(exp) / 100).toFixed(1))} color={mainColor} style={styles.progressBar} />
           </View>
         </View>
       </View>
